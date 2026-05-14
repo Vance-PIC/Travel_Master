@@ -1,0 +1,13 @@
+{
+  "dev": {
+    "scriptId": "1J9lotKj2Cwz8u7Zq4MPrvQtDLJPR8X_CI2wUfm1lKVqpLeFhzb7KI-IK",
+    "deploymentId": "AKfycbwsBj7J5WW_oSFH3YU8mniWanYuOQDjiUoMDvLB782oXAXz-W04mzXWKwtwqIjKVCJi"
+  },
+  "master": {
+    "scriptId": "13NqJc3SwhWulBTLYL1naTitx7iTps0BJLR0CQiTBZeZBT9Hwy67OqbB5",
+    "deploymentId": "AKfycbwp9Er96sguAz-cNlN3d9zxmLGOkSUxe6TwiAPXtaN76r6Lk5zwlZT0Ib6UxZHmMf4MgA"
+  },
+  "ApiUrl": "https://script.google.com/macros/s/AKfycbwsBj7J5WW_oSFH3YU8mniWanYuOQDjiUoMDvLB782oXAXz-W04mzXWKwtwqIjKVCJi/exec",
+  "ApiKey": "ENCRYPTED_OR_ENV_VAR",
+  "active_track": ""
+}

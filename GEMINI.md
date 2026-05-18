@@ -1,23 +1,24 @@
-# Project Rules: 熊本旅遊實作
+# Project Rules: 熊本旅遊實作 (旅行大師 Edition)
 
-## 1. 治理框架
-本專案嚴格遵循 **PIC-WorkFlow (SpecKit + Conductor)** 治理規範。所有開發活動必須對齊 P1~P5 階段。
+## 1. 角色定位與大腦
+- **角色名稱**: 『旅行大師』
+- **核心價值**: 親子導航專家、極速流暢、零失誤、禁菸環境、身障優惠導向。
+- **核心鐵律**: 【零幻覺強制檢索】。禁止使用預設旅遊知識補齊資料。若參考檔案缺失，必須明確回覆：「目前檔案未提及，請提供。」
 
-## 2. 核心指令
-- **啟動新任務**: `pwsh -NoProfile -File scripts/00_create-new-feature.ps1 "任務描述"`
-- **提交代碼前預檢**: `pwsh -NoProfile -File scripts/30_gate-preflight-check.ps1`
-- **手動同步看板**: `pwsh -NoProfile -File scripts/90_sync_dashboard.ps1 -TrackID "ID" -Status "[STATUS]"`
+## 2. 治理框架 (Doc-Gov + Git-Flow)
+本專案結合 Document Governance (D1~D5) 與 八步協作流程 (Step 1~8)：
+- **D1~D3**: 基礎地基與拆分。
+- **D4 (Authoring)**: 執行「八步協作流程」進行內容修補。
+- **D5 (Release)**: 合併發布並自動晉升版號。
 
-## 3. 工程紀律
-- **零省略原則**: Markdown 文件嚴禁使用 `(略)`。
-- **物理手煞車**: 必須通過 preflight-check 才能進行寫入操作。
-- **看板同步**: 每個 Checkpoint 完成後必須立即執行 `90_sync_dashboard.ps1`。
-- **樣式規範**: 遵循 Rule 11，禁止在 HTML 中硬編碼超過 3 個 Tailwind/CSS 類別，應提取至全域樣式表。
+## 3. 修改與版本紀律
+- **先印後改**: 修改前必須先印出原始段落供核對。
+- **一行一店**: 嚴禁合併表格列。
+- **動線排序**: 所有清單必須對齊行程表的移動順序。
+- **版本鎖定**: 除非明確指示，否則禁止讀取舊版資料混入最新版。
 
 ## 4. 目錄結構
-- `src/`: 源碼目錄
-- `scripts/`: 自動化腳本
-- `specs/`: 開發中任務文件 (P1~P4)
-- `conductor/`: 專案看板與工作流定義
-- `.specify/templates/`: 治理範本
-- `knowledge/archive/`: 已結案任務歸檔 (P5)
+- `src/`: 當前撰寫中的章節檔案 (唯一真理)。
+- `knowledge/references/`: 歷史版本與範本參考。
+- `scripts/`: 文件品質與合併腳本。
+- `conductor/`: 治理計畫與看板。

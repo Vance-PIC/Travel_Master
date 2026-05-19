@@ -18,8 +18,9 @@
     *   [x] **WP-04: Day 2 行程精鍊** (Step 8)
     *   [x] **WP-05: Day 3 行程精鍊** (Step 8)
     *   [x] **WP-06: Day 4 行程精鍊** (Step 8)
-    *   [ ] **WP-07: Day 5 行程精鍊** (Step 7 - **IN REVIEW**)
-    *   [ ] **WP-08: Day 6 行程精鍊** (Step 0 - **PENDING**)
+    *   [x] **WP-07: Day 5 行程精鍊** (Step 8)
+    *   [ ] **WP-08: Day 6 行程精鍊** (Step 2 - **TRACKING**)
+    *   [ ] **WP-09: Day 7 行程精鍊** (Step 0 - **PENDING**)
 *   **L2 - D5: 全域整合與發布 (Release)**
 
 ---
@@ -28,8 +29,14 @@
 
 | ID | 任務章節 | 座標 | 狀態 | 審計 | 核心精鍊紀錄 |
 | :-- | :--- | :--- | :--- | :--- | :--- |
-| 07 | Day 5 和牛烤肉 | **Step 7** | [IN REVIEW] | ⏳ PENDING | 待審核：農場 14:00 撤離戰術、阿蘇車站順路打卡、Miyahara 和牛採購注入。 |
-| 08 | Day 6 神社採果 | Step 0 | [PENDING] | ⏳ PENDING | 待精鍊。 |
+| 01 | Ch1 預算戰報 | **Step 8** | [DONE] | ✅ PASS | 完成預算定錨。 |
+| 02 | Ch2 作戰中心 | **Step 8** | [DONE] | ✅ PASS | 確立全案共通守則。 |
+| 03 | Day 1 抵達熊本 | **Step 8** | [DONE] | ✅ PASS | 巴士 MapCode 與櫻町放電注入。 |
+| 04 | Day 2 熊本巡禮 | **Step 8** | [DONE] | ✅ PASS | 領車任務與 AMU 購物補完。 |
+| 05 | Day 3 樂園挑戰 | **Step 8** | [DONE] | ✅ PASS | CP值黑亭首選、鯛魚燒宵夜修正。 |
+| 06 | Day 4 挺進阿蘇 | **Step 8** | [DONE] | ✅ PASS | 新大橋與農場 10選3 策略。 |
+| 07 | Day 5 和牛烤肉 | **Step 8** | [DONE] | ✅ PASS | 動線排序修正，每餐定量 3 筆達成。 |
+| 08 | Day 6 神社採果 | **Step 2** | [TRACKING] | ⏳ PENDING | 啟動 Day 6 精鍊：聚焦阿蘇神社、參道美食與採果大慶功。 |
 | 09 | Day 7 返程機場 | Step 0 | [PENDING] | ⏳ PENDING | 待精鍊。 |
 
 ---

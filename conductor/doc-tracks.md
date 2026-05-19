@@ -17,23 +17,18 @@
     *   [x] **WP-03: Day 1 行程精鍊** (Step 8)
     *   [x] **WP-04: Day 2 行程精鍊** (Step 8)
     *   [x] **WP-05: Day 3 行程精鍊** (Step 8)
-    *   [ ] **WP-06: Day 4 行程精鍊** (Step 7 - **IN REVIEW**)
-    *   [ ] **WP-07: Day 5 行程精鍊** (Next Start)
+    *   [x] **WP-06: Day 4 行程精鍊** (Step 8)
+    *   [ ] **WP-07: Day 5 行程精鍊** (Step 7 - **IN REVIEW**)
+    *   [ ] **WP-08: Day 6 行程精鍊** (Step 0 - **PENDING**)
 *   **L2 - D5: 全域整合與發布 (Release)**
 
 ---
 
-## 🖋️ II. D micro-Tracks 實時狀態 (截至 2026-05-16)
+## 🖋️ II. D micro-Tracks 實時狀態 (截至 2026-05-18)
 
 | ID | 任務章節 | 座標 | 狀態 | 審計 | 核心精鍊紀錄 |
 | :-- | :--- | :--- | :--- | :--- | :--- |
-| 01 | Chapter 1 預算戰報 | **Step 8** | [DONE] | ✅ PASS | 預算 ¥268,066、計程車/停車明細物理拆分完成。 |
-| 02 | Chapter 2 作戰中心 | **Step 8** | [DONE] | ✅ PASS | 全行程共通守則與快速索引建立。 |
-| 03 | Day 1 抵達與櫻町 | **Step 8** | [DONE] | ✅ PASS | 貴賓室/外帶餐盒戰術、巴士淘汰西瓜卡防雷完成。 |
-| 04 | Day 2 熊本城巡禮 | **Step 8** | [DONE] | ✅ PASS | 神社介紹、15:00 魯夫銅像彈性門檻、市電時間校正。 |
-| 05 | Day 3 Greenland | **Step 8** | [DONE] | ✅ PASS | 強制發車時間、身障正本購票、水樂園泳裝規定。 |
-| 06 | Day 4 挺進阿蘇 | **Step 7** | [IN REVIEW] | ✅ PASS | **待核：Workman 補給、牧場擠牛奶時間、農場設施紅利。** |
-| 07 | Day 5 和牛烤肉 | Step 1 | [TRACKING] | ⏳ PENDING | 待精鍊。 |
+| 07 | Day 5 和牛烤肉 | **Step 7** | [IN REVIEW] | ⏳ PENDING | 待審核：農場 14:00 撤離戰術、阿蘇車站順路打卡、Miyahara 和牛採購注入。 |
 | 08 | Day 6 神社採果 | Step 0 | [PENDING] | ⏳ PENDING | 待精鍊。 |
 | 09 | Day 7 返程機場 | Step 0 | [PENDING] | ⏳ PENDING | 待精鍊。 |
 

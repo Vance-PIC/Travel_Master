@@ -19,8 +19,8 @@
     *   [x] **WP-05: Day 3 行程精鍊** (Step 8)
     *   [x] **WP-06: Day 4 行程精鍊** (Step 8)
     *   [x] **WP-07: Day 5 行程精鍊** (Step 8)
-    *   [ ] **WP-08: Day 6 行程精鍊** (Step 2 - **TRACKING**)
-    *   [ ] **WP-09: Day 7 行程精鍊** (Step 0 - **PENDING**)
+    *   [x] **WP-08: Day 6 行程精鍊** (Step 8)
+    *   [ ] **WP-09: Day 7 行程精鍊** (Step 2 - **TRACKING**)
 *   **L2 - D5: 全域整合與發布 (Release)**
 
 ---
@@ -36,8 +36,8 @@
 | 05 | Day 3 樂園挑戰 | **Step 8** | [DONE] | ✅ PASS | CP值黑亭首選、鯛魚燒宵夜修正。 |
 | 06 | Day 4 挺進阿蘇 | **Step 8** | [DONE] | ✅ PASS | 新大橋與農場 10選3 策略。 |
 | 07 | Day 5 和牛烤肉 | **Step 8** | [DONE] | ✅ PASS | 動線排序修正，每餐定量 3 筆達成。 |
-| 08 | Day 6 神社採果 | **Step 2** | [TRACKING] | ⏳ PENDING | 啟動 Day 6 精鍊：聚焦阿蘇神社、參道美食與採果大慶功。 |
-| 09 | Day 7 返程機場 | Step 0 | [PENDING] | ⏳ PENDING | 待精鍊。 |
+| 08 | Day 6 神社採果 | **Step 8** | [DONE] | ✅ PASS | 退房參拜銜接優化，HI Hirose 掃貨死線對齊。 |
+| 09 | Day 7 返程機場 | **Step 2** | [TRACKING] | ⏳ PENDING | 啟動 Day 7 終章精鍊：機場最後衝刺。 |
 
 ---
 **本看板由『旅行大師』物理更新，確保流程合規。**

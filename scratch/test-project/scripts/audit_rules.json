@@ -1,0 +1,17 @@
+[
+  {
+    "pattern": "(租車|開車|(?<!不)自駕|MapCode|Map code|汽座|加油)",
+    "description": "不自駕專案之檔案禁止包含租車、自駕、MapCode、加油等關鍵字",
+    "type": "must_not_match"
+  },
+  {
+    "pattern": "(?s)(?!.*\\| 推薦餐廳 \\|)|.*(禁菸|全店禁菸)",
+    "description": "若檔案包含美食推薦表格，則內容必須標註餐廳是否禁菸或全店禁菸",
+    "type": "must_match"
+  },
+  {
+    "pattern": "(?s)(?!.*# \\*\\*🗺️)|.*\\[🏠 返回總目錄\\]",
+    "description": "除主索引檔案外，所有行程與章節檔案必須包含 [🏠 返回總目錄] 導航超連結",
+    "type": "must_match"
+  }
+]

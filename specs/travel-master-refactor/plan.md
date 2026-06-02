@@ -215,7 +215,7 @@
 **Files:**
 - Modify: `scripts/sync-tracks.ps1`
 
-- [ ] **Step 1: 重構 `scripts/sync-tracks.ps1` 加入參數與動態看板路徑**
+- [x] **Step 1: 重構 `scripts/sync-tracks.ps1` 加入參數與動態看板路徑**
   將 `scripts/sync-tracks.ps1` 修改為支援 `-Spec` 參數，代碼如下：
   ```powershell
   # scripts/sync-tracks.ps1
@@ -295,14 +295,14 @@
   Write-Host "Sync Complete"
   ```
 
-- [ ] **Step 2: 執行同步功能測試 (以日本東西行軍行程 Day 1 設為 REVIEW 為例)**
+- [x] **Step 2: 執行同步功能測試 (以日本東西行軍行程 Day 1 設為 REVIEW 為例)**
   執行命令：
   ```powershell
   ./scripts/sync-tracks.ps1 -Spec japan-march -WP_ID 03 -Status REVIEW -Message "待安排羽田➔橫濱/秋葉原交通與弄髮行程。"
   ```
   Expected: 輸出 `Updated doc-tracks.md for Spec: japan-march, WP-03`，並且 [conductor/japan-march/doc-tracks.md](file:///C:/Home/熊本旅遊實作/conductor/japan-march/doc-tracks.md) 的 WP-03 狀態變為 `[IN REVIEW]`。
 
-- [ ] **Step 3: Git Checkpoint 4**
+- [x] **Step 3: Git Checkpoint 4**
   ```bash
   git add scripts/sync-tracks.ps1
   git commit -m "feat(scripts): add multi-spec support to sync-tracks.ps1"

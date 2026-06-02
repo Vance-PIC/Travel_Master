@@ -35,11 +35,7 @@ if ($TargetDir -eq "") {
 }
 
 if ($OutputFile -eq "") {
-    if ($Spec -eq "kumamoto") {
-        $OUTPUT_FILE = Join-Path $ROOT_DIR "specs/kumamoto/RELEASE.md"
-    } else {
-        $OUTPUT_FILE = Join-Path $ROOT_DIR "specs/$Spec/RELEASE-$Spec.md"
-    }
+    $OUTPUT_FILE = Join-Path $ROOT_DIR "specs/$Spec/RELEASE-$Spec.md"
     
     # 向後相容回退
     if (-not (Test-Path (Join-Path $ROOT_DIR "specs/$Spec"))) {

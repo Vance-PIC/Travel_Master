@@ -11,13 +11,16 @@
 
 #### **第二章：每日詳細作戰中心**
 * [02_第二章：作戰守則與快速索引](./02_DAILY_OPERATIONS.md)
-* ➔ [Day 1：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 2：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 3：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 4：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 5：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 6：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* ➔ [Day 7：[今日主題關鍵字]](./03_DAY_MISSION.md)
+* ➔ [Day 1：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 2：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 3：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 4：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 5：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 6：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* ➔ [Day 7：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+
+#### 第三章：行李準備與打包清單
+* [03_第三章：行李準備與打包清單](./03_PACKING_CHECKLIST.md)
 
 ---
 **本文件遵循 Doc-Gov 文件治理規範。**

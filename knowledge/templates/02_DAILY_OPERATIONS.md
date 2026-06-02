@@ -2,7 +2,7 @@
 
 [🏠 返回總目錄](./00_MASTER_INDEX.md)
 
-[⬅️ 上一頁 (第一章)](./01_CHAPTER_INTEL.md) | [➡️ 下一頁 (Day 1)](./03_DAY_MISSION.md)
+[⬅️ 上一頁 (第一章)](./01_CHAPTER_INTEL.md) | [➡️ 下一頁 (Day 1)](./02.X_DAY_MISSION.md)
 
 本章節將 [天數] 天行程拆解為獨立的作戰指令，包含「職人級」的時間精算、交通搭乘策略與防雷看盤安排，確保兩名大人在無車自駕的挑戰下，依然能精準掌控交易日看盤時段與硬死線。
 
@@ -21,11 +21,11 @@
 ---
 
 ### 📅 快速跳轉：每日任務
-* [Day 1：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* [Day 2：[今日主題關鍵字]](./03_DAY_MISSION.md)
-* [Day 3：[今日主題關鍵字]](./03_DAY_MISSION.md)
+* [Day 1：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* [Day 2：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
+* [Day 3：[今日主題關鍵字]](./02.X_DAY_MISSION.md)
 
 ---
-[⬅️ 上一頁 (第一章)](./01_CHAPTER_INTEL.md) | [➡️ 下一頁 (Day 1)](./03_DAY_MISSION.md)
+[⬅️ 上一頁 (第一章)](./01_CHAPTER_INTEL.md) | [➡️ 下一頁 (Day 1)](./02.X_DAY_MISSION.md)
 
 [🏠 返回總目錄](./00_MASTER_INDEX.md)

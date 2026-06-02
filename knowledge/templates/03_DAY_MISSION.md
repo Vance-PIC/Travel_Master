@@ -1,6 +1,6 @@
 ### **Day X: MM/DD (週名) 🎯 [今日主題關鍵字]**
 
-[🏠 返回總目錄](./00_Index.md)
+[🏠 返回總目錄](./00_MASTER_INDEX.md)
 
 [⬅️ 上一頁 (Day X-1)](./XX_DayX-1.md) | [➡️ 下一頁 (Day X+1)](./XX_DayX+1.md)
 
@@ -49,4 +49,4 @@
 ---
 [⬅️ 上一頁 (Day X-1)](./XX_DayX-1.md) | [➡️ 下一頁 (Day X+1)](./XX_DayX+1.md)
 
-[🏠 返回總目錄](./00_Index.md)
+[🏠 返回總目錄](./00_MASTER_INDEX.md)

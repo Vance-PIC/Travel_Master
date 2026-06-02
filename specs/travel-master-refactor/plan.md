@@ -315,7 +315,7 @@
 **Files:**
 - Modify: `scripts/merge-doc.ps1`
 
-- [ ] **Step 1: 重構 `scripts/merge-doc.ps1` 支援多行程合併**
+- [x] **Step 1: 重構 `scripts/merge-doc.ps1` 支援多行程合併**
   將 `scripts/merge-doc.ps1` 修改為支援 `-Spec` 參數，以指向新路徑 `specs/$Spec/src`，並輸出到根目錄的 `RELEASE-$Spec.md` (或熊本行程維持預設 `RELEASE.md`)。代碼如下：
   ```powershell
   # merge-doc.ps1 - Document Merger (RELEASE Edition)
@@ -411,21 +411,21 @@
   Write-Host "[成功] 已產生穩定跳轉文件: $OUTPUT_FILE" -ForegroundColor Green
   ```
 
-- [ ] **Step 2: 測試熊本行程合併**
+- [x] **Step 2: 測試熊本行程合併**
   執行命令：
   ```powershell
   ./scripts/merge-doc.ps1 -Spec kumamoto
   ```
   Expected: 成功合併並更新根目錄下的 [RELEASE.md](file:///C:/Home/熊本旅遊實作/RELEASE.md)。
 
-- [ ] **Step 3: 測試日本東西行軍行程合併**
+- [x] **Step 3: 測試日本東西行軍行程合併**
   執行命令：
   ```powershell
   ./scripts/merge-doc.ps1 -Spec japan-march
   ```
   Expected: 成功合併並在根目錄下產生 `RELEASE-japan-march.md`。
 
-- [ ] **Step 4: Git Checkpoint 5**
+- [x] **Step 4: Git Checkpoint 5**
   ```bash
   git add scripts/merge-doc.ps1
   git commit -m "feat(scripts): add multi-spec support to merge-doc.ps1"

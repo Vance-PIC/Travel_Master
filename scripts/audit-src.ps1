@@ -1,14 +1,29 @@
 # scripts/audit-src.ps1
-# [v1.4.2] Simplified English Version for Encoding Compatibility
+# [v1.5.0] Multi-Spec Support with Backward Compatibility
+
+param (
+    [string]$Spec = "kumamoto"
+)
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 $ROOT_DIR = Resolve-Path "$PSScriptRoot\.."
 $ErrorCount = 0
 
-Write-Host "--- Start Audit ---" -ForegroundColor Cyan
+Write-Host "--- Start Audit for Spec: $Spec ---" -ForegroundColor Cyan
 
-$MdFiles = Get-ChildItem -Path (Join-Path $ROOT_DIR "src") -Filter "*.md"
+# 動態定位行程 src 目錄，若 specs/ 下找不到則回退至根目錄的 src
+$SPEC_SRC_DIR = Join-Path $ROOT_DIR "specs/$Spec/src"
+if (-not (Test-Path $SPEC_SRC_DIR)) {
+    $SPEC_SRC_DIR = Join-Path $ROOT_DIR "src"
+}
+
+if (-not (Test-Path $SPEC_SRC_DIR)) {
+    Write-Host "FAIL: Source directory not found ($SPEC_SRC_DIR)" -ForegroundColor Red
+    exit 1
+}
+
+$MdFiles = Get-ChildItem -Path $SPEC_SRC_DIR -Filter "*.md"
 foreach ($file in $MdFiles) {
     $fName = $file.Name
     $content = Get-Content -Path $file.FullName -Raw -Encoding UTF8
@@ -45,7 +60,7 @@ foreach ($file in $MdFiles) {
 }
 
 if ($ErrorCount -eq 0) {
-    Write-Host "--- Audit PASS ---" -ForegroundColor Green
+    Write-Host "--- Audit PASS ($Spec) ---" -ForegroundColor Green
     exit 0
 } else {
     Write-Host "--- Audit FAILED: $ErrorCount errors ---" -ForegroundColor Red

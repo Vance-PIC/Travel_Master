@@ -14,13 +14,14 @@
 *   **L2 - D4: 內容精鍊循環 (Authoring - 執行中)**
     *   [x] **WP-01: Chapter 1 預算與戰報** (Step 8)
     *   [x] **WP-02: Chapter 2 作戰中心** (Step 8)
-    *   [x] **WP-03: Day 1 行程精鍊** (Step 8)
-    *   [x] **WP-04: Day 2 行程精鍊** (Step 8)
-    *   [x] **WP-05: Day 3 行程精鍊** (Step 8)
-    *   [x] **WP-06: Day 4 行程精鍊** (Step 8)
-    *   [x] **WP-07: Day 5 行程精鍊** (Step 8)
-    *   [x] **WP-08: Day 6 行程精鍊** (Step 8)
-    *   [x] **WP-09: Day 7 行程精鍊** (Step 8)
+    *   [x] **WP-03: Chapter 3 行李準備與打包清單** (Step 8)
+    *   [x] **WP-04: Day 1 行程精鍊** (Step 8)
+    *   [x] **WP-05: Day 2 行程精鍊** (Step 8)
+    *   [x] **WP-06: Day 3 行程精鍊** (Step 8)
+    *   [x] **WP-07: Day 4 行程精鍊** (Step 8)
+    *   [x] **WP-08: Day 5 行程精鍊** (Step 8)
+    *   [x] **WP-09: Day 6 行程精鍊** (Step 8)
+    *   [x] **WP-10: Day 7 行程精鍊** (Step 8)
 *   **L2 - D5: 全域整合與發布 (Release)**
 
 ---
@@ -31,14 +32,15 @@
 | :-- | :--- | :--- | :--- | :--- | :--- |
 | 01 | Ch1 預算戰報 | **Step 8** | [DONE] | ✅ PASS | 完成預算定錨。 |
 | 02 | Ch2 作戰中心 | **Step 8** | [DONE] | ✅ PASS | 確立全案共通守則。 |
-| 03 | Day 1 抵達熊本 | **Step 8** | [DONE] | ✅ PASS | 巴士 MapCode 與櫻町放電注入。 |
-| 04 | Day 2 熊本巡禮 | **Step 8** | [DONE] | ✅ PASS | 領車任務與 AMU 購物補完。 |
-| 05 | Day 3 樂園挑戰 | **Step 8** | [DONE] | ✅ PASS | CP值黑亭首選、鯛魚燒宵夜修正。 |
-| 06 | Day 4 挺進阿蘇 | **Step 8** | [DONE] | ✅ PASS | 新大橋與農場 10選3 策略。 |
-| 07 | Day 5 和牛烤肉 | **Step 8** | [DONE] | ✅ PASS | 動線排序修正，每餐定量 3 筆達成。 |
-| 08 | Day 6 神社採果 | **Step 8** | [DONE] | ✅ PASS | 退房參拜銜接優化，HI Hirose 掃貨死線對齊。 |
-| 09 | Day 7 返程機場 | **Step 8** | [DONE] | ✅ PASS | 完成返台動線與機場採買優化，手冊全案完工。 |
-| 10 | D5 全域整合發布 | **Step 8** | [DONE] | ✅ PASS | 全域合併完成，審計通過，已產出 RELEASE.md (v24.00)。 | 啟動全域合併與審計程序。 |
+| 03 | Ch3 行李清單 | **Step 8** | [DONE] | ✅ PASS | 補齊自駕重要證件與防雷打包守則。 |
+| 04 | Day 1 抵達熊本 | **Step 8** | [DONE] | ✅ PASS | 巴士 MapCode 與櫻町放電注入。 |
+| 05 | Day 2 熊本巡禮 | **Step 8** | [DONE] | ✅ PASS | 領車任務與 AMU 購物補完。 |
+| 06 | Day 3 樂園挑戰 | **Step 8** | [DONE] | ✅ PASS | CP值黑亭首選、鯛魚燒宵夜修正。 |
+| 07 | Day 4 挺進阿蘇 | **Step 8** | [DONE] | ✅ PASS | 新大橋與農場 10選3 策略。 |
+| 08 | Day 5 和牛烤肉 | **Step 8** | [DONE] | ✅ PASS | 動線排序修正，每餐定量 3 筆達成。 |
+| 09 | Day 6 神社採果 | **Step 8** | [DONE] | ✅ PASS | 退房參拜銜接優化，HI Hirose 掃貨死線對齊。 |
+| 10 | Day 7 返程機場 | **Step 8** | [DONE] | ✅ PASS | 完成返台動線與機場採買優化，手冊全案完工。 |
+| 11 | D5 全域整合發布 | **Step 8** | [DONE] | ✅ PASS | 全域合併完成，審計通過，已產出 RELEASE-kumamoto.md (v24.00)。 |
 
 
 ---

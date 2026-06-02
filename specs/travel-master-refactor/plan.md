@@ -439,7 +439,7 @@
 - Create: `conductor/overview.md`
 - Modify: `GEMINI.md`
 
-- [ ] **Step 1: 建立 `conductor/overview.md` 檔案**
+- [x] **Step 1: 建立 `conductor/overview.md` 檔案**
   寫入以下內容到 `conductor/overview.md`：
   ```markdown
   # 🌐 旅行大師 (Travel-Master) 專案進度總覽
@@ -459,7 +459,7 @@
   *註：進度由『旅行大師』治理機制實時定錨維護。*
   ```
 
-- [ ] **Step 2: 修訂 `GEMINI.md` 的目錄結構**
+- [x] **Step 2: 修訂 `GEMINI.md` 的目錄結構**
   更新 `GEMINI.md` 的目錄結構定義部分，與新結構保持一致：
   ```markdown
   ## 4. 目錄結構
@@ -473,7 +473,7 @@
     - `conductor/[行程代號]/`: 各行程的 WBS 看板與進度狀態。
   ```
 
-- [ ] **Step 3: Git Checkpoint 6**
+- [x] **Step 3: Git Checkpoint 6**
   ```bash
   git add conductor/overview.md GEMINI.md
   git commit -m "docs(global): add overview registry and update GEMINI.md structure"

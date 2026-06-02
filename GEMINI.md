@@ -43,7 +43,11 @@
 - **版本鎖定**: 除非明確指示，否則禁止讀取舊版資料混入最新版。
 
 ## 4. 目錄結構
-- `src/`: 當前撰寫中的章節檔案 (唯一真理)。
-- `knowledge/references/`: 歷史版本與範本參考。
-- `scripts/`: 文件品質與合併腳本。
-- `conductor/`: 治理計畫與看板。
+- `specs/[行程代號]/src/`: 各行程當前撰寫中的章節檔案 (唯一真理)。
+- `specs/[行程代號]/references/`: 各行程專屬的歷史版本與歷史行程表參考。
+- `knowledge/templates/`: 全域共享之寫作與 UAT 範本。
+- `knowledge/references/`: 全域共享之通用參考資料。
+- `scripts/`: 全域共享之自動化審計與進度同步腳本 (支援 -Spec 參數)。
+- `conductor/`: 全域共享之各行程任務進度看板。
+  - `conductor/overview.md`: 全域行程進度總覽。
+  - `conductor/[行程代號]/`: 各行程的 WBS 看板與進度狀態。

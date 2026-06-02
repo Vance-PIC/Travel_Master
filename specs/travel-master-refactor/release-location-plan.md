@@ -18,7 +18,7 @@
 **Files:**
 - Modify: `scripts/merge-doc.ps1`
 
-- [ ] **Step 1: 修改 `scripts/merge-doc.ps1` 檔名與路徑解析邏輯**
+- [x] **Step 1: 修改 `scripts/merge-doc.ps1` 檔名與路徑解析邏輯**
   將 `scripts/merge-doc.ps1` 的路徑解析區塊修改為：
   ```powershell
   if ($OutputFile -eq "") {
@@ -41,21 +41,21 @@
   }
   ```
 
-- [ ] **Step 2: 執行熊本行程合併測試**
+- [x] **Step 2: 執行熊本行程合併測試**
   執行命令：
   ```powershell
   pwsh -NoProfile -Command "chcp 65001; ./scripts/merge-doc.ps1 -Spec kumamoto"
   ```
   Expected: 成功在 `specs/kumamoto/RELEASE.md` 產生合併檔案。
 
-- [ ] **Step 3: 執行日本東西行軍行程合併測試**
+- [x] **Step 3: 執行日本東西行軍行程合併測試**
   執行命令：
   ```powershell
   pwsh -NoProfile -Command "chcp 65001; ./scripts/merge-doc.ps1 -Spec japan-march"
   ```
   Expected: 成功在 `specs/japan-march/RELEASE-japan-march.md` 產生合併檔案。
 
-- [ ] **Step 4: Git Checkpoint 1**
+- [x] **Step 4: Git Checkpoint 1**
   ```bash
   git add scripts/merge-doc.ps1 specs/kumamoto/RELEASE.md specs/japan-march/RELEASE-japan-march.md
   git commit -m "feat(scripts): output spec release files into specs subdirectory"
@@ -69,14 +69,14 @@
 - Delete: `RELEASE.md`
 - Delete: `RELEASE-japan-march.md`
 
-- [ ] **Step 1: 刪除根目錄發布手冊**
+- [x] **Step 1: 刪除根目錄發布手冊**
   執行命令：
   ```powershell
   Remove-Item -Path "RELEASE.md", "RELEASE-japan-march.md" -ErrorAction SilentlyContinue
   ```
   Expected: 根目錄下的兩個檔案已被刪除。
 
-- [ ] **Step 2: Git Checkpoint 2**
+- [x] **Step 2: Git Checkpoint 2**
   ```bash
   git rm RELEASE.md RELEASE-japan-march.md
   git commit -m "cleanup(global): remove legacy release manuals from workspace root"
@@ -90,10 +90,10 @@
 - Modify: `conductor/overview.md`
 - Modify: `specs/travel-master-refactor/release-location-plan.md` (本計畫本身打勾)
 
-- [ ] **Step 1: 修改 `conductor/overview.md` 的路徑標記**
+- [x] **Step 1: 修改 `conductor/overview.md` 的路徑標記**
   將 `conductor/overview.md` 內容中的 `已產出 RELEASE.md` 說明文字與連結更新，使其對齊新發布路徑。
 
-- [ ] **Step 2: Git Checkpoint 3**
+- [x] **Step 2: Git Checkpoint 3**
   ```bash
   git add conductor/overview.md specs/travel-master-refactor/release-location-plan.md
   git commit -m "docs(global): update overview manual locations"

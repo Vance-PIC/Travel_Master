@@ -59,7 +59,20 @@ if (-not (Test-Path $SRC_DIR)) {
     exit 1
 }
 
-$MdFiles = Get-ChildItem -Path $SRC_DIR -Filter "*.md" | Sort-Object Name
+$MdFiles = Get-ChildItem -Path $SRC_DIR -Filter "*.md" | Sort-Object {
+    $name = $_.Name
+    if ($name -match '^(\d+)\.(\d+)_') {
+        $main = [int]$matches[1]
+        $sub = [int]$matches[2]
+    } elseif ($name -match '^(\d+)_') {
+        $main = [int]$matches[1]
+        $sub = 0
+    } else {
+        $main = 99
+        $sub = 99
+    }
+    $main * 1000 + $sub
+}
 if ($MdFiles.Count -eq 0) {
     Write-Host "警告: 來源路徑中無 any Markdown 檔案。" -ForegroundColor Yellow
     exit 0

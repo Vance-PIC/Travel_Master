@@ -82,10 +82,14 @@ $FullContent = New-Object System.Text.StringBuilder
 
 foreach ($file in $MdFiles) {
     Write-Host "  - 正在處理: $($file.Name)"
-    $content = Get-Content -Path $file.FullName -Raw -Encoding UTF8
+    $content = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::UTF8)
     
-    # 取得章節編號 (例如 01, 02...)
-    if ($file.Name -match "^(\d{2})") {
+    # 取得章節編號 (例如 01, 02.01...)
+    if ($file.Name -match "^(\d{2})\.(\d{2})") {
+        $chId = "$($matches[1]).$($matches[2])"
+        # 在章節最前方插入隱形錨點
+        $content = "<div id='ch-$chId'></div>`n`n" + $content
+    } elseif ($file.Name -match "^(\d{2})") {
         $chId = $matches[1]
         # 在章節最前方插入隱形錨點
         $content = "<div id='ch-$chId'></div>`n`n" + $content
@@ -95,6 +99,7 @@ foreach ($file in $MdFiles) {
     $content = $content -replace '(?m)^.*?(上一頁|下一頁|返回總目錄).*?$', ''
 
     # 2. 連結校準 (指向穩定 ID)
+    $content = $content -replace '\.\/(\d{2})\.(\d{2})_.*\.md', '#ch-$1.$2'
     $content = $content -replace '\.\/(\d{2})_.*\.md', '#ch-$1'
     
     [void]$FullContent.AppendLine($content)

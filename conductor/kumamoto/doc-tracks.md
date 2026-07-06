@@ -33,7 +33,7 @@
 | 01 | Ch1 預算戰報 | **Step 8** | [DONE] | ✅ PASS | 完成預算定錨。 |
 | 02 | Ch2 作戰中心 | **Step 8** | [DONE] | ✅ PASS | 確立全案共通守則。 |
 | 03 | Ch3 行李清單 | **Step 8** | [DONE] | ✅ PASS | 補齊自駕重要證件與防雷打包守則。 |
-| 04 | Day 1 抵達熊本 | **Step 8** | [DONE] | ✅ PASS | 巴士 MapCode 與櫻町放電注入。 |
+| 04 | Day 1 抵達熊本 | **Step 8** | [DONE] | ✅ PASS | ⏳ PENDING | ⏳ PENDING | ✅ PASS | 巴士 MapCode 與櫻町放電注入。 |
 | 05 | Day 2 熊本巡禮 | **Step 8** | [DONE] | ✅ PASS | 領車任務與 AMU 購物補完。 |
 | 06 | Day 3 樂園挑戰 | **Step 8** | [DONE] | ✅ PASS | CP值黑亭首選、鯛魚燒宵夜修正。 |
 | 07 | Day 4 挺進阿蘇 | **Step 8** | [DONE] | ✅ PASS | 新大橋與農場 10選3 策略。 |
@@ -45,4 +45,7 @@
 
 ---
 **本看板由『旅行大師』物理更新，確保流程合規。**
+
+
+
 

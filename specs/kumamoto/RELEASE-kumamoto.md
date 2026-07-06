@@ -122,7 +122,8 @@
 | 12:10 / 12:30 | 機場巴士往市區 | 產交巴士 | 36 分 | **直達戰術**：搭快速車直達「通町筋」。巴士已淘汰西瓜卡。 |
 | 13:05 - 13:30 | 飯店寄行李 | 步行 | 3 分 | **兵分兩路**：爸爸去寄行李，媽媽帶小孩去 HAB@ 1F 買麵包墊胃。 |
 | 13:30 - 14:40 | 熊本熊部長辦公室 | 步行 | 3 分 | 鶴屋東館 1F。**13:40 前務必抵達排隊領號碼牌**，14:00 表演。 |
-| 14:40 - 16:15 | 市區逛街動線 | 步行 | - | 鶴屋本館(Dior) -> New-S 2F(3COINS) -> COCOSA 5F(無印)。 |
+| 14:40 - 15:10 | 鶴屋東館 4F (Spingle) | 步行 | 1 分 | **採購日本手工鞋**：Spingle Move 專櫃試穿購入。 |
+| 15:10 - 16:15 | 市區逛街動線 | 步行 | 2 分 | 鶴屋本館(Dior) -> New-S 2F(3COINS) -> COCOSA 5F(無印)。 |
 | 16:30 - 19:30 | Sakura Machi 櫻町 | 步行 | 8 分 | 小孩 3F namco / Pokemon Center，媽媽 2F mont-bell。 |
 | 18:30 - 19:30 | 勝烈亭 (櫻町店) | 步行 | - | **今日晚餐**：櫻町分店環境對親子友善，排隊較少。 |
 | 19:30 - 21:00 | 唐吉訶德 下通店 | 步行 | 順路 | 回程最後補貨，啟動「肯特包」搬運戰術。 |
@@ -152,6 +153,7 @@
 | 購物地點 (Google Map) | 營業時間 | 交通與相對位置 | 鎖定目標 / 備註 |
 | :--- | :--- | :--- | :--- |
 | [鶴屋百貨](https://maps.google.com/?q=Tsuruya+Department+Store) | 10:00 - 19:00 (週五六至19:30) | 通町筋站旁<br>🐾 離飯店步行 2 分 | 本館 1F Dior 等美妝櫃位補貨，退稅櫃位在東館。 |
+| [鶴屋東館 4F (Spingle)](https://maps.google.com/?q=Tsuruya+Department+Store) | 10:00 - 19:00 (週五六至19:30) | 東館 4F<br>🐾 與部長辦公室同棟 | **鎖定日本手工帆布鞋**：Spingle Move 專櫃。 |
 | [鶴屋 New-S](https://maps.google.com/?q=New-S+Tsuruya) | 10:30 - 20:00 | 下通入口處<br>🐾 離飯店步行 3 分 | 2F 3COINS+plus 質感雜貨，市區無 LOFT，在此補貨。 |
 | [COCOSA](https://maps.google.com/?q=COCOSA+Kumamoto) | 11:00 - 20:00 | 下通商店街內<br>🐾 離飯店步行 1 分 | 5F 無印良品大櫃位，生活質感雜貨，空間非常寬敞。 |
 | [SAKURA MACHI](https://maps.google.com/?q=SAKURA+MACHI+Kumamoto) | 10:00 - 20:00 | 辛島町站直通<br>🐾 離飯店步行 8 分 | 2F mont-bell 戶外用品、3F Pokemon Center 熊本唯一朝聖店。 |

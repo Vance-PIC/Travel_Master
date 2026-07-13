@@ -1,0 +1,15 @@
+{
+  "pdf_options": {
+    "format": "A4",
+    "margin": {
+      "top": "10mm",
+      "bottom": "10mm",
+      "left": "10mm",
+      "right": "10mm"
+    }
+  },
+  "launch_options": {
+    "executablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+  }
+}

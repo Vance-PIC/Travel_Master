@@ -1,4 +1,4 @@
-# scripts/audit-src.ps1
+﻿# scripts/audit-src.ps1
 # [v1.5.0] Multi-Spec Support with Backward Compatibility
 
 param (
@@ -66,3 +66,4 @@ if ($ErrorCount -eq 0) {
     Write-Host "--- Audit FAILED: $ErrorCount errors ---" -ForegroundColor Red
     exit 1
 }
+

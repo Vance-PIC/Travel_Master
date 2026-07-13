@@ -1,4 +1,4 @@
-# merge-doc.ps1 - Document Merger (RELEASE Edition)
+﻿# merge-doc.ps1 - Document Merger (RELEASE Edition)
 # [v1.5.0] Multi-Spec Document Merger
 
 param (
@@ -112,3 +112,4 @@ $finalText = $FullContent.ToString() -replace '(?m)^\s*$\n\s*$\n', "`n"
 
 Write-Host ("-" * 50)
 Write-Host "[成功] 已產生穩定跳轉文件: $OUTPUT_FILE" -ForegroundColor Green
+

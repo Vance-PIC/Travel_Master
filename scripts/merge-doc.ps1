@@ -98,6 +98,8 @@ foreach ($file in $MdFiles) {
     # 2. 連結校準 (指向穩定 ID)
     $content = $content -replace '\.\/(\d{2})\.(\d{2})_.*\.md', '#ch-$1.$2'
     $content = $content -replace '\.\/(\d{2})_.*\.md', '#ch-$1'
+    # src 內的附件連結在 RELEASE 輸出位置需少一層
+    $content = $content -replace '\.\.\/attachments\/', './attachments/'
     
     [void]$FullContent.AppendLine($content)
     [void]$FullContent.AppendLine("---")

@@ -1,28 +1,35 @@
 ﻿# merge-doc.ps1 - Document Merger (RELEASE Edition)
-# [v1.5.0] Multi-Spec Document Merger
+# [v1.6.0] Multi-Spec Document Merger & PDF Export
 
 param (
     [string]$Spec = "kumamoto",
     [string]$TargetDir = "",
-    [string]$OutputFile = ""
+    [string]$OutputFile = "",
+    [switch]$Pdf
 )
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 
 # 自適應探測根目錄
-$current = (Get-Item $PSScriptRoot)
+$ScriptPath = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ScriptPath) { $ScriptPath = (Get-Location).Path }
+
+$current = Get-Item $ScriptPath
 $ROOT_DIR = $null
 while ($current -ne $null) {
-    if ((Test-Path (Join-Path $current.FullName "conductor")) -or (Test-Path (Join-Path $current.FullName "specs"))) {
+    if ((Test-Path (Join-Path $current.FullName "specs")) -or (Test-Path (Join-Path $current.FullName "conductor"))) {
         $ROOT_DIR = $current.FullName
         break
     }
     $current = $current.Parent
 }
 if ($null -eq $ROOT_DIR) {
-    $ROOT_DIR = Resolve-Path "$PSScriptRoot\.."
+    $ROOT_DIR = Split-Path -Parent $ScriptPath
 }
+
+Write-Host "  [Debug] ScriptPath: $ScriptPath"
+Write-Host "  [Debug] ROOT_DIR: $ROOT_DIR"
 
 # 動態路徑解析
 if ($TargetDir -eq "") {
@@ -59,25 +66,15 @@ if (-not (Test-Path $SRC_DIR)) {
     exit 1
 }
 
-$MdFiles = Get-ChildItem -Path $SRC_DIR -Filter "*.md" | Sort-Object {
-    $name = $_.Name
-    if ($name -match '^(\d+)\.(\d+)_') {
-        $main = [int]$matches[1]
-        $sub = [int]$matches[2]
-    } elseif ($name -match '^(\d+)_') {
-        $main = [int]$matches[1]
-        $sub = 0
-    } else {
-        $main = 99
-        $sub = 99
-    }
-    $main * 1000 + $sub
-}
+$MdFiles = @(Get-ChildItem -LiteralPath $SRC_DIR -Filter "*.md" -File | Sort-Object -Property Name)
+Write-Host "  [Debug] Get-ChildItem 找到 $($MdFiles.Count) 個 MD 檔案"
+
 if ($MdFiles.Count -eq 0) {
     Write-Host "警告: 來源路徑中無 any Markdown 檔案。" -ForegroundColor Yellow
     exit 0
 }
 
+Write-Host "  [Debug] 排序後共 $($MdFiles.Count) 個 MD 檔案"
 $FullContent = New-Object System.Text.StringBuilder
 
 foreach ($file in $MdFiles) {
@@ -103,13 +100,30 @@ foreach ($file in $MdFiles) {
     $content = $content -replace '\.\/(\d{2})_.*\.md', '#ch-$1'
     
     [void]$FullContent.AppendLine($content)
-    [void]$FullContent.AppendLine("`n---`n")
+    [void]$FullContent.AppendLine("---")
 }
 
-# 3. 寫入檔案
-$finalText = $FullContent.ToString() -replace '(?m)^\s*$\n\s*$\n', "`n"
+# 3. 寫入檔案 (直接寫入，不做額外 regex 處理)
+$finalText = $FullContent.ToString()
+Write-Host "  [Debug] StringBuilder 總字元數: $($finalText.Length)"
 [System.IO.File]::WriteAllText($OUTPUT_FILE, $finalText, $OutputEncoding)
 
 Write-Host ("-" * 50)
 Write-Host "[成功] 已產生穩定跳轉文件: $OUTPUT_FILE" -ForegroundColor Green
 
+# 4. PDF 轉換 (當指定 -Pdf 參數時)
+if ($Pdf) {
+    Write-Host "`n[PDF] 正在啟動 md-to-pdf 轉檔作業..." -ForegroundColor Cyan
+    $PdfFile = $OUTPUT_FILE -replace '\.md$', '.pdf'
+    
+    try {
+        npx -y md-to-pdf "$OUTPUT_FILE"
+        if (Test-Path $PdfFile) {
+            Write-Host "[成功] 已成功產生 PDF 文件: $PdfFile" -ForegroundColor Green
+        } else {
+            Write-Host "[失敗] 轉換完成，但未發現 PDF 檔案: $PdfFile" -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "錯誤: 執行 md-to-pdf 轉檔時發生例外: $_" -ForegroundColor Red
+    }
+}

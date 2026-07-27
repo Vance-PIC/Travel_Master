@@ -379,6 +379,7 @@
 | Greenland 樂園禮品店 | [[Greenland 樂園](https://maps.google.com/?q=Greenland+Kumamoto)] | 配合樂園營業時間 | 樂園出口旁 | 推薦 Greenland 樂園限定商品。 | ⭐⭐⭐⭐☆ | 15:30 後安排購買，16:00 計畫離園。 |
 | 無印良品 | [[ゆめタウンシティモール 1F](https://maps.google.com/?q=MUJI+Youme+Town+City+Mall+Arao)] | 10:00 - 20:00 | Greenland 車程約 3–5 分 | 固定行程；推薦收納、零食、旅行用品。 | ⭐⭐⭐⭐⭐ | 16:00 離園後先逛；若找不到指定商品，再把 COCOSA 熊本無印列為後續備案。 |
 | Standard Products | [[ゆめタウンシティモール 1F](https://maps.google.com/?q=Standard+Products+Youme+Town+City+Mall+Arao)] | 10:00 - 20:00 | 與無印良品同層 | 推薦高 CP 值生活、居家用品。 | ⭐⭐⭐⭐⭐ | 無印後接著逛，17:00 離開商場返回熊本市區。 |
+| 無印良品（大型店備案） | [[COCOSA 熊本下通 4F](https://maps.google.com/?q=MUJI+COCOSA+Kumamoto)] | 11:00 - 20:00 | COCOSA 4F<br>🐾 離 OMO5 步行約 1 分 | 熊本縣內大型店，商品較多；推薦補找ゆめタウン缺貨的指定商品。 | ⭐⭐⭐☆☆ | ゆめタウン無印找不到想買的商品時才去；不列固定行程，並於 20:00 關門前完成。 |
 | 唐吉訶德 | [[熊本下通店](https://maps.google.com/?q=Don+Quijote+Shimotori+Kumamoto)] | 24 小時營業 | 下通商店街內<br>🐾 離 OMO5 步行約 5 分 | 固定行程；推薦零食、玩具、扭蛋、藥妝與伴手禮。 | ⭐⭐⭐⭐⭐ | 20:15–21:00 依清單採買，21:00 準時離開。 |
 
 #### **🏟️ 推薦景點表**

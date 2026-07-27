@@ -200,13 +200,21 @@
 
 #### **🛍️ 今日購物攻略**
 
-| 購物地點 (Google Map) | 營業時間 | 交通與相對位置 | 鎖定目標 / 備註 |
-| :--- | :--- | :--- | :--- |
-| [[鶴屋百貨](https://maps.google.com/?q=Tsuruya+Department+Store)] | 10:00 - 19:00 (週五六至19:30) | 通町筋站旁<br>🐾 離飯店步行 2 分 | 本館 1F Dior 等美妝櫃位補貨，退稅櫃位在東館。|
-| [[鶴屋東館 4F (Spingle)](https://maps.google.com/?q=Tsuruya+Department+Store)] | 10:00 - 19:00 (週五六至19:30) | 東館 4F 與部長辦公室同棟<br>🐾 離飯店步行 3 分 | 鎖定日本手工帆布鞋：Spingle Move 專櫃。|
-| [[鶴屋 New-S](https://maps.google.com/?q=New-S+Tsuruya)] | 10:30 - 20:00 | 下通入口處<br>🐾 離飯店步行 3 分 | 2F 3COINS+plus 質感雜貨，市區無 LOFT，在此補貨。|
-| [[COCOSA](https://maps.google.com/?q=COCOSA+Kumamoto)] | 11:00 - 20:00 | 下通商店街內<br>🐾 離飯店步行 1 分 | D1非必去：僅在有餘裕或媽媽仍需補看ASICS時前往ABC-MART SPORTS；4F無印留待Day 3討論。|
-| [[SAKURA MACHI](https://maps.google.com/?q=SAKURA+MACHI+Kumamoto)] | 10:00 - 20:00 | 辛島町站直通<br>🐾 離飯店步行 8 分 | 2F mont-bell、熊本熊 Village、namco／あそびパーク PLUS。|
+> 排序原則：先依當日實際路線排列，同一地點再按星等由高到低。  
+> 優先度：⭐⭐⭐⭐⭐＝必逛｜⭐⭐⭐⭐☆＝順路逛｜⭐⭐⭐☆☆＝有時間再逛
+
+| 路線順序 | 購物地點 (Google Map) | 營業時間 | 交通與相對位置 | 鎖定目標 / 備註 | 優先 | 推薦購買 | 現場策略 |
+| :---: | :--- | :--- | :--- | :--- | :---: | :--- | :--- |
+| 1 | [[HAB@](https://maps.google.com/?q=HAB+Kumamoto)] | 店家多約 10:00 - 20:00 | OMO5 同棟<br>🐾 離飯店步行 1 分 | Standard Products 高 CP 值生活雜貨。 | ⭐⭐⭐⭐☆ | 生活、居家用品 | 12:30 寄行李或 16:00 回飯店時順逛；時間緊就不壓縮熊本熊表演。 |
+| 2 | [[鶴屋東館 4F (Spingle)](https://maps.google.com/?q=Tsuruya+Department+Store)] | 10:00 - 19:00 (週五六至19:30) | 東館 4F，與熊本熊廣場同棟<br>🐾 離飯店步行 3 分 | 鎖定日本手工鞋 Spingle；爸爸於熊本熊表演期間分頭試穿。 | ⭐⭐⭐⭐⭐ | 爸爸鞋子 | 13:00–14:30 必逛，優先確認尺寸與款式。 |
+| 3 | [[鶴屋百貨](https://maps.google.com/?q=Tsuruya+Department+Store)] | 10:00 - 19:00 (週五六至19:30) | 通町筋站旁<br>🐾 離飯店步行 2 分 | 本館 1F Dior／SK-II／Albion 等美妝櫃位；退稅櫃位在東館。 | ⭐⭐⭐⭐⭐ | 媽媽保養品 | 15:15–15:45 必逛，集中補貨並辦理退稅。 |
+| 4 | [[鶴屋 New-S](https://maps.google.com/?q=New-S+Tsuruya)] | 10:30 - 20:00 | 下通入口處<br>🐾 離飯店步行 3 分 | 2F 3COINS+plus 質感雜貨；市區無 LOFT，可在此補貨。 | ⭐⭐⭐⭐⭐ | 居家、旅行用品 | 媽媽逛彩妝時，爸爸帶孩子分組購物。 |
+| 5 | [[COCOSA](https://maps.google.com/?q=COCOSA+Kumamoto)] | 11:00 - 20:00 | 下通商店街內<br>🐾 離飯店步行 1 分 | 4F MUJI；若媽媽仍需補看 ASICS，可順逛 ABC-MART SPORTS。 | ⭐⭐⭐☆☆ | 收納、零食、旅行用品 | 純加分行程；時間不足直接略過，最晚 16:00 回 OMO5。 |
+| 6 | [[下通商店街](https://maps.google.com/?q=Shimotori+Shopping+Street+Kumamoto)] | 店家多約 10:00 - 20:00 | OMO5 往 SAKURA MACHI 的步行路線<br>🐾 飯店下樓即達 | 藥妝店比價；沿途留意熊本限定特色小店。 | ⭐⭐⭐⭐☆ | 藥妝、熊本限定商品 | 16:30 後前往櫻町時邊走邊看；價格漂亮才買，不特別繞路。 |
+| 7 | [[SAKURA MACHI Kumamon Village](https://maps.google.com/?q=SAKURA+MACHI+Kumamoto)] | 10:00 - 20:00 | SAKURA MACHI 2F，辛島町站直通<br>🐾 離飯店步行 8 分 | Kumamon Village 熊本限定商品。 | ⭐⭐⭐⭐⭐ | 熊本限定商品 | 抵達商場後優先完成，再進行其他購物。 |
+| 8 | [[SAKURA MACHI mont-bell](https://maps.google.com/?q=mont-bell+SAKURA+MACHI+Kumamoto)] | 10:00 - 20:00 | SAKURA MACHI 2F<br>🐾 離飯店步行 8 分 | mont-bell 戶外用品與日本限定品項。 | ⭐⭐⭐⭐⭐ | 戶外用品 | 17:40 前完成，鎖定目標後快速選購。 |
+| 9 | [[namco SAKURA MACHI](https://maps.google.com/?q=namco+SAKURA+MACHI+Kumamoto)] | 10:00 - 20:00 | SAKURA MACHI 3F<br>🐾 離飯店步行 8 分 | namco 與官方扭蛋店；未滿 16 歲於 18:00 後須由保護者陪同。 | ⭐⭐⭐⭐☆ | 小朋友娛樂、扭蛋 | 行程已排 17:40–18:25；18:25 準時離開前往晚餐。 |
+| 10 | [[SAKURA MACHI DAISO](https://maps.google.com/?q=DAISO+SAKURA+MACHI+Kumamoto)] | 10:00 - 20:00 | SAKURA MACHI 內<br>🐾 離飯店步行 8 分 | 百元生活用品與旅行補給。 | ⭐⭐⭐⭐☆ | 百元商品 | 同為四星但未排固定時段；只有 namco 結束前仍有餘裕才逛。 |
 
 #### **🏟️ 推薦景點表**
 

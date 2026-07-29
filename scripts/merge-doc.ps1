@@ -100,6 +100,13 @@ foreach ($file in $MdFiles) {
     $content = $content -replace '\.\/(\d{2})_.*\.md', '#ch-$1'
     # src 內的附件連結在 RELEASE 輸出位置需少一層
     $content = $content -replace '\.\.\/attachments\/', './attachments/'
+
+    # 依表頭加入 PDF 排版用類型標記，讓不同用途的表格可使用各自的欄寬
+    $content = $content -replace '(\| 抵達-離開時間 \| 地點 / 活動 \| 交通方式 \| 距離/時間 \| 重點摘要 \|)', "<div class='table-itinerary'></div>`n`n`$1"
+    $content = $content -replace '(\| 餐 \| 推薦餐廳 \(Google Map\) \| 營業時間 / 評分 \| 交通與距離 \| 特色與防雷備註 \|)', "<div class='table-food'></div>`n`n`$1"
+    $content = $content -replace '(\| 專櫃／店家 \| 地點 \(Google Map\) \| 營業時間 \| 交通與相對位置 \| 目標與推薦購買 \| 優先 \| 現場策略與備註 \|)', "<div class='table-shopping'></div>`n`n`$1"
+    $content = $content -replace '(\| 景點名稱 \(Google Map\) \| 營業時間 / 門票 \| 交通與相對位置 \| 親子亮點 / 防雷備註 \|)', "<div class='table-attractions'></div>`n`n`$1"
+    $content = $content -replace '(\| 類別 \| 項目名稱 \| 估算金額 \(日圓\) \| 備註說明 \|)', "<div class='table-budget'></div>`n`n`$1"
     
     [void]$FullContent.AppendLine($content)
     [void]$FullContent.AppendLine("---")
@@ -117,9 +124,16 @@ Write-Host "[成功] 已產生穩定跳轉文件: $OUTPUT_FILE" -ForegroundColor
 if ($Pdf) {
     Write-Host "`n[PDF] 正在啟動 md-to-pdf 轉檔作業..." -ForegroundColor Cyan
     $PdfFile = $OUTPUT_FILE -replace '\.md$', '.pdf'
+    $ConfigFile = Join-Path (Split-Path -Parent $OUTPUT_FILE) "md-to-pdf.config.json"
     
     try {
-        npx -y md-to-pdf "$OUTPUT_FILE"
+        if (Test-Path $ConfigFile) {
+            Write-Host "  - 使用設定檔: $ConfigFile"
+            npx -y md-to-pdf "$OUTPUT_FILE" --config-file "$ConfigFile"
+        } else {
+            Write-Host "  - 未發現設定檔，使用 md-to-pdf 預設值"
+            npx -y md-to-pdf "$OUTPUT_FILE"
+        }
         if (Test-Path $PdfFile) {
             Write-Host "[成功] 已成功產生 PDF 文件: $PdfFile" -ForegroundColor Green
         } else {

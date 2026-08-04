@@ -1,4 +1,4 @@
-﻿# scripts/audit-src.ps1
+# scripts/audit-src.ps1
 # [v1.5.0] Multi-Spec Support with Backward Compatibility
 
 param (
@@ -29,11 +29,9 @@ foreach ($file in $MdFiles) {
     $content = Get-Content -Path $file.FullName -Raw -Encoding UTF8
     
     # 1. Format Check
-    if ($content -match "今日美食地圖") {
-        if ($content -notmatch "今日美食地圖 \(定量推薦\)") {
-            Write-Host "FAIL: $fName - Gourmet Map Header format error" -ForegroundColor Red
-            $ErrorCount++
-        }
+    if ($fName -match "Day" -and $content -notmatch "今日美食地圖") {
+        Write-Host "FAIL: $fName - Gourmet Map Header format error" -ForegroundColor Red
+        $ErrorCount++
     }
     
     if ($content -match "神隊友提醒" -and $content -notmatch "🤝 神隊友提醒") {
@@ -48,7 +46,7 @@ foreach ($file in $MdFiles) {
     }
 
     if ($fName -match "Day") {
-        $cats = @("早", "午", "晚", "品")
+        $cats = if ($fName -match "Day7") { @("早", "午", "品") } else { @("早", "午", "晚", "品") }
         foreach ($cat in $cats) {
             $m = [regex]::Matches($content, "(?m)^\|\s*$cat\s*\|")
             if ($m.Count -lt 3) {

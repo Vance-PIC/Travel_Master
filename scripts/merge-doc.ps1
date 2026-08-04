@@ -1,4 +1,4 @@
-﻿# merge-doc.ps1 - Document Merger (RELEASE Edition)
+# merge-doc.ps1 - Document Merger (RELEASE Edition)
 # [v1.6.0] Multi-Spec Document Merger & PDF Export
 
 param (
@@ -129,11 +129,74 @@ if ($Pdf) {
     try {
         if (Test-Path $ConfigFile) {
             Write-Host "  - 使用設定檔: $ConfigFile"
-            npx -y md-to-pdf "$OUTPUT_FILE" --config-file "$ConfigFile"
         } else {
-            Write-Host "  - 未發現設定檔，使用 md-to-pdf 預設值"
-            npx -y md-to-pdf "$OUTPUT_FILE"
+            Write-Host "  - 未發現設定檔"
         }
+        
+        $npxCacheDir = Join-Path $env:LOCALAPPDATA "npm-cache\_npx"
+        $nodeModulesDir = ""
+        if (Test-Path $npxCacheDir) {
+            $latestFolder = Get-ChildItem $npxCacheDir -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            if ($latestFolder) {
+                $candidate = Join-Path $latestFolder.FullName "node_modules"
+                if (Test-Path $candidate) { $nodeModulesDir = $candidate }
+            }
+        }
+
+        if ($nodeModulesDir) {
+            $env:NODE_PATH = $nodeModulesDir
+            $escapedMdPath = $OUTPUT_FILE.Replace('\', '/')
+            $escapedPdfPath = $PdfFile.Replace('\', '/')
+            $escapedConfigPath = $ConfigFile.Replace('\', '/')
+
+            $nodeScript = @"
+const puppeteer = require('puppeteer-core');
+const fs = require('fs');
+const marked = require('marked');
+
+(async () => {
+  try {
+    const mdPath = '$escapedMdPath';
+    const pdfPath = '$escapedPdfPath';
+    const configPath = '$escapedConfigPath';
+    
+    let customCss = '';
+    if (fs.existsSync(configPath)) {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      customCss = config.css || '';
+    }
+
+    const browser = await puppeteer.launch({
+      executablePath: 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    const page = await browser.newPage();
+    const md = fs.readFileSync(mdPath, 'utf8');
+    
+    const htmlContent = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' + customCss + '</style></head><body>' + marked.parse(md) + '</body></html>';
+
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.pdf({
+      path: pdfPath,
+      format: 'A4',
+      margin: { top: '12mm', bottom: '12mm', left: '12mm', right: '12mm' },
+      printBackground: true
+    });
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+})();
+"@
+            $tempJs = Join-Path $env:TEMP "render_pdf_temp.cjs"
+            Set-Content -Path $tempJs -Value $nodeScript -Encoding UTF8
+            node $tempJs
+            if (Test-Path $tempJs) { Remove-Item $tempJs -Force }
+        } else {
+            npx -y md-to-pdf "$OUTPUT_FILE" --config-file "$ConfigFile"
+        }
+
         if (Test-Path $PdfFile) {
             Write-Host "[成功] 已成功產生 PDF 文件: $PdfFile" -ForegroundColor Green
         } else {

@@ -150,8 +150,21 @@ if ($Pdf) {
             $escapedConfigPath = $ConfigFile.Replace('\', '/')
 
             $nodeScript = @"
-const puppeteer = require('puppeteer-core');
+const path = require('path');
 const fs = require('fs');
+
+if (process.env.NODE_PATH) {
+  module.paths.push(process.env.NODE_PATH);
+}
+const npxDir = path.join(process.env.LOCALAPPDATA || '', 'npm-cache', '_npx');
+if (fs.existsSync(npxDir)) {
+  fs.readdirSync(npxDir).forEach(f => {
+    const candidate = path.join(npxDir, f, 'node_modules');
+    if (fs.existsSync(candidate)) module.paths.push(candidate);
+  });
+}
+
+const puppeteer = require('puppeteer-core');
 const marked = require('marked');
 
 (async () => {
@@ -161,26 +174,36 @@ const marked = require('marked');
     const configPath = '$escapedConfigPath';
     
     let customCss = '';
+    let pdfMargin = { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' };
     if (fs.existsSync(configPath)) {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       customCss = config.css || '';
+      if (config.pdf_options && config.pdf_options.margin) {
+        pdfMargin = config.pdf_options.margin;
+      }
     }
+    const mdDir = path.dirname(mdPath).replace(/\\/g, '/');
+    const baseHref = 'file:///' + mdDir + '/';
+    customCss += '\n img { max-width: 100% !important; height: auto !important; border-radius: 8px; margin: 12px 0; display: block; }';
 
     const browser = await puppeteer.launch({
       executablePath: 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--allow-file-access-from-files']
     });
     const page = await browser.newPage();
-    const md = fs.readFileSync(mdPath, 'utf8');
-    
-    const htmlContent = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' + customCss + '</style></head><body>' + marked.parse(md) + '</body></html>';
+    page.setDefaultNavigationTimeout(0);
+    page.setDefaultTimeout(0);
 
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const htmlContent = '<!DOCTYPE html><html><head><meta charset="utf-8"><base href="' + baseHref + '"><style>' + customCss + '</style></head><body>' + marked.parse(md) + '</body></html>';
+
+    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded', timeout: 0 });
     await page.pdf({
       path: pdfPath,
       format: 'A4',
-      margin: { top: '12mm', bottom: '12mm', left: '12mm', right: '12mm' },
-      printBackground: true
+      margin: pdfMargin,
+      printBackground: true,
+      timeout: 0
     });
     await browser.close();
   } catch (e) {
@@ -192,7 +215,13 @@ const marked = require('marked');
             $tempJs = Join-Path $env:TEMP "render_pdf_temp.cjs"
             Set-Content -Path $tempJs -Value $nodeScript -Encoding UTF8
             node $tempJs
+            $nodeResult = $LASTEXITCODE
             if (Test-Path $tempJs) { Remove-Item $tempJs -Force }
+
+            if ($nodeResult -ne 0) {
+                Write-Host "[失敗] Node 轉檔程式回傳錯誤碼 $nodeResult" -ForegroundColor Red
+                return
+            }
         } else {
             npx -y md-to-pdf "$OUTPUT_FILE" --config-file "$ConfigFile"
         }

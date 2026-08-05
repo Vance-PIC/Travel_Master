@@ -1,5 +1,5 @@
-# merge-doc.ps1 - Document Merger (RELEASE Edition)
-# [v1.6.0] Multi-Spec Document Merger & PDF Export
+﻿# merge-doc.ps1 - Document Merger (RELEASE Edition)
+# [v1.7.2] Multi-Spec Document Merger & PDF Export (Option C: Cover Image Only)
 
 param (
     [string]$Spec = "kumamoto",
@@ -31,18 +31,22 @@ if ($null -eq $ROOT_DIR) {
 Write-Host "  [Debug] ScriptPath: $ScriptPath"
 Write-Host "  [Debug] ROOT_DIR: $ROOT_DIR"
 
-# 動態路徑解析
+# 動態路徑解析與 Windows 相容性正規化
 if ($TargetDir -eq "") {
-    $SRC_DIR = Join-Path $ROOT_DIR "specs/$Spec/src"
+    $SRC_DIR = (Join-Path $ROOT_DIR "specs/$Spec/src").Replace('/', '\')
     if (-not (Test-Path $SRC_DIR)) {
         $SRC_DIR = Join-Path $ROOT_DIR "src"
     }
 } else {
-    $SRC_DIR = Join-Path $ROOT_DIR $TargetDir
+    $SRC_DIR = (Join-Path $ROOT_DIR $TargetDir).Replace('/', '\')
+}
+
+if (Test-Path $SRC_DIR) {
+    $SRC_DIR = (Get-Item $SRC_DIR).FullName
 }
 
 if ($OutputFile -eq "") {
-    $OUTPUT_FILE = Join-Path $ROOT_DIR "specs/$Spec/RELEASE-$Spec.md"
+    $OUTPUT_FILE = (Join-Path $ROOT_DIR "specs/$Spec/RELEASE-$Spec.md").Replace('/', '\')
     
     # 向後相容回退
     if (-not (Test-Path (Join-Path $ROOT_DIR "specs/$Spec"))) {
@@ -53,7 +57,7 @@ if ($OutputFile -eq "") {
         }
     }
 } else {
-    $OUTPUT_FILE = Join-Path $ROOT_DIR $OutputFile
+    $OUTPUT_FILE = (Join-Path $ROOT_DIR $OutputFile).Replace('/', '\')
 }
 
 Write-Host "`n[Merge] 啟動穩定錨點合併程序 (v25.00)..." -ForegroundColor Cyan
@@ -66,7 +70,7 @@ if (-not (Test-Path $SRC_DIR)) {
     exit 1
 }
 
-$MdFiles = @(Get-ChildItem -LiteralPath $SRC_DIR -Filter "*.md" -File | Sort-Object -Property Name)
+$MdFiles = @(Get-ChildItem -Path $SRC_DIR -Filter "*.md" | Where-Object { -not $_.PSIsContainer } | Sort-Object -Property @{ Expression = { $_.Name -replace '^(\d{2})_', '$1.00_' } })
 Write-Host "  [Debug] Get-ChildItem 找到 $($MdFiles.Count) 個 MD 檔案"
 
 if ($MdFiles.Count -eq 0) {
@@ -100,6 +104,9 @@ foreach ($file in $MdFiles) {
     $content = $content -replace '\.\/(\d{2})_.*\.md', '#ch-$1'
     # src 內的附件連結在 RELEASE 輸出位置需少一層
     $content = $content -replace '\.\.\/attachments\/', './attachments/'
+
+    # 3. 僅保留首頁封面圖 (cover.jpg)，移除各章節頭部插圖 (ch1.jpg, ch2.jpg, ch3.jpg 等)
+    $content = $content -replace '(?m)^!\[.*\]\(\./images/(?!cover\.)[^)]+\)\s*$', ''
 
     # 依表頭加入 PDF 排版用類型標記，讓不同用途的表格可使用各自的欄寬
     $content = $content -replace '(\| 抵達-離開時間 \| 地點 / 活動 \| 交通方式 \| 距離/時間 \| 重點摘要 \|)', "<div class='table-itinerary'></div>`n`n`$1"
@@ -168,6 +175,7 @@ const puppeteer = require('puppeteer-core');
 const marked = require('marked');
 
 (async () => {
+  let tempHtmlPath = '';
   try {
     const mdPath = '$escapedMdPath';
     const pdfPath = '$escapedPdfPath';
@@ -182,9 +190,14 @@ const marked = require('marked');
         pdfMargin = config.pdf_options.margin;
       }
     }
-    const mdDir = path.dirname(mdPath).replace(/\\/g, '/');
-    const baseHref = 'file:///' + mdDir + '/';
-    customCss += '\n img { max-width: 100% !important; height: auto !important; border-radius: 8px; margin: 12px 0; display: block; }';
+    const mdDir = path.dirname(mdPath);
+    customCss += '\n img { max-width: 100% !important; height: auto !important; border-radius: 8px; margin: 12px auto; display: block; }';
+
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const htmlContent = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' + customCss + '</style></head><body>' + marked.parse(md) + '</body></html>';
+
+    tempHtmlPath = path.join(mdDir, 'temp_render_document.html');
+    fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
 
     const browser = await puppeteer.launch({
       executablePath: 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe',
@@ -194,10 +207,8 @@ const marked = require('marked');
     page.setDefaultNavigationTimeout(0);
     page.setDefaultTimeout(0);
 
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const htmlContent = '<!DOCTYPE html><html><head><meta charset="utf-8"><base href="' + baseHref + '"><style>' + customCss + '</style></head><body>' + marked.parse(md) + '</body></html>';
-
-    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded', timeout: 0 });
+    const tempUrl = 'file:///' + tempHtmlPath.replace(/\\\\/g, '/');
+    await page.goto(tempUrl, { waitUntil: 'networkidle0', timeout: 0 });
     await page.pdf({
       path: pdfPath,
       format: 'A4',
@@ -209,6 +220,10 @@ const marked = require('marked');
   } catch (e) {
     console.error(e);
     process.exit(1);
+  } finally {
+    if (tempHtmlPath && fs.existsSync(tempHtmlPath)) {
+      try { fs.unlinkSync(tempHtmlPath); } catch (_) {}
+    }
   }
 })();
 "@

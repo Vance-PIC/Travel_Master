@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight Tracker &amp; Price Analyzer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: '#3b82f6',
+          darkbg: '#0f172a',
+          cardbg: '#1e293b',
+          borderbg: '#334155',
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    background:
+      radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .16), transparent 30rem),
+      radial-gradient(circle at 88% 0%, rgba(14, 165, 233, .08), transparent 28rem),
+      #0b1220;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    min-width: 320px;
+  }
+  .app-shell { width: min(100% - 2rem, 1500px); margin-inline: auto; }
+  .glass-header { background: rgba(11, 18, 32, .88); backdrop-filter: blur(14px); }
+  .tab-btn { color: #94a3b8; transition: all .18s ease; white-space: nowrap; }
+  .tab-btn:hover { color: #e2e8f0; background: rgba(51, 65, 85, .45); }
+  .tab-btn.active { background-color: rgba(59, 130, 246, .16); color: #60a5fa; box-shadow: inset 0 -2px #3b82f6; }
+  .settings-subtab-btn { border: 1px solid #334155; }
+  .settings-subtab-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+  .settings-subtab { margin-bottom: 5rem; }
+  .panel { background: rgba(30, 41, 59, .78); border: 1px solid rgba(71, 85, 105, .55); border-radius: 1rem; box-shadow: 0 18px 45px rgba(2, 6, 23, .16); }
+  .field-label { display: block; color: #94a3b8; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .45rem; }
+  .control-field { min-height: 2.7rem; border-radius: .7rem; border: 1px solid #334155; background: #0f172a; padding: .55rem .75rem; color: #e2e8f0; }
+  .control-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, .12); }
+  .destination-chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .destination-chip > span { display: flex; align-items: center; gap: .5rem; min-width: 8.5rem; padding: .7rem .85rem; border-radius: .75rem; border: 1px solid #334155; background: rgba(15, 23, 42, .7); color: #94a3b8; cursor: pointer; transition: all .16s ease; }
+  .destination-chip > span::before { content: ''; width: .48rem; height: .48rem; border-radius: 999px; background: #475569; }
+  .destination-chip input:checked + span { border-color: rgba(59, 130, 246, .65); background: rgba(59, 130, 246, .13); color: #dbeafe; }
+  .destination-chip input:checked + span::before { background: #60a5fa; box-shadow: 0 0 0 4px rgba(59, 130, 246, .13); }
+  .page-title { font-size: 1.45rem; font-weight: 700; color: #f8fafc; }
+  .page-subtitle { color: #94a3b8; font-size: .88rem; margin-top: .3rem; }
+  .metric-card { padding: 1rem; border-radius: .9rem; border: 1px solid rgba(71, 85, 105, .5); background: rgba(15, 23, 42, .55); }
+  .metric-value { margin-top: .35rem; font-size: 1.45rem; font-weight: 700; color: #f8fafc; }
+  .data-table thead { background: rgba(15, 23, 42, .72); }
+  .data-table th { position: sticky; top: 0; z-index: 1; padding: .7rem .75rem; color: #94a3b8; font-size: .72rem; letter-spacing: .04em; text-align: left; white-space: nowrap; }
+  .data-table td { padding: .75rem; border-top: 1px solid rgba(51, 65, 85, .55); vertical-align: middle; }
+  .data-table tbody tr:hover { background: rgba(51, 65, 85, .22); }
+  .best-row { background: linear-gradient(90deg, rgba(16, 185, 129, .11), transparent 55%); }
+  .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: .25rem .55rem; font-size: .7rem; font-weight: 700; white-space: nowrap; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary .chevron { transition: transform .18s ease; }
+  details[open] > summary .chevron { transform: rotate(180deg); }
+  .console-line.warn { color: #fbbf24; }
+  .console-line.warning { color: #fbbf24; }
+  .console-line.error { color: #f87171; }
+  .console-line.info { color: #94a3b8; }
+  #console { font-family: 'JetBrains Mono', monospace; scrollbar-color: #334155 transparent; }
+  .flight-card.excluded { opacity: 0.4; }
+  @media (max-width: 760px) {
+    .app-shell { width: min(100% - 1rem, 1500px); }
+    .desktop-status-label { display: none; }
+    .destination-chip > span { min-width: calc(50vw - 1.5rem); }
+    .data-table th, .data-table td { padding: .65rem .55rem; }
+  }
+</style>
+
+<div class="min-h-screen">
+  <header class="glass-header sticky top-0 z-30 border-b border-borderbg/70">
+    <div class="app-shell py-4 flex items-center justify-between gap-4">
+      <h1 class="text-lg font-bold flex items-center gap-3">
+        <span class="w-9 h-9 rounded-xl bg-blue-500/15 text-brand flex items-center justify-center"><i class="fa-solid fa-plane"></i></span>
+        <span><span class="hidden sm:inline">Flight Tracker </span><span class="text-slate-500">&amp;</span> Price Analyzer</span>
+      </h1>
+      <div id="status-badge" class="badge bg-slate-800 text-slate-400">狀態載入中...</div>
+    </div>
+  </header>
+
+  <nav class="glass-header sticky top-[73px] z-20 border-b border-borderbg/70">
+    <div class="app-shell flex gap-1 overflow-x-auto py-2">
+      <button data-tab="control" class="tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-gauge-high mr-2"></i>主控台</button>
+      <button data-tab="flights" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-route mr-2"></i>航班決策</button>
+      <button data-tab="matrix" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-chart-simple mr-2"></i>航點評比</button>
+      <button data-tab="db" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-database mr-2"></i>資料庫</button>
+      <button data-tab="ai" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>AI 顧問</button>
+      <button data-tab="settings" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold"><i class="fa-solid fa-sliders mr-2"></i>設定</button>
+    </div>
+  </nav>
+
+  <main class="app-shell py-8">
+    <!-- Control Center -->
+    <section id="tab-control" class="tab-panel space-y-6">
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div><h2 class="page-title">開始航班追蹤</h2><p class="page-subtitle">選好航點與條件後，系統會依序確認航班並更新最新票價。</p></div>
+          <span id="execution-mode-label" class="badge bg-emerald-500/10 text-emerald-400"><i class="fa-solid fa-circle text-[6px] mr-2"></i>真實資料模式</span>
+        </div>
+      </div>
+
+      <div class="panel p-5 lg:p-6">
+        <div class="grid gap-6 lg:grid-cols-[1.25fr_1fr]">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div><span class="text-xs font-bold text-brand">STEP 1</span><h3 class="font-semibold mt-1">選擇目標航點</h3></div>
+              <div class="flex gap-2 text-xs"><button id="select-all-destinations" class="text-blue-400 hover:text-blue-300">全選</button><span class="text-slate-600">/</span><button id="clear-all-destinations" class="text-slate-400 hover:text-white">清除</button></div>
+            </div>
+            <div id="control-destinations" class="grid grid-cols-2 xl:grid-cols-3 gap-2"></div>
+          </div>
+
+          <div class="lg:border-l lg:border-borderbg/70 lg:pl-6">
+            <div><span class="text-xs font-bold text-brand">STEP 2</span><h3 class="font-semibold mt-1 mb-3">設定查詢條件</h3></div>
+            <div class="grid grid-cols-2 gap-3">
+              <label><span class="field-label">旅行時段</span><select id="window-select" class="control-field w-full"><option value="ALL">全部時段</option></select></label>
+              <label><span class="field-label">執行階段</span><select id="stage-select" class="control-field w-full"><option value="discover">① 發現航班</option><option value="enrich">② 補充票價</option><option value="all" selected>依序執行全部</option></select></label>
+              <label><span class="field-label">旅客人數</span><input id="passenger-count" type="number" min="1" value="1" class="control-field w-full"></label>
+              <div><span class="field-label">航班條件</span><label class="control-field flex items-center gap-2"><input id="direct-only" type="checkbox" checked><span class="text-sm">僅限直達航班</span></label></div>
+            </div>
+            <div id="source-options" class="mt-3 flex items-center gap-3 rounded-xl border border-borderbg/70 bg-slate-950/30 px-3 py-2.5">
+              <span class="text-xs font-semibold text-slate-500">資料來源</span>
+              <span class="badge bg-blue-500/10 text-blue-400">Google Flights</span>
+              <span class="text-xs text-slate-500">Stage 1 單程確認航班，Stage 2 正式來回查價</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-borderbg/70 flex flex-wrap items-center justify-between gap-4">
+          <details class="text-sm text-slate-400">
+            <summary class="flex items-center gap-2 hover:text-white"><i class="fa-solid fa-gear"></i>進階／開發設定 <i class="fa-solid fa-chevron-down chevron text-[10px]"></i></summary>
+            <div class="mt-3 flex flex-wrap gap-5">
+              <label class="flex items-center gap-2 text-amber-400" title="開啟後不會查詢真實航班"><input id="debug-mock" type="checkbox">使用 Mock 測試資料</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="export-checkbox">完成後自動匯出 Excel</label>
+            </div>
+          </details>
+          <div class="flex items-center gap-4">
+            <span class="text-xs text-slate-500 hidden md:inline">查詢期間請保持本頁開啟</span>
+            <button id="run-pipeline-btn" class="bg-brand hover:bg-blue-500 disabled:opacity-50 px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-950/40">
+              <i class="fa-solid fa-magnifying-glass mr-2"></i>開始查詢航班
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <details id="console-panel" class="panel overflow-hidden">
+        <summary class="p-5 flex items-center gap-4">
+          <span class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center"><i class="fa-solid fa-terminal"></i></span>
+          <div class="flex-1 min-w-0"><div class="flex justify-between gap-3 text-sm"><span id="pipeline-stage-label" class="font-semibold">執行紀錄</span><span id="progress-percent" class="text-slate-400">0%</span></div><div class="w-full bg-slate-800 rounded-full h-1.5 mt-2"><div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full transition-all" style="width:0%"></div></div></div>
+          <i class="fa-solid fa-chevron-down chevron text-slate-500"></i>
+        </summary>
+        <div class="border-t border-borderbg/70 p-4">
+          <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-500">即時 Pipeline 日誌</span><button id="clear-console-btn" class="text-xs text-slate-400 hover:text-white">清除</button></div>
+          <div id="console" class="bg-slate-950/70 border border-slate-800 rounded-xl p-4 h-72 overflow-y-auto text-xs leading-6"><div class="text-slate-600">尚未開始執行。</div></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Flight Schedule (去回程合併表格) -->
+    <section id="tab-flights" class="tab-panel hidden space-y-6">
+      <div><h2 class="page-title">航班決策</h2><p class="page-subtitle">先看符合條件的來回配對，再視需要展開 Stage 1 原始航班。</p></div>
+      <div class="panel p-4 flex flex-wrap gap-3 items-end">
+        <label><span class="field-label">地區</span>
+          <select id="filter-dest" class="control-field min-w-40">
+            <option value="">全部</option>
+            <option value="NGO">NGO 名古屋</option>
+            <option value="KIX">KIX 大阪</option>
+            <option value="SDJ">SDJ 仙台</option>
+            <option value="CTS">CTS 札幌</option>
+            <option value="HIJ">HIJ 廣島</option>
+            <option value="PUS">PUS 釜山</option>
+          </select>
+        </label>
+        <label><span class="field-label">旅行時段</span>
+          <select id="filter-window" class="control-field min-w-52">
+            <option value="ALL">全部</option>
+          </select>
+        </label>
+        <label><span class="field-label">查價人數</span><input id="filter-passenger-count" type="number" min="1" value="1" class="control-field w-28"></label>
+        <label class="control-field flex items-center gap-2 text-sm">
+          <input type="checkbox" id="strict-filter" checked> 僅顯示符合嚴格時間規則
+        </label>
+        <button id="apply-filter-btn" class="bg-brand hover:bg-blue-500 px-5 min-h-[2.7rem] rounded-xl text-sm font-semibold">套用篩選</button>
+        <button id="reset-filter-btn" class="border border-borderbg hover:bg-slate-800 px-4 min-h-[2.7rem] rounded-xl text-sm">重設</button>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="metric-card"><div class="text-xs text-slate-500">符合配對</div><div id="metric-paired" class="metric-value">—</div></div>
+        <div class="metric-card"><div class="text-xs text-slate-500">整體最佳</div><div id="metric-best-count" class="metric-value text-emerald-400">—</div></div>
+        <div class="metric-card"><div class="text-xs text-slate-500">最低來回總價</div><div id="metric-lowest" class="metric-value text-blue-400">—</div></div>
+        <div class="metric-card"><div class="text-xs text-slate-500">已確認航班</div><div id="metric-instances" class="metric-value">—</div></div>
+      </div>
+
+      <div class="panel overflow-hidden">
+        <div class="p-5 flex items-center justify-between gap-4"><div><h3 class="font-semibold">推薦與正式來回票價</h3><p class="text-xs text-slate-500 mt-1">票價為 Google Flights 實際來回查詢的旅客總額，不以兩張單程票相加。</p></div><span class="badge bg-emerald-500/10 text-emerald-400"><i class="fa-solid fa-star mr-1.5"></i>整體最佳優先</span></div>
+        <div class="overflow-x-auto max-h-[680px]">
+        <table class="data-table w-full text-sm">
+          <thead>
+            <tr><th>推薦</th><th>目的地／行程</th><th>去程</th><th>回程</th><th>查價條件</th><th>來源</th><th class="text-right">來回總價</th><th>備註</th></tr>
+          </thead>
+          <tbody id="schedule-table-body"></tbody>
+        </table>
+        </div>
+      </div>
+
+      <details class="panel overflow-hidden">
+        <summary class="p-5 flex items-center gap-3"><span class="w-9 h-9 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-plane-departure"></i></span><div class="flex-1"><h3 class="font-semibold">Stage 1 已確認航班</h3><p class="text-xs text-slate-500 mt-1">原始航班清單，供查核與確認哪些航班尚待補價。</p></div><span id="instances-summary-count" class="badge bg-slate-800 text-slate-400">0 筆</span><i class="fa-solid fa-chevron-down chevron text-slate-500"></i></summary>
+        <div class="overflow-x-auto max-h-[620px] border-t border-borderbg/70"><table class="data-table w-full text-sm"><thead><tr><th>日期</th><th>航段</th><th>航班</th><th>時間</th><th>直達</th><th>票價狀態</th></tr></thead><tbody id="instances-table-body"></tbody></table></div>
+      </details>
+    </section>
+
+    <!-- Phase 1 Matrix -->
+    <section id="tab-matrix" class="tab-panel hidden space-y-6">
+      <div><h2 class="page-title">航點橫向評比</h2><p class="page-subtitle">比較機票、住宿及地面交通，快速縮小目的地選擇。</p></div>
+      <div class="panel p-5">
+        <div class="flex items-center justify-between mb-5"><div><h3 class="font-semibold">預估總開銷</h3><p class="text-xs text-slate-500 mt-1">未取得票價的航點僅顯示住宿與交通估算。</p></div><span class="badge bg-blue-500/10 text-blue-400">TWD</span></div>
+        <div class="relative h-[420px]"><canvas id="chart-phase1-cost"></canvas></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="phase1-cards"></div>
+    </section>
+
+    <!-- DB Inspector -->
+    <section id="tab-db" class="tab-panel hidden space-y-6">
+      <div><h2 class="page-title">票價快照資料庫</h2><p class="page-subtitle">查看歷史觀測資料、最後查詢時間與去重狀態。</p></div>
+      <div class="panel p-4 flex flex-wrap gap-3 items-center">
+        <div class="relative flex-1 min-w-[240px]"><i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-600"></i><input id="db-search" type="text" placeholder="搜尋航班、航點或日期…" class="control-field pl-9 w-full text-sm"></div>
+        <button id="test-dedup-btn" class="border border-borderbg px-4 py-2 rounded-lg text-sm">測試 Hash 去重</button>
+        <button id="export-excel-btn" class="bg-brand px-4 py-2 rounded-lg text-sm font-semibold">
+          <i class="fa-solid fa-file-excel"></i> 匯出 Excel
+        </button>
+        <button id="clear-snapshots-btn" class="border border-red-500/50 text-red-300 hover:bg-red-500/10 px-4 py-2 rounded-lg text-sm font-semibold">
+          <i class="fa-solid fa-trash-can"></i> 清除票價快照
+        </button>
+        <button id="clear-all-db-btn" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-sm font-semibold">
+          <i class="fa-solid fa-triangle-exclamation"></i> 清除全部資料
+        </button>
+      </div>
+      <div id="dedup-result" class="text-sm text-slate-400"></div>
+      <div class="panel overflow-x-auto max-h-[720px]">
+        <table class="data-table w-full text-sm">
+          <thead class="text-slate-400 border-b border-borderbg">
+            <tr>
+              <th class="p-2 text-left">行程日期</th>
+              <th class="p-2 text-left">類型／時程</th>
+              <th class="p-2 text-left">航段</th>
+              <th class="p-2 text-left">去程／單程</th>
+              <th class="p-2 text-left">回程</th>
+              <th class="p-2 text-left">查價條件</th>
+              <th class="p-2 text-right">票價 (TWD)</th>
+              <th class="p-2 text-left">來源</th>
+              <th class="p-2 text-left">最後查詢時間</th>
+              <th class="p-2 text-left">Hash</th>
+            </tr>
+          </thead>
+          <tbody id="db-table-body"></tbody>
+        </table>
+      </div>
+      <div class="flex items-center justify-between mt-2"><div><h3 class="font-semibold">已確認航班實例</h3><p class="text-xs text-slate-500 mt-1">包含尚未取得單程或正式來回價格的航班。</p></div><span id="db-flight-count" class="badge bg-slate-800 text-slate-400">0 筆</span></div>
+      <div class="panel overflow-x-auto max-h-[560px]">
+        <table class="data-table w-full text-sm">
+          <thead class="text-slate-400 border-b border-borderbg"><tr>
+            <th class="p-2 text-left">日期</th><th class="p-2 text-left">類型</th><th class="p-2 text-left">航段</th><th class="p-2 text-left">航班</th><th class="p-2 text-left">出發</th><th class="p-2 text-left">抵達</th><th class="p-2 text-left">來源</th><th class="p-2 text-left">價格狀態</th><th class="p-2 text-left">最後確認</th>
+          </tr></thead>
+          <tbody id="db-flight-instance-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AI Advisor -->
+    <section id="tab-ai" class="tab-panel hidden space-y-6">
+      <div><h2 class="page-title">AI 家族旅行顧問</h2><p class="page-subtitle">利用目前的票價與航點資料，協助比較預算及安排方向。</p></div>
+      <div class="bg-cardbg border border-borderbg rounded-xl p-4 flex flex-wrap gap-2">
+        <button class="quick-prompt border border-borderbg px-3 py-1.5 rounded-lg text-xs">預算怎麼分配比較好？</button>
+        <button class="quick-prompt border border-borderbg px-3 py-1.5 rounded-lg text-xs">哪個航點最適合帶小孩？</button>
+        <button class="quick-prompt border border-borderbg px-3 py-1.5 rounded-lg text-xs">推薦景點行程安排</button>
+      </div>
+      <div id="chat-log" class="bg-cardbg border border-borderbg rounded-xl p-4 h-96 overflow-y-auto space-y-3"></div>
+      <div class="flex gap-2">
+        <input id="chat-input" type="text" placeholder="輸入訊息..." class="flex-1 bg-darkbg border border-borderbg rounded-lg px-3 py-2">
+        <button id="chat-send-btn" class="bg-brand px-4 py-2 rounded-lg font-semibold">送出</button>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="tab-settings" class="tab-panel hidden space-y-6">
+      <div><h2 class="page-title">追蹤設定</h2><p class="page-subtitle">維護出發機場、目的地、完整旅行時程與納入比較的航空公司。</p></div>
+      <div class="flex gap-2">
+        <button data-settings-tab="region" class="settings-subtab-btn px-3 py-1.5 rounded-lg text-sm font-semibold">地區</button>
+        <button data-settings-tab="window" class="settings-subtab-btn px-3 py-1.5 rounded-lg text-sm font-semibold">時段</button>
+        <button data-settings-tab="airline" class="settings-subtab-btn px-3 py-1.5 rounded-lg text-sm font-semibold">航空公司</button>
+      </div>
+
+      <div id="settings-subtab-region" class="settings-subtab space-y-4">
+        <div class="panel p-5">
+          <div class="flex flex-wrap items-end justify-between gap-4 pb-5 border-b border-borderbg/70">
+            <div><h3 class="font-semibold">出發機場</h3><p class="text-xs text-slate-500 mt-1">可輸入多個 IATA 代碼，以逗號分隔。</p></div>
+            <label class="w-full sm:w-96"><span class="field-label">機場代碼</span><input id="settings-origins" class="control-field w-full" placeholder="TPE, TSA"></label>
+          </div>
+          <div class="flex items-center justify-between mt-5 mb-3"><div><h3 class="font-semibold">目的地</h3><p class="text-xs text-slate-500 mt-1">卡片順序會影響報表及篩選選項。</p></div></div>
+          <div id="settings-destinations-body" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+          <div class="mt-5 pt-5 border-t border-dashed border-borderbg">
+            <div class="field-label">新增目的地</div><div class="flex flex-wrap gap-2 items-center">
+              <input id="new-dest-iata" placeholder="IATA（如 KIX）" class="control-field text-sm w-36">
+              <input id="new-dest-name" placeholder="名稱（如 大阪）" class="control-field text-sm w-48">
+              <button id="add-dest-btn" class="border border-blue-500/50 text-blue-400 hover:bg-blue-500/10 px-4 min-h-[2.7rem] rounded-xl text-sm"><i class="fa-solid fa-plus mr-1"></i>新增</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="settings-subtab-window" class="settings-subtab space-y-4 hidden">
+        <div class="panel p-5">
+          <div class="flex items-center justify-between mb-4"><div><h3 class="font-semibold">完整旅行時程</h3><p class="text-xs text-slate-500 mt-1">每張卡是一組去回程；航班出發時間必須早於設定值。</p></div><span class="badge bg-amber-500/10 text-amber-400"><i class="fa-regular fa-clock mr-1.5"></i>嚴格小於</span></div>
+          <div id="settings-windows-body" class="grid lg:grid-cols-2 gap-4"></div>
+          <div class="mt-5 pt-5 border-t border-dashed border-borderbg">
+            <div class="field-label">新增時程</div><div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-2">
+              <input id="new-window-key" placeholder="代碼（如 JULY_SAT）" class="control-field text-sm">
+              <input id="new-window-group" placeholder="群組（如 JULY_2027）" class="control-field text-sm">
+              <input id="new-window-label" placeholder="顯示標籤" class="control-field text-sm">
+              <input id="new-window-order" type="number" min="1" placeholder="查詢順序" class="control-field text-sm">
+              <input id="new-window-outbound" type="datetime-local" class="control-field text-sm">
+              <input id="new-window-inbound" type="datetime-local" class="control-field text-sm">
+            </div><button id="add-window-btn" class="mt-3 border border-blue-500/50 text-blue-400 hover:bg-blue-500/10 px-4 py-2 rounded-xl text-sm"><i class="fa-solid fa-plus mr-1"></i>新增時程</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="settings-subtab-airline" class="settings-subtab space-y-4 hidden">
+        <div class="panel p-5">
+          <div class="flex items-center justify-between mb-4"><div><h3 class="font-semibold">航空公司範圍</h3><p class="text-xs text-slate-500 mt-1">啟用才納入航班配對；可在此排除廉航。</p></div></div>
+          <div id="settings-airlines-body" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+          <div class="mt-5 pt-5 border-t border-dashed border-borderbg"><div class="field-label">新增航空公司</div><div class="flex flex-wrap gap-2 items-center">
+            <input id="new-airline-code" placeholder="代碼（如 CI）" class="control-field text-sm w-32">
+            <input id="new-airline-name" placeholder="名稱（如 中華航空）" class="control-field text-sm w-52">
+            <label class="control-field text-sm flex items-center gap-2"><input type="checkbox" id="new-airline-query" checked>納入查詢</label>
+            <button id="add-airline-btn" class="border border-blue-500/50 text-blue-400 hover:bg-blue-500/10 px-4 min-h-[2.7rem] rounded-xl text-sm"><i class="fa-solid fa-plus mr-1"></i>新增</button>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="sticky bottom-4 z-10 panel p-3 flex items-center justify-between gap-3">
+        <span id="settings-save-status" class="text-sm text-slate-400">修改後請記得儲存</span>
+        <button id="save-settings-btn" class="bg-brand hover:bg-blue-500 px-5 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-floppy-disk mr-2"></i>儲存全部設定</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+let DESTINATIONS = {};
+let appSettings = null;
+
+function orderedWindowEntries(windows) {
+  return Object.entries(windows || {})
+    .map(([key, value], index) => ({ key, value, index }))
+    .sort((a, b) => (Number(a.value.query_order) || a.index + 1) - (Number(b.value.query_order) || b.index + 1) || a.index - b.index)
+    .map(({ key, value }) => [key, value]);
+}
+
+function refreshDynamicOptions(settings) {
+  appSettings = settings;
+  DESTINATIONS = Object.fromEntries(settings.destinations.map(d => [d.iata, d.name_zh]));
+  document.getElementById('control-destinations').innerHTML = settings.destinations.map(d => `
+    <label class="destination-chip relative text-sm">
+      <input type="checkbox" name="destination" value="${d.iata}" checked>
+      <span><strong>${d.iata}</strong><span class="font-normal">${d.name_zh}</span></span>
+    </label>
+  `).join('');
+
+  const destinationOptions = settings.destinations.map(d =>
+    `<option value="${d.iata}">${d.iata} ${d.name_zh}</option>`).join('');
+  document.getElementById('filter-dest').innerHTML = `<option value="">全部</option>${destinationOptions}`;
+
+  const windowOptions = orderedWindowEntries(settings.windows).map(([key, value]) =>
+    `<option value="${key}">${value.label || key}</option>`).join('');
+  document.getElementById('window-select').innerHTML = `<option value="ALL">全部</option>${windowOptions}`;
+  document.getElementById('filter-window').innerHTML = `<option value="ALL">全部</option>${windowOptions}`;
+}
+
+function setAllDestinations(checked) {
+  document.querySelectorAll('input[name="destination"]').forEach(input => { input.checked = checked; });
+}
+
+document.getElementById('select-all-destinations').addEventListener('click', () => setAllDestinations(true));
+document.getElementById('clear-all-destinations').addEventListener('click', () => setAllDestinations(false));
+
+function syncPassengerCount(value) {
+  const count = Math.max(1, Number(value) || 1);
+  document.getElementById('passenger-count').value = count;
+  document.getElementById('filter-passenger-count').value = count;
+  localStorage.setItem('flightTrackerPassengerCount', String(count));
+}
+
+const savedPassengerCount = Number(localStorage.getItem('flightTrackerPassengerCount'));
+if (savedPassengerCount >= 1) syncPassengerCount(savedPassengerCount);
+document.getElementById('passenger-count').addEventListener('change', event => syncPassengerCount(event.target.value));
+document.getElementById('filter-passenger-count').addEventListener('change', event => {
+  syncPassengerCount(event.target.value);
+  applyFlightFilters();
+});
+
+async function loadAppSettings() {
+  const res = await fetch('/api/settings');
+  if (!res.ok) throw new Error(`設定載入失敗：HTTP ${res.status}`);
+  const settings = await res.json();
+  refreshDynamicOptions(settings);
+  return settings;
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('hidden', panel.id !== `tab-${tabId}`));
+  if (tabId === 'flights') applyFlightFilters();
+  if (tabId === 'db') loadDbTable();
+  if (tabId === 'matrix') renderPhase1Chart();
+  if (tabId === 'settings') loadSettings();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+function appendConsoleLog(message, level = 'info') {
+  const el = document.getElementById('console');
+  const line = document.createElement('div');
+  line.className = `console-line ${level}`;
+  const time = new Date().toLocaleTimeString();
+  line.textContent = `[${time}] ${message}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+document.getElementById('clear-console-btn').addEventListener('click', () => {
+  document.getElementById('console').innerHTML = '';
+});
+
+async function refreshStatus() {
+  try {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    document.getElementById('status-badge').textContent =
+      `DB 連線：${data.db_connected ? '正常' : '異常'} ｜ 正式來回：${data.roundtrip_snapshots ?? 0} ｜ 單程初估：${data.single_leg_snapshots ?? 0}`;
+  } catch (e) {
+    document.getElementById('status-badge').textContent = '狀態查詢失敗';
+  }
+}
+
+async function runPipeline() {
+  const mode = document.getElementById('debug-mock').checked ? 'mock' : 'crawl';
+  const windowVal = document.getElementById('window-select').value;
+  const exportFlag = document.getElementById('export-checkbox').checked;
+  const stage = document.getElementById('stage-select').value;
+  const passenger_count = Number(document.getElementById('passenger-count').value);
+  const direct_only = document.getElementById('direct-only').checked;
+  const destinations = [...document.querySelectorAll('input[name="destination"]:checked')].map(el => el.value);
+  const sources = ['google_flights'];
+  const btn = document.getElementById('run-pipeline-btn');
+  btn.disabled = true;
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-percent').textContent = '0%';
+  document.getElementById('pipeline-stage-label').textContent = '準備執行';
+  document.getElementById('console-panel').open = true;
+  document.getElementById('console').innerHTML = '';
+  if (!destinations.length) {
+    appendConsoleLog('請至少選擇一個目標航點', 'error');
+    btn.disabled = false;
+    return;
+  }
+  appendConsoleLog(
+    mode === 'mock'
+      ? `Debug：開始執行 Mock Pipeline (window=${windowVal})`
+      : `開始執行真實 Pipeline (window=${windowVal})`,
+    mode === 'mock' ? 'warning' : 'info',
+  );
+
+  try {
+    const res = await fetch('/api/run-pipeline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode, window: windowVal, export: exportFlag, destinations, sources, stage, passenger_count, direct_only }),
+    });
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n\n');
+      buffer = lines.pop();
+      for (const chunk of lines) {
+        if (!chunk.startsWith('data: ')) continue;
+        const evt = JSON.parse(chunk.slice(6));
+        appendConsoleLog(`[${evt.step}] ${evt.message}`, evt.level);
+        document.getElementById('progress-bar').style.width = `${evt.percent}%`;
+        document.getElementById('progress-percent').textContent = `${evt.percent}%`;
+        document.getElementById('pipeline-stage-label').textContent = evt.step || '執行中';
+      }
+    }
+    appendConsoleLog('Pipeline 執行結束', 'info');
+    document.getElementById('pipeline-stage-label').textContent = '執行完成';
+    refreshStatus();
+  } catch (e) {
+    appendConsoleLog(`發生錯誤：${e}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function syncDebugMode() {
+  const debug = document.getElementById('debug-mock').checked;
+  const label = document.getElementById('execution-mode-label');
+  label.className = debug ? 'badge bg-amber-500/10 text-amber-400' : 'badge bg-emerald-500/10 text-emerald-400';
+  label.innerHTML = debug
+    ? '<i class="fa-solid fa-bug mr-2"></i>Debug Mock 模式'
+    : '<i class="fa-solid fa-circle text-[6px] mr-2"></i>真實資料模式';
+  document.getElementById('source-options').classList.toggle('opacity-40', debug);
+  document.querySelectorAll('input[name="source"]').forEach(input => { input.disabled = debug; });
+}
+
+document.getElementById('debug-mock').addEventListener('change', syncDebugMode);
+syncDebugMode();
+
+document.getElementById('run-pipeline-btn').addEventListener('click', runPipeline);
+
+function checkStrictRule(flightDate, tripType, departureTime) {
+  const date = new Date(flightDate + 'T00:00:00');
+  const weekday = date.getDay(); // 0=Sun, 6=Sat
+  const [h, m] = departureTime.split(':').map(Number);
+  const minutes = h * 60 + m;
+  if (tripType === 'OUTBOUND' && weekday === 0) return minutes < 15 * 60;
+  if (tripType === 'INBOUND' && weekday === 6) return minutes < 20 * 60;
+  if (tripType === 'INBOUND' && weekday === 0) return minutes < 14 * 60;
+  return true;
+}
+
+async function applyFlightFilters() {
+  const dest = document.getElementById('filter-dest').value;
+  const windowVal = document.getElementById('filter-window').value;
+  const strict = document.getElementById('strict-filter').checked;
+
+  const params = new URLSearchParams();
+  if (dest) params.set('dest', dest);
+  if (windowVal) params.set('window', windowVal);
+  if (strict) params.set('strict', 'true');
+
+  const instancesResponse = await fetch(`/api/flight-instances?${params.toString()}`);
+  const instances = (await instancesResponse.json()).flights;
+  const display = (value, fallback = '—') => value === undefined || value === null || value === '' ? fallback : value;
+  document.getElementById('instances-table-body').innerHTML = instances.length ? instances.map(f => `
+    <tr><td>${display(f.flight_date)}</td><td>${display(f.origin_airport)} → ${display(f.dest_airport)}</td>
+      <td class="font-mono text-xs">${display(f.flight_number)}</td><td>${display(f.departure_time)}–${display(f.arrival_time)}</td>
+      <td>${f.stops === 0 ? '<span class="badge bg-emerald-500/10 text-emerald-400">直達</span>' : '<span class="badge bg-slate-800 text-slate-400">未知</span>'}</td>
+      <td>${f.has_price ? '<span class="text-emerald-400">已有票價</span>' : '<span class="text-amber-400">待補充</span>'}</td></tr>`).join('')
+    : '<tr><td colspan="6" class="text-center text-slate-500 py-10">目前沒有符合條件的已確認航班</td></tr>';
+  document.getElementById('metric-instances').textContent = instances.length.toLocaleString();
+  document.getElementById('instances-summary-count').textContent = `${instances.length} 筆`;
+
+  const scheduleParams = new URLSearchParams(params);
+  scheduleParams.set('passenger_count', document.getElementById('filter-passenger-count').value || '1');
+  scheduleParams.set('cabin_class', 'ECONOMY');
+  const res = await fetch(`/api/flight-schedule?${scheduleParams.toString()}`);
+  const data = await res.json();
+  const rows = data.rows;
+
+  const tbody = document.getElementById('schedule-table-body');
+  document.getElementById('metric-paired').textContent = rows.length.toLocaleString();
+  document.getElementById('metric-best-count').textContent = rows.filter(row => row.is_recommended).length.toLocaleString();
+  const validPrices = rows.map(row => row.price_twd_roundtrip).filter(Number.isFinite);
+  document.getElementById('metric-lowest').textContent = validPrices.length ? `NT$ ${Math.min(...validPrices).toLocaleString()}` : '—';
+  tbody.innerHTML = rows.length ? '' : '<tr><td colspan="8" class="text-center text-slate-500 py-12"><i class="fa-regular fa-folder-open mr-2"></i>目前沒有可配對票價，請確認旅客人數或先執行補充票價。</td></tr>';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.className = r.is_recommended ? 'best-row' : '';
+    const recommendation = r.is_recommended
+      ? '<span class="badge bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-star mr-1"></i>整體最佳</span>'
+      : (r.is_airline_best ? '<span class="badge bg-blue-500/10 text-blue-400">航空最佳</span>' : '<span class="text-slate-600">—</span>');
+    tr.innerHTML = `
+      <td>${recommendation}</td>
+      <td><div class="font-semibold">${display(r.region)}</div><div class="text-xs text-slate-500 mt-1">${display(r.duration_days)} 天 · ${display(r.inbound_weekday)}</div></td>
+      <td><div>${display(r.outbound_airline)} <span class="font-mono text-xs text-blue-300">${display(r.outbound_flight_number)}</span></div><div class="text-xs text-slate-400 mt-1">${display(r.outbound_datetime)}</div></td>
+      <td><div>${display(r.inbound_airline)} <span class="font-mono text-xs text-blue-300">${display(r.inbound_flight_number)}</span></div><div class="text-xs text-slate-400 mt-1">${display(r.inbound_datetime)}</div></td>
+      <td><div>${display(r.passenger_count)} 人</div><div class="text-xs text-slate-500 mt-1">${display(r.cabin_class)}</div></td>
+      <td class="text-xs"><div>去：${display(r.outbound_source)}</div><div class="mt-1">回：${display(r.inbound_source)}</div></td>
+      <td class="text-right whitespace-nowrap"><strong class="text-blue-400">${Number.isFinite(r.price_twd_roundtrip) ? `NT$ ${r.price_twd_roundtrip.toLocaleString()}` : '—'}</strong></td>
+      <td class="text-xs text-amber-400">${display(r.note)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('apply-filter-btn').addEventListener('click', applyFlightFilters);
+document.getElementById('strict-filter').addEventListener('change', applyFlightFilters);
+document.getElementById('reset-filter-btn').addEventListener('click', () => {
+  document.getElementById('filter-dest').value = '';
+  document.getElementById('filter-window').value = 'ALL';
+  applyFlightFilters();
+});
+
+let phase1ChartInstance = null;
+async function renderPhase1Chart() {
+  const ctx = document.getElementById('chart-phase1-cost');
+  if (phase1ChartInstance) return;
+  const response = await fetch('/api/phase1');
+  const phaseData = await response.json();
+  const rows = phaseData.rows;
+  phase1ChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: rows.map(row => row.name_zh),
+      datasets: [
+        { label: '機票', data: rows.map(row => row.airfare), backgroundColor: '#3b82f6' },
+        { label: '住宿', data: rows.map(row => row.accommodation), backgroundColor: '#8b5cf6' },
+        { label: '地面交通', data: rows.map(row => row.ground_transport), backgroundColor: '#22c55e' },
+      ],
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(51,65,85,.35)' }, ticks: { color: '#64748b' } },
+        y: { stacked: true, grid: { display: false }, ticks: { color: '#cbd5e1' } },
+      },
+      plugins: { legend: { labels: { color: '#e2e8f0' } } },
+    },
+  });
+
+  const cardsEl = document.getElementById('phase1-cards');
+  cardsEl.innerHTML = rows.map(row => `
+    <div class="panel p-5">
+      <div class="flex items-start justify-between"><div class="font-semibold">${row.name_zh}</div><span class="badge bg-slate-800 text-slate-400">${row.iata}</span></div>
+      <div class="text-xs text-slate-500 mt-3">符合配對 ${row.matched_schedules} 組</div>
+      <div class="mt-1 font-semibold ${row.total == null ? 'text-slate-500' : 'text-blue-400'}">${row.total == null ? '尚無可配對票價' : `NT$ ${row.total.toLocaleString()}`}</div>
+    </div>
+  `).join('');
+}
+
+async function loadDbTable(keyword = '') {
+  const res = await fetch('/api/db/snapshots');
+  const data = await res.json();
+  let rows = data.snapshots;
+  if (keyword) {
+    const k = keyword.toLowerCase();
+    rows = rows.filter(r => JSON.stringify(r).toLowerCase().includes(k));
+  }
+  const tbody = document.getElementById('db-table-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="p-10 text-center text-slate-500">目前沒有票價快照</td></tr>';
+    await loadFlightInstances(keyword);
+    return;
+  }
+  tbody.innerHTML = rows.map(renderDbSnapshotRow).join('');
+  await loadFlightInstances(keyword);
+}
+
+async function loadFlightInstances(keyword = '') {
+  const response = await fetch('/api/db/flight-instances');
+  const data = await response.json();
+  let rows = data.flight_instances || [];
+  if (keyword) {
+    const k = keyword.toLowerCase();
+    rows = rows.filter(row => JSON.stringify(row).toLowerCase().includes(k));
+  }
+  document.getElementById('db-flight-count').textContent = `${rows.length.toLocaleString()} 筆`;
+  const tbody = document.getElementById('db-flight-instance-body');
+  tbody.innerHTML = rows.length ? rows.map(row => `
+    <tr class="border-b border-borderbg/50 align-top">
+      <td class="p-3 whitespace-nowrap">${shortIsoDate(row.flight_date)}</td>
+      <td class="p-3 whitespace-nowrap">${row.trip_type === 'OUTBOUND' ? '去程' : '回程'}</td>
+      <td class="p-3 whitespace-nowrap font-semibold">${row.origin_airport} → ${row.dest_airport}</td>
+      <td class="p-3 whitespace-nowrap font-mono font-semibold">${row.flight_number || '—'}</td>
+      <td class="p-3 whitespace-nowrap">${row.departure_time || '—'}</td>
+      <td class="p-3 whitespace-nowrap">${row.arrival_time || '—'}</td>
+      <td class="p-3 whitespace-nowrap text-xs">${fareSourceLabel(row.discovery_source)}</td>
+      <td class="p-3 whitespace-nowrap text-xs"><span class="${row.has_price || row.has_roundtrip_price ? 'text-emerald-400' : 'text-amber-400'}">${row.has_price ? '已有單程' : '尚無單程'}${row.has_roundtrip_price ? ' · 已有來回' : ''}</span></td>
+      <td class="p-3 whitespace-nowrap text-xs text-slate-400">${formatTaipeiTime(row.last_verified_at)}<div class="text-[10px] text-slate-600 mt-1">台北時間</div></td>
+    </tr>`).join('') : '<tr><td colspan="9" class="p-10 text-center text-slate-500">目前沒有符合條件的航班實例</td></tr>';
+}
+
+function shortIsoDate(value) {
+  return value ? value.replaceAll('-', '/') : '—';
+}
+
+function formatTaipeiTime(value) {
+  if (!value) return '—';
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+  const instant = new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized) ? normalized : `${normalized}Z`);
+  if (Number.isNaN(instant.getTime())) return value;
+  return new Intl.DateTimeFormat('zh-TW', {
+    timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  }).format(instant);
+}
+
+function fareSourceLabel(source) {
+  return ({ google_flights: 'Google Flights', mock: 'Mock', manual: '人工匯入', legacy: '舊資料' })[source] || source || '—';
+}
+
+function renderDbSnapshotRow(r) {
+  const isRoundtrip = r.record_type === 'ROUNDTRIP';
+  const passengers = Number(r.passenger_count) || 1;
+  const fare = Number.isFinite(r.price_twd) ? r.price_twd : null;
+  const checkedUtc = r.last_checked_at ?? r.captured_at;
+  const cabin = r.cabin_class === 'ECONOMY' ? '經濟艙' : (r.cabin_class || '—');
+  const hash = r.snapshot_hash || '';
+  if (isRoundtrip) {
+    const perPerson = fare == null ? null : Math.round(fare / passengers);
+    return `
+      <tr class="border-b border-borderbg/50 bg-blue-500/[0.025] align-top">
+        <td class="p-3 whitespace-nowrap"><div><span class="text-slate-500">去</span> ${shortIsoDate(r.outbound_date)}</div><div class="mt-1"><span class="text-slate-500">回</span> ${shortIsoDate(r.inbound_date)}</div></td>
+        <td class="p-3 whitespace-nowrap"><span class="badge bg-emerald-500/10 text-emerald-400">正式來回</span><div class="text-xs text-slate-500 mt-1">${r.window_key || '—'}</div></td>
+        <td class="p-3 whitespace-nowrap font-semibold">${r.origin_airport} ↔ ${r.dest_airport}</td>
+        <td class="p-3 whitespace-nowrap"><div class="font-semibold">${r.outbound_flight_number}</div><div class="text-xs text-slate-400 mt-1">${r.outbound_departure_time} → ${r.outbound_arrival_time}</div></td>
+        <td class="p-3 whitespace-nowrap"><div class="font-semibold">${r.inbound_flight_number}</div><div class="text-xs text-slate-400 mt-1">${r.inbound_departure_time} → ${r.inbound_arrival_time}</div></td>
+        <td class="p-3 whitespace-nowrap"><div>${passengers} 人 · ${cabin}</div></td>
+        <td class="p-3 text-right whitespace-nowrap"><div class="font-mono font-semibold text-blue-400">${fare == null ? '—' : `NT$ ${fare.toLocaleString()}`}</div><div class="text-xs text-slate-500 mt-1">${perPerson == null ? '' : `每人約 NT$ ${perPerson.toLocaleString()}`}</div></td>
+        <td class="p-3 whitespace-nowrap text-xs">${fareSourceLabel(r.source)}</td>
+        <td class="p-3 whitespace-nowrap text-xs text-slate-400" title="UTC：${checkedUtc || '—'}">${formatTaipeiTime(checkedUtc)}<div class="text-[10px] text-slate-600 mt-1">台北時間</div></td>
+        <td class="p-3 text-xs text-slate-500 font-mono" title="${hash}">${hash ? `${hash.slice(0, 10)}...` : '—'}</td>
+      </tr>`;
+  }
+  return `
+    <tr class="border-b border-borderbg/50 align-top">
+      <td class="p-3 whitespace-nowrap">${shortIsoDate(r.flight_date)}</td>
+      <td class="p-3 whitespace-nowrap"><span class="badge bg-slate-800 text-slate-400">單程初估</span><div class="text-xs text-slate-600 mt-1">${r.trip_type === 'OUTBOUND' ? '去程' : '回程'}</div></td>
+      <td class="p-3 whitespace-nowrap font-semibold">${r.origin_airport} → ${r.dest_airport}</td>
+      <td class="p-3 whitespace-nowrap"><div class="font-semibold">${r.flight_number}</div><div class="text-xs text-slate-400 mt-1">${r.departure_time} → ${r.arrival_time}</div></td>
+      <td class="p-3 text-slate-600">—</td>
+      <td class="p-3 whitespace-nowrap">${passengers} 人 · ${cabin}</td>
+      <td class="p-3 text-right whitespace-nowrap"><div class="font-mono">${fare == null ? '—' : `NT$ ${fare.toLocaleString()}`}</div><div class="text-xs text-slate-600 mt-1">單程初估價</div></td>
+      <td class="p-3 whitespace-nowrap text-xs">${fareSourceLabel(r.source)}</td>
+      <td class="p-3 whitespace-nowrap text-xs text-slate-400" title="UTC：${checkedUtc || '—'}">${formatTaipeiTime(checkedUtc)}<div class="text-[10px] text-slate-600 mt-1">台北時間</div></td>
+      <td class="p-3 text-xs text-slate-500 font-mono" title="${hash}">${hash ? `${hash.slice(0, 10)}...` : '—'}</td>
+    </tr>`;
+}
+
+document.getElementById('db-search').addEventListener('input', (e) => loadDbTable(e.target.value));
+
+document.getElementById('test-dedup-btn').addEventListener('click', async () => {
+  const before = (await (await fetch('/api/status')).json()).total_snapshots;
+  const pipelineResponse = await fetch('/api/run-pipeline', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode: 'mock', window: 'ALL', export: false }),
+  });
+  await pipelineResponse.text();
+  const after = (await (await fetch('/api/status')).json()).total_snapshots;
+  document.getElementById('dedup-result').textContent =
+    `去重測試：重複執行 Mock Pipeline 前 ${before} 筆 → 後 ${after} 筆（相同資料不應重複新增）`;
+  loadDbTable();
+});
+
+document.getElementById('export-excel-btn').addEventListener('click', () => {
+  window.location.href = '/api/export/excel';
+});
+
+document.getElementById('clear-snapshots-btn').addEventListener('click', async () => {
+  if (!confirm('確定要清除所有票價快照嗎？已確認航班會保留。')) return;
+  const res = await fetch('/api/db/snapshots', { method: 'DELETE' });
+  const data = await res.json();
+  document.getElementById('dedup-result').textContent = `已清除 ${data.deleted} 筆票價快照。`;
+  refreshStatus();
+  loadDbTable();
+});
+
+document.getElementById('clear-all-db-btn').addEventListener('click', async () => {
+  if (!confirm('確定要清除所有票價快照與已確認航班嗎？此動作無法復原。')) return;
+  if (!confirm('最後確認：這會刪除所有航班實例，確定繼續嗎？')) return;
+  const res = await fetch('/api/db/all', { method: 'DELETE' });
+  const data = await res.json();
+  const detail = data.details || {};
+  document.getElementById('dedup-result').textContent =
+    `已清除 ${detail.flight_instances || 0} 筆航班實例、${detail.single_leg || 0} 筆單程快照、${detail.roundtrip || 0} 筆正式來回快照。`;
+  refreshStatus();
+  loadDbTable();
+});
+
+function appendUserMessage(text) {
+  const log = document.getElementById('chat-log');
+  const div = document.createElement('div');
+  div.className = 'text-right';
+  div.innerHTML = `<span class="inline-block bg-brand px-3 py-2 rounded-lg text-sm">${text}</span>`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function appendAiMessage(text) {
+  const log = document.getElementById('chat-log');
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="inline-block bg-cardbg border border-borderbg px-3 py-2 rounded-lg text-sm">${text}</span>`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function askGeminiAI(message) {
+  appendUserMessage(message);
+  try {
+    const res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    appendAiMessage(data.reply);
+  } catch (e) {
+    appendAiMessage(`發生錯誤：${e}`);
+  }
+}
+
+document.getElementById('chat-send-btn').addEventListener('click', () => {
+  const input = document.getElementById('chat-input');
+  if (!input.value.trim()) return;
+  askGeminiAI(input.value.trim());
+  input.value = '';
+});
+document.getElementById('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('chat-send-btn').click();
+});
+document.querySelectorAll('.quick-prompt').forEach(btn => {
+  btn.addEventListener('click', () => askGeminiAI(btn.textContent));
+});
+
+let settingsState = null;
+
+document.querySelectorAll('.settings-subtab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.settings-subtab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.settings-subtab').forEach(el => el.classList.add('hidden'));
+    document.getElementById(`settings-subtab-${btn.dataset.settingsTab}`).classList.remove('hidden');
+  });
+});
+document.querySelector('.settings-subtab-btn[data-settings-tab="region"]').classList.add('active');
+
+async function loadSettings() {
+  const res = await fetch('/api/settings');
+  settingsState = await res.json();
+  Object.entries(settingsState.windows || {}).forEach(([key, window], index) => {
+    if (!window.outbound_before && window.outbound_date) {
+      window.outbound_before = `${window.outbound_date}T15:00`;
+    }
+    if (!window.inbound_before && window.inbound_dates?.length) {
+      const inboundDate = window.inbound_dates[0];
+      const weekday = new Date(`${inboundDate}T00:00`).getDay();
+      window.inbound_before = `${inboundDate}T${weekday === 6 ? '20:00' : '14:00'}`;
+    }
+    window.group ||= key;
+    const queryOrder = Number(window.query_order);
+    window.query_order = Number.isInteger(queryOrder) && queryOrder >= 1 ? queryOrder : index + 1;
+  });
+  document.getElementById('new-window-order').value = Math.max(
+    0, ...Object.values(settingsState.windows || {}).map(window => Number(window.query_order) || 0),
+  ) + 1;
+  document.getElementById('settings-origins').value = (settingsState.origins || []).join(', ');
+  renderSettingsDestinations();
+  renderSettingsWindows();
+  renderSettingsAirlines();
+}
+
+function renderSettingsDestinations() {
+  const container = document.getElementById('settings-destinations-body');
+  container.innerHTML = settingsState.destinations.map((d, i) => `
+    <div class="settings-item rounded-xl border border-borderbg/70 bg-slate-950/25 p-4" data-i="${i}">
+      <div class="flex items-center justify-between mb-3"><span class="badge bg-blue-500/10 text-blue-400 font-mono">${d.iata}</span><button class="dest-remove-btn text-red-400/80 hover:text-red-400 text-xs"><i class="fa-regular fa-trash-can"></i></button></div>
+      <label><span class="field-label">地區名稱</span><input class="dest-name-input control-field w-full text-sm" value="${d.name_zh}"></label>
+      <div class="flex items-center justify-between mt-3"><span class="text-xs text-slate-500">排序 ${i + 1}</span><div class="flex gap-1"><button data-dir="-1" class="dest-move-btn w-8 h-8 rounded-lg border border-borderbg hover:bg-slate-800 text-xs">▲</button><button data-dir="1" class="dest-move-btn w-8 h-8 rounded-lg border border-borderbg hover:bg-slate-800 text-xs">▼</button></div></div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.settings-item').forEach(item => {
+    const i = Number(item.dataset.i);
+    item.querySelector('.dest-name-input').addEventListener('input', (e) => {
+      settingsState.destinations[i].name_zh = e.target.value;
+    });
+    item.querySelectorAll('.dest-move-btn').forEach(btn => btn.addEventListener('click', () => {
+      const dir = Number(btn.dataset.dir);
+      const j = i + dir;
+      if (j < 0 || j >= settingsState.destinations.length) return;
+      [settingsState.destinations[i], settingsState.destinations[j]] = [settingsState.destinations[j], settingsState.destinations[i]];
+      renderSettingsDestinations();
+    }));
+    item.querySelector('.dest-remove-btn').addEventListener('click', () => {
+      settingsState.destinations.splice(i, 1);
+      renderSettingsDestinations();
+    });
+  });
+}
+
+document.getElementById('add-dest-btn').addEventListener('click', () => {
+  const iata = document.getElementById('new-dest-iata').value.trim().toUpperCase();
+  const name = document.getElementById('new-dest-name').value.trim();
+  if (!iata || !name) return;
+  settingsState.destinations.push({ iata, name_zh: name });
+  document.getElementById('new-dest-iata').value = '';
+  document.getElementById('new-dest-name').value = '';
+  renderSettingsDestinations();
+});
+
+function renderSettingsWindows() {
+  const container = document.getElementById('settings-windows-body');
+  const entries = orderedWindowEntries(settingsState.windows);
+  container.innerHTML = entries.map(([key, w]) => `
+    <div class="settings-item rounded-xl border border-borderbg/70 bg-slate-950/25 p-4" data-key="${key}">
+      <div class="flex items-center justify-between gap-3 mb-4"><div class="flex items-center gap-2"><input class="window-key-input control-field !min-h-0 !py-1.5 w-44 font-mono text-xs text-blue-300" value="${key}" aria-label="時程代碼"><span class="window-weekday badge bg-slate-800 text-slate-400"></span></div><div class="flex items-center gap-3"><button class="window-copy-btn text-blue-400 hover:text-blue-300 text-xs"><i class="fa-regular fa-copy mr-1"></i>複製設定</button><button class="window-remove-btn text-red-400/80 hover:text-red-400 text-xs"><i class="fa-regular fa-trash-can mr-1"></i>刪除</button></div></div>
+      <div class="grid sm:grid-cols-2 xl:grid-cols-5 gap-3">
+        <label><span class="field-label">月份群組</span><input class="window-group-input control-field w-full text-sm" value="${w.group || key}"></label>
+        <label><span class="field-label">顯示標籤</span><input class="window-label-input control-field w-full text-sm" value="${w.label || ''}"></label>
+        <label><span class="field-label"><i class="fa-solid fa-arrow-down-1-9 mr-1"></i>查詢順序</span><input type="number" min="1" class="window-order-input control-field w-full text-sm" value="${w.query_order}"></label>
+        <label><span class="field-label"><i class="fa-solid fa-plane-departure mr-1"></i>去程出發須早於</span><input type="datetime-local" class="window-outbound-input control-field w-full text-sm" value="${w.outbound_before || ''}"></label>
+        <label><span class="field-label"><i class="fa-solid fa-plane-arrival mr-1"></i>回程出發須早於</span><input type="datetime-local" class="window-inbound-input control-field w-full text-sm" value="${w.inbound_before || ''}"></label>
+      </div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.settings-item').forEach(item => {
+    const key = item.dataset.key;
+    const updateWeekday = () => {
+      const value = settingsState.windows[key].inbound_before;
+      item.querySelector('.window-weekday').textContent = value ? ['週日','週一','週二','週三','週四','週五','週六'][new Date(value).getDay()] + '回程' : '尚未設定';
+    };
+    item.querySelector('.window-key-input').addEventListener('change', (event) => {
+      const newKey = event.target.value.trim().toUpperCase();
+      const status = document.getElementById('settings-save-status');
+      if (!newKey) {
+        event.target.value = key;
+        status.className = 'text-sm text-red-400';
+        status.textContent = '時程代碼不可為空';
+        return;
+      }
+      if (newKey !== key && settingsState.windows[newKey]) {
+        event.target.value = key;
+        status.className = 'text-sm text-red-400';
+        status.textContent = `代碼 ${newKey} 已存在，請使用其他代碼`;
+        return;
+      }
+      if (newKey === key) return;
+      const renamedWindows = {};
+      Object.entries(settingsState.windows).forEach(([existingKey, value]) => {
+        renamedWindows[existingKey === key ? newKey : existingKey] = value;
+      });
+      settingsState.windows = renamedWindows;
+      renderSettingsWindows();
+      status.className = 'text-sm text-amber-400';
+      status.textContent = `已將 ${key} 改名為 ${newKey}，請儲存設定`;
+    });
+    item.querySelector('.window-group-input').addEventListener('input', (e) => { settingsState.windows[key].group = e.target.value.trim(); });
+    item.querySelector('.window-label-input').addEventListener('input', (e) => {
+      settingsState.windows[key].label = e.target.value;
+    });
+    item.querySelector('.window-order-input').addEventListener('change', (e) => {
+      const value = Number(e.target.value);
+      if (!Number.isInteger(value) || value < 1) {
+        e.target.value = settingsState.windows[key].query_order;
+        const status = document.getElementById('settings-save-status');
+        status.className = 'text-sm text-red-400';
+        status.textContent = '查詢順序必須是大於等於 1 的整數';
+        return;
+      }
+      settingsState.windows[key].query_order = value;
+      renderSettingsWindows();
+    });
+    item.querySelector('.window-outbound-input').addEventListener('input', (e) => {
+      settingsState.windows[key].outbound_before = e.target.value;
+    });
+    item.querySelector('.window-inbound-input').addEventListener('input', (e) => {
+      settingsState.windows[key].inbound_before = e.target.value;
+      updateWeekday();
+    });
+    updateWeekday();
+    item.querySelector('.window-copy-btn').addEventListener('click', () => {
+      const original = settingsState.windows[key];
+      const keyInput = document.getElementById('new-window-key');
+      keyInput.value = '';
+      document.getElementById('new-window-group').value = original.group || '';
+      document.getElementById('new-window-label').value = original.label || '';
+      document.getElementById('new-window-order').value = original.query_order || 1;
+      document.getElementById('new-window-outbound').value = original.outbound_before || '';
+      document.getElementById('new-window-inbound').value = original.inbound_before || '';
+      keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      keyInput.focus();
+      const status = document.getElementById('settings-save-status');
+      status.className = 'text-sm text-blue-400';
+      status.textContent = `已帶入 ${key} 的設定，請輸入新代碼後新增`;
+    });
+    item.querySelector('.window-remove-btn').addEventListener('click', () => {
+      delete settingsState.windows[key];
+      renderSettingsWindows();
+    });
+  });
+}
+
+document.getElementById('add-window-btn').addEventListener('click', () => {
+  const key = document.getElementById('new-window-key').value.trim().toUpperCase();
+  const group = document.getElementById('new-window-group').value.trim();
+  const label = document.getElementById('new-window-label').value.trim();
+  const queryOrder = Number(document.getElementById('new-window-order').value);
+  const outbound = document.getElementById('new-window-outbound').value.trim();
+  const inbound = document.getElementById('new-window-inbound').value;
+  const status = document.getElementById('settings-save-status');
+  if (!key || !group || !outbound || !inbound || !Number.isInteger(queryOrder) || queryOrder < 1) {
+    status.className = 'text-sm text-red-400';
+    status.textContent = '新增時程前，請填寫代碼、群組、正整數查詢順序及去回程日期時間';
+    return;
+  }
+  if (settingsState.windows[key]) {
+    status.className = 'text-sm text-red-400';
+    status.textContent = `代碼 ${key} 已存在，請使用其他代碼`;
+    return;
+  }
+  settingsState.windows[key] = { group, label, query_order: queryOrder, outbound_before: outbound, inbound_before: inbound };
+  document.getElementById('new-window-key').value = '';
+  document.getElementById('new-window-group').value = '';
+  document.getElementById('new-window-label').value = '';
+  document.getElementById('new-window-order').value = Math.max(
+    0, ...Object.values(settingsState.windows).map(window => Number(window.query_order) || 0),
+  ) + 1;
+  document.getElementById('new-window-outbound').value = '';
+  document.getElementById('new-window-inbound').value = '';
+  renderSettingsWindows();
+  status.className = 'text-sm text-amber-400';
+  status.textContent = `已新增 ${key}，請儲存設定`;
+});
+
+function renderSettingsAirlines() {
+  const container = document.getElementById('settings-airlines-body');
+  const entries = Object.entries(settingsState.airlines);
+  container.innerHTML = entries.map(([code, info]) => `
+    <div class="settings-item rounded-xl border ${info.is_lcc ? 'border-borderbg/60 bg-slate-950/20' : 'border-blue-500/30 bg-blue-500/5'} p-4" data-code="${code}">
+      <div class="flex items-center justify-between mb-3"><span class="badge bg-slate-800 text-slate-300 font-mono">${code}</span><button class="airline-remove-btn text-red-400/80 hover:text-red-400 text-xs"><i class="fa-regular fa-trash-can"></i></button></div>
+      <label><span class="field-label">航空公司名稱</span><input class="airline-name-input control-field w-full text-sm" value="${info.name_zh}"></label>
+      <label class="mt-3 flex items-center justify-between rounded-lg bg-slate-950/35 px-3 py-2 text-sm"><span>${info.is_lcc ? '目前排除' : '納入航班查詢'}</span><input type="checkbox" class="airline-query-input" ${info.is_lcc ? '' : 'checked'}></label>
+    </div>
+  `).join('');
+  container.querySelectorAll('.settings-item').forEach(item => {
+    const code = item.dataset.code;
+    item.querySelector('.airline-name-input').addEventListener('input', (e) => {
+      settingsState.airlines[code].name_zh = e.target.value;
+    });
+    item.querySelector('.airline-query-input').addEventListener('change', (e) => {
+      settingsState.airlines[code].is_lcc = !e.target.checked;
+      renderSettingsAirlines();
+    });
+    item.querySelector('.airline-remove-btn').addEventListener('click', () => {
+      delete settingsState.airlines[code];
+      renderSettingsAirlines();
+    });
+  });
+}
+
+document.getElementById('add-airline-btn').addEventListener('click', () => {
+  const code = document.getElementById('new-airline-code').value.trim().toUpperCase();
+  const name = document.getElementById('new-airline-name').value.trim();
+  const query = document.getElementById('new-airline-query').checked;
+  if (!code || !name) return;
+  settingsState.airlines[code] = { name_zh: name, is_lcc: !query };
+  document.getElementById('new-airline-code').value = '';
+  document.getElementById('new-airline-name').value = '';
+  document.getElementById('new-airline-query').checked = true;
+  renderSettingsAirlines();
+});
+
+document.getElementById('save-settings-btn').addEventListener('click', async () => {
+  const status = document.getElementById('settings-save-status');
+  status.textContent = '儲存中...';
+  try {
+    settingsState.origins = document.getElementById('settings-origins').value
+      .split(',').map(value => value.trim().toUpperCase()).filter(Boolean);
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settingsState),
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.detail || `HTTP ${res.status}`);
+    }
+    const saved = await res.json();
+    settingsState.windows = saved.windows || settingsState.windows;
+    status.textContent = '已儲存 ✓';
+    refreshDynamicOptions(settingsState);
+    if (phase1ChartInstance) {
+      phase1ChartInstance.destroy();
+      phase1ChartInstance = null;
+    }
+  } catch (e) {
+    status.textContent = `儲存失敗：${e}`;
+  }
+});
+
+loadAppSettings().catch(error => appendConsoleLog(error.message, 'error'));
+refreshStatus();
+</script>

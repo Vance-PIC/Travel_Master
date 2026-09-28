@@ -1,4 +1,4 @@
-name: Nagoya flight monitor test
+name: Nagoya Google Flights web test
 
 on:
   workflow_dispatch:
@@ -9,28 +9,50 @@ permissions:
 jobs:
   search:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Check SerpApi credential
-        env:
-          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
         run: |
-          if [ -z "$SERPAPI_KEY" ]; then
-            echo "::error::Repository secret SERPAPI_KEY is not configured."
-            exit 2
-          fi
-      - name: Search Google Flights exact-date fares
-        env:
-          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Search Google Flights in headless browser
+        id: scrape
+        continue-on-error: true
         run: python3 scripts/nagoya_flight_monitor.py
+
+      - name: Upload browser debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-flights-debug
+          path: |
+            travel/nagoya/flights/debug/
+          if-no-files-found: ignore
+
       - name: Commit monitoring data
+        if: always()
         run: |
-          if git diff --quiet -- travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv; then
-            echo "No monitoring data changes."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv
-          git commit -m "Update Nagoya flight monitoring data"
-          git push
+          git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv || true
+          if git diff --cached --quiet; then
+            echo "No monitoring data changes."
+          else
+            git commit -m "Update Nagoya Google Flights monitoring data"
+            git push
+          fi
+
+      - name: Fail if scrape failed
+        if: steps.scrape.outcome != 'success'
+        run: |
+          echo "::error::Google Flights scrape did not produce a parseable result. Check google-flights-debug artifact."
+          exit 1

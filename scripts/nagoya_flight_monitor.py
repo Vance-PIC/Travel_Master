@@ -3,6 +3,7 @@ import csv
 import json
 import re
 import sys
+import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -52,43 +53,35 @@ def save_debug(page):
     page.screenshot(path=str(DEBUG_DIR / "google-flights.png"), full_page=True)
 
 def search_google_flights(page):
+    # Google Flights home page does not expose one generic query input in the
+    # headless layout. Use Google's supported Flights query URL instead and let
+    # Google render the results page directly.
     query = (
         "Flights from TPE to NGO on July 11 2027 returning July 18 2027 "
-        "for 2 adults and 2 children nonstop"
+        "for 2 adults and 2 children nonstop economy"
     )
-    url = "https://www.google.com/travel/flights?hl=zh-TW&curr=TWD"
+    params = {
+        "q": query,
+        "hl": "zh-TW",
+        "curr": "TWD",
+        "gl": "tw",
+    }
+    url = "https://www.google.com/travel/flights?" + urllib.parse.urlencode(params)
     page.goto(url, wait_until="domcontentloaded", timeout=60000)
-
-    # Prefer Google's generic travel search box if present.
-    candidates = [
-        'input[placeholder*="搜尋"]',
-        'input[aria-label*="搜尋"]',
-        'input[placeholder*="Search"]',
-        'input[aria-label*="Search"]',
-    ]
-    box = None
-    for sel in candidates:
-        loc = page.locator(sel).first
-        if loc.count() > 0:
-            try:
-                if loc.is_visible():
-                    box = loc
-                    break
-            except Exception:
-                pass
-    if box is None:
-        raise RuntimeError("Google Flights search box not found")
-
-    box.fill(query)
-    box.press("Enter")
     page.wait_for_timeout(10000)
-
-    # Wait for the page to settle and expose fare cards.
     try:
         page.wait_for_load_state("networkidle", timeout=20000)
     except PlaywrightTimeoutError:
         pass
     page.wait_for_timeout(5000)
+
+    body = page.locator("body").inner_text()
+    # Detect whether Google actually rendered a search-results page. We keep
+    # the page as debug output even when this check fails.
+    result_markers = ["最佳航班", "其他航班", "Best departing flights", "Other departing flights",
+                      "TPE", "NGO"]
+    if sum(1 for marker in result_markers if marker in body) < 2:
+        raise RuntimeError("Google Flights direct query did not render expected flight results")
 
 def extract_candidates(page):
     body_text = page.locator("body").inner_text()

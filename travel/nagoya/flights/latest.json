@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "route": {
+    "origin": "TPE",
+    "destination": "NGO",
+    "outbound_date": "2027-07-11",
+    "inbound_date": "2027-07-18",
+    "market": "TW",
+    "locale": "zh-TW",
+    "currency": "TWD",
+    "cabin_class": "economy"
+  },
+  "checked_at": null,
+  "status": "not_run",
+  "source": null,
+  "options": [],
+  "family_total_twd": null,
+  "notes": "SSoT for Nagoya flight monitoring. Populated by scheduled monitoring runs."
+}

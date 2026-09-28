@@ -1,1 +1,2 @@
 checked_at,status,source,airline,outbound_flight,outbound_departure,outbound_arrival,inbound_flight,inbound_departure,inbound_arrival,price_twd,family_total_twd,baggage_verified,time_preference_match,notes
+2026-09-28T23:08:28+00:00,no_parseable_results,Google Flights web (Playwright),,,,,,False,No parseable matching fare rows

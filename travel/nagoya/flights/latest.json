@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "route": {
     "origin": "TPE",
     "destination": "NGO",
@@ -8,12 +8,17 @@
     "market": "TW",
     "locale": "zh-TW",
     "currency": "TWD",
-    "cabin_class": "economy"
+    "cabin_class": "economy",
+    "passengers": {
+      "adults": 2,
+      "children": 2
+    },
+    "nonstop_only": true
   },
-  "checked_at": null,
-  "status": "not_run",
-  "source": null,
+  "checked_at": "2026-09-28T23:08:28+00:00",
+  "status": "no_parseable_results",
+  "source": "Google Flights web (Playwright)",
+  "source_validation": "web_scrape_unverified",
   "options": [],
-  "family_total_twd": null,
-  "notes": "SSoT for Nagoya flight monitoring. Populated by scheduled monitoring runs."
+  "notes": "No API token used. Browser automation against Google Flights. Selectors and rendered text may change. Price/baggage/fare conditions must be independently verified before booking."
 }

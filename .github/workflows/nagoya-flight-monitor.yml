@@ -11,17 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check Duffel credential
+      - name: Check SerpApi credential
         env:
-          DUFFEL_ACCESS_TOKEN: ${{ secrets.DUFFEL_ACCESS_TOKEN }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: |
-          if [ -z "$DUFFEL_ACCESS_TOKEN" ]; then
-            echo "::error::Repository secret DUFFEL_ACCESS_TOKEN is not configured."
+          if [ -z "$SERPAPI_KEY" ]; then
+            echo "::error::Repository secret SERPAPI_KEY is not configured."
             exit 2
           fi
-      - name: Search exact-date fares
+      - name: Search Google Flights exact-date fares
         env:
-          DUFFEL_ACCESS_TOKEN: ${{ secrets.DUFFEL_ACCESS_TOKEN }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: python3 scripts/nagoya_flight_monitor.py
       - name: Commit monitoring data
         run: |

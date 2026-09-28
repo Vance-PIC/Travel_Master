@@ -1,0 +1,36 @@
+name: Nagoya flight monitor test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Duffel credential
+        env:
+          DUFFEL_ACCESS_TOKEN: ${{ secrets.DUFFEL_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$DUFFEL_ACCESS_TOKEN" ]; then
+            echo "::error::Repository secret DUFFEL_ACCESS_TOKEN is not configured."
+            exit 2
+          fi
+      - name: Search exact-date fares
+        env:
+          DUFFEL_ACCESS_TOKEN: ${{ secrets.DUFFEL_ACCESS_TOKEN }}
+        run: python3 scripts/nagoya_flight_monitor.py
+      - name: Commit monitoring data
+        run: |
+          if git diff --quiet -- travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv; then
+            echo "No monitoring data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv
+          git commit -m "Update Nagoya flight monitoring data"
+          git push

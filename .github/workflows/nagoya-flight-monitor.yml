@@ -2,6 +2,11 @@ name: Nagoya Google Flights web test
 
 on:
   workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "scripts/nagoya_flight_monitor.py"
+      - ".github/workflows/nagoya-flight-monitor.yml"
 
 permissions:
   contents: write

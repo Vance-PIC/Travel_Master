@@ -4,7 +4,7 @@
   "execution": {
     "query_enabled": false,
     "schedule_enabled": false,
-    "executor": null,
+    "executor": "scripts/hotel_executor.py",
     "api_adapter": "scripts/hotel_searchapi.py",
     "max_quote_age_hours": null
   },
@@ -213,6 +213,7 @@
     "key_env": "SEARCHAPI_KEY",
     "query_currency": "JPY",
     "max_verification_requests": 5,
-    "mode": "manual_capability_verification"
+    "mode": "manual_capability_verification",
+    "max_requests_per_run": 5
   }
 }

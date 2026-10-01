@@ -1,15 +1,14 @@
-name: Nagoya Google Flights web test
+name: Nagoya SerpApi flight monitor
 
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - "scripts/nagoya_flight_monitor.py"
-      - ".github/workflows/nagoya-flight-monitor.yml"
 
 permissions:
   contents: write
+
+concurrency:
+  group: nagoya-flight-monitor
+  cancel-in-progress: false
 
 jobs:
   search:
@@ -17,47 +16,37 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Playwright
+      - name: Check SerpApi credential
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: |
-          python -m pip install --upgrade pip
-          pip install playwright
-          python -m playwright install --with-deps chromium
-
-      - name: Search Google Flights in headless browser
-        id: scrape
-        continue-on-error: true
-        run: python3 scripts/nagoya_flight_monitor.py
-
-      - name: Upload browser debug artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: google-flights-debug
-          path: |
-            travel/nagoya/flights/debug/
-          if-no-files-found: ignore
-
-      - name: Commit monitoring data
-        if: always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv travel/nagoya/flights/debug/google-flights.html travel/nagoya/flights/debug/google-flights.txt || true
-          if git diff --cached --quiet; then
-            echo "No monitoring data changes."
-          else
-            git commit -m "Update Nagoya Google Flights monitoring data"
-            git push
+          if [ -z "$SERPAPI_KEY" ]; then
+            echo "::error::Repository secret SERPAPI_KEY is not configured."
+            exit 2
           fi
 
-      - name: Fail if scrape failed
-        if: steps.scrape.outcome != 'success'
+      - name: Search Google Flights exact-date fares
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+        run: python3 scripts/nagoya_flight_monitor.py
+
+      - name: Commit monitoring data
         run: |
-          echo "::error::Google Flights scrape did not produce a parseable result. Check google-flights-debug artifact."
-          exit 1
+          if git diff --quiet -- travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv; then
+            echo "No monitoring data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv
+          git commit -m "Update Nagoya SerpApi flight monitoring data"
+          git pull --rebase origin master
+          git push origin HEAD:master

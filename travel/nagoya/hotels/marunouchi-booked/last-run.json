@@ -1,0 +1,21 @@
+{
+  "run_id": "311c027ac8174661b75e6d1da32eb737",
+  "monitor_id": "marunouchi-booked",
+  "stage": "booked_room_compare",
+  "started_at": "2026-10-01T08:10:57.381556+00:00",
+  "status": "error",
+  "snapshot_run_id": null,
+  "coverage": {
+    "requested": [
+      "searchapi.io"
+    ],
+    "completed": [],
+    "deferred": [],
+    "failed": [
+      "searchapi.io"
+    ]
+  },
+  "ended_at": "2026-10-01T08:11:00.013537+00:00",
+  "error": "Hotel query or validation failed",
+  "attempted_requests": 1
+}

@@ -89,7 +89,7 @@ def migrate_history_if_needed():
             "currency": old.get("currency") or "TWD",
             "baggage_status": old.get("baggage_status") or ("verified" if old.get("baggage_verified") == "True" else "unknown"),
             "time_preference_match": old.get("time_preference_match", ""),
-            "notes": ("migrated_history; " + old.get("notes", "")).strip(),
+            "notes": ("migrated_history; " + (old.get("notes") or "")).strip(),
         })
 
     with HISTORY.open("w", newline="", encoding="utf-8") as f:

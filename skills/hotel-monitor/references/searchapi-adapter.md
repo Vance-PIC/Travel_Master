@@ -46,3 +46,10 @@ Engine localization overrides are configured in `api.engine_parameters`. A null
 `api.hl=en`. Run 36847823093 accepted discovery but rejected property `hl=en`
 with HTTP 400, despite the documented default. Omission uses the provider default;
 live property success remains unverified. Dates, party and currency are preserved.
+
+The `google_hotels_property` endpoint requires `property_token`, which is
+distinct from a listing/property `data_id`. A configured, evidenced `data_id`
+anchors identity validation; the executor may cache the token returned by a
+matching discovery listing only after the property detail confirms the same
+ID and hotel name. The cache is `property-resolution.json` under the monitor's
+persistence directory. Never construct a token from a `data_id` or hotel URL.

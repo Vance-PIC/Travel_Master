@@ -34,6 +34,15 @@ class HotelTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             parameters(m, 'JPY', 'en', 'TW')
 
+    def test_explicit_smoking_room_name_only(self):
+        def parsed(name):
+            data = {'property': {'featured_offers': [{'source': 'OTA', 'rooms': [{'name': name}]}]}}
+            return room_quotes(data, 'JPY')[0]['smoking']
+        self.assertEqual(parsed('Twin Room - Smoking'), 'smoking')
+        self.assertEqual(parsed('Luxury Twin Non-Smoking'), 'non-smoking')
+        self.assertIsNone(parsed('Smoking / Non-Smoking'))
+        self.assertIsNone(parsed('Twin Room'))
+
     def test_aggregate_is_never_a_room_quote(self):
         self.assertEqual(room_quotes({'property': {'total_price': {'extracted_price': 1},
                         'featured_offers': [{'source': 'OTA', 'total_price': {'extracted_price': 1}}]}}, 'JPY'), [])

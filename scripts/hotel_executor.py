@@ -156,13 +156,15 @@ def location(config, monitor_id, root):
 
 def collect(config, m, client):
     p = parameters(m, config['api']['query_currency'])
-    query = m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels'
+    query = m.get('search', {}).get('query') or (m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels')
     data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
     if not isinstance(data.get('properties'), list): raise ValueError('Missing hotel results')
     hotels = data['properties']
     if m['stage'] == 'booked_room_compare':
         source_id = m['hotel_identity'].get('source_ids', {}).get('searchapi.io')
-        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else h.get('name', '').casefold() == query.casefold())]
+        names = [m['hotel_identity']['name']] + m['hotel_identity'].get('discovery_aliases', [])
+        normalize = lambda value: re.sub(r'[^\w]', '', value.casefold())
+        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else normalize(h.get('name', '')) in {normalize(n) for n in names})]
     completed, deferred, rows = [], [], []
     for h in hotels:
         if h.get('type') != 'hotel': continue

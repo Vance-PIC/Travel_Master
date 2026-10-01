@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-01T03:04:35+00:00",
+  "checked_at": "2026-10-01T04:52:31+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 1,
@@ -7,17 +7,17 @@
   "api_searches_used": 1,
   "account_calls": 2,
   "quota_before": {
-    "usage": 12,
-    "remaining": 238,
+    "usage": 16,
+    "remaining": 234,
     "tier": "normal",
-    "plan_searches_left": 238,
+    "plan_searches_left": 234,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 12,
-    "remaining": 238,
+    "usage": 16,
+    "remaining": 234,
     "tier": "normal",
-    "plan_searches_left": 238,
+    "plan_searches_left": 234,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 0,
@@ -26,5 +26,6 @@
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
+  "booking_verification_checks": [],
   "refresh_complete": false
 }

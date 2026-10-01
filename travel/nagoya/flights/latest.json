@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-01T03:04:35+00:00",
+  "checked_at": "2026-10-01T04:52:31+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 1,
@@ -7,17 +7,17 @@
   "api_searches_used": 1,
   "account_calls": 2,
   "quota_before": {
-    "usage": 12,
-    "remaining": 238,
+    "usage": 16,
+    "remaining": 234,
     "tier": "normal",
-    "plan_searches_left": 238,
+    "plan_searches_left": 234,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 12,
-    "remaining": 238,
+    "usage": 16,
+    "remaining": 234,
     "tier": "normal",
-    "plan_searches_left": 238,
+    "plan_searches_left": 234,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 0,
@@ -26,8 +26,9 @@
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
+  "booking_verification_checks": [],
   "refresh_complete": false,
-  "schema_version": 6,
+  "schema_version": 7,
   "skill_version": 2,
   "route": {
     "origin": "TPE",
@@ -67,7 +68,8 @@
     "reduced_refresh_days": 5,
     "full_max_expansions": 3,
     "monitor_max_expansions": 1,
-    "reduced_max_expansions": 1
+    "reduced_max_expansions": 1,
+    "booking_verifications_per_run": 1
   },
   "source": "SerpApi Google Flights",
   "source_validation": "single_source_unverified",
@@ -395,5 +397,5 @@
   },
   "pending_deep_search": {},
   "itinerary_refresh_days": 4,
-  "notes": "Market prices are detection signals. Only freshly expanded itinerary prices enter itinerary_history. Retained quotes keep their original checked_at. Prices and baggage remain unverified; family totals are null."
+  "notes": "Raw market/itinerary prices remain unchanged. Only exact 2A2C Booking Options matches verify that specific quote. Baggage evidence is seller-specific literal text. Historical rows are not backfilled."
 }

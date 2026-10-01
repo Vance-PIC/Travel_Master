@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import uuid
 from datetime import datetime, timezone
-from hotel_searchapi import Client, SearchAPIError, parameters, room_quotes
+from hotel_searchapi import Client, SearchAPIError, parameters, room_quotes, engine_parameters
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = 'schema_version run_id monitor_id stage comparison_key observed_at source hotel_key room_key rate_key status amount currency price_scope tax_fee_inclusion filter_status room_match comparison_status evidence_ref'.split()
@@ -187,7 +187,7 @@ def collect(config, m, client):
         if not h.get('property_token'): raise ValueError('Hotel token missing')
         if client.attempts >= client.limit:
             deferred.append(key); continue
-        detail = client.search(dict(p, engine='google_hotels_property', property_token=h['property_token']))
+        detail = client.search(dict(engine_parameters(p, config['api'], 'google_hotels_property'), engine='google_hotels_property', property_token=h['property_token']))
         if not isinstance(detail.get('property'), dict) or not detail['property'].get('name'):
             raise ValueError('Malformed hotel detail')
         for group in ('featured_offers', 'all_offers'):

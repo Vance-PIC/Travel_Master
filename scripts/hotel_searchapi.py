@@ -114,6 +114,21 @@ def parameters(monitor, currency, hl, gl):
             'currency': currency, 'hl': hl, 'gl': gl}
 
 
+def engine_parameters(params, api, engine):
+    """Apply explicit engine overrides; null omits optional localization."""
+    result = dict(params)
+    for field, value in api.get('engine_parameters', {}).get(engine, {}).items():
+        if field not in ('hl', 'gl'):
+            raise ValueError('Unsupported engine localization override')
+        if value is None:
+            result.pop(field, None)
+        elif isinstance(value, str) and value:
+            result[field] = value
+        else:
+            raise ValueError('Invalid engine localization override')
+    return result
+
+
 def room_quotes(data, currency):
     """Only room/rate-level values; do not inherit hotel or OTA aggregate prices."""
     prop = data.get('property', {})
@@ -154,7 +169,7 @@ def verify(config, monitor_id, client):
             break
         if hotel.get('type') != 'hotel' or not hotel.get('property_token'):
             continue
-        detail = client.search(dict(p, engine='google_hotels_property', property_token=hotel['property_token']))
+        detail = client.search(dict(engine_parameters(p, config['api'], 'google_hotels_property'), engine='google_hotels_property', property_token=hotel['property_token']))
         rows.extend(room_quotes(detail, p['currency']))
     return {'mode': 'capability_verification', 'monitor_id': monitor_id, 'stage': m['stage'],
             'observed_at': datetime.now(timezone.utc).isoformat(), 'query': p,

@@ -40,3 +40,9 @@ Formal executor and Stage evaluators now exist: see [executor.md](executor.md).
 This capability-verification entry point remains isolated. Source ID/address and
 room evidence mapping still require actual evidence; account allowance is not
 inferred from request counts. Scheduling remains disabled.
+
+Engine localization overrides are configured in `api.engine_parameters`. A null
+`hl` omits the optional field for `google_hotels_property`, while discovery keeps
+`api.hl=en`. Run 36847823093 accepted discovery but rejected property `hl=en`
+with HTTP 400, despite the documented default. Omission uses the provider default;
+live property success remains unverified. Dates, party and currency are preserved.

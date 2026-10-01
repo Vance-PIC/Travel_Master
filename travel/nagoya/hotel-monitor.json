@@ -233,6 +233,11 @@
     "mode": "manual_capability_verification",
     "max_requests_per_run": 5,
     "hl": "en",
-    "gl": "TW"
+    "gl": "TW",
+    "engine_parameters": {
+      "google_hotels_property": {
+        "hl": null
+      }
+    }
   }
 }

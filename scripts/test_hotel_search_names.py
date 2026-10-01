@@ -11,15 +11,16 @@ class SearchNameTests(unittest.TestCase):
         m['search'] = {'property_token': 'ChConfirmed', 'property_token_evidence': {'source': 'searchapi.io', 'reference': 'confirmed response'}}
         client = Mock(attempts=1, limit=5)
         client.search.return_value = {'property': {'name': 'Hotel', 'data_id': 'hotel1'}}
-        collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+        collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'engine_parameters': {'google_hotels_property': {'hl': None}}}}, m, client)
         client.search.assert_called_once()
         params = client.search.call_args.args[0]
         self.assertEqual(params['engine'], 'google_hotels_property')
         self.assertEqual(params['property_token'], 'ChConfirmed')
         self.assertNotIn('q', params)
+        self.assertNotIn('hl', params)
         m['search']['property_token'] = '/g/kgmid'
         with self.assertRaises(ValueError):
-            collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+            collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'engine_parameters': {'google_hotels_property': {'hl': None}}}}, m, client)
 
     def test_query_alias_preserves_exact_party_dates_and_currency(self):
         m = monitor('booked_room_compare')
@@ -31,7 +32,7 @@ class SearchNameTests(unittest.TestCase):
             {'type': 'hotel', 'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id', 'property_token': 'token'},
             {'type': 'hotel', 'name': 'Hotel Live Max Nagoya OTHER', 'property_token': 'wrong'}]},
             {'property': {'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id'}}]
-        rows, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+        rows, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'engine_parameters': {'google_hotels_property': {'hl': None}}}}, m, client)
         self.assertEqual(client.search.call_count, 2)
         first = client.search.call_args_list[0].args[0]
         self.assertEqual(first['q'], m['search']['query'])
@@ -42,7 +43,10 @@ class SearchNameTests(unittest.TestCase):
             self.assertEqual(p['check_in_date'], '2027-07-11')
             self.assertEqual(p['check_out_date'], '2027-07-17')
             self.assertEqual(p['currency'], 'JPY')
-            self.assertEqual(p['hl'], 'en')
+            if p['engine'] == 'google_hotels':
+                self.assertEqual(p['hl'], 'en')
+            else:
+                self.assertNotIn('hl', p)
             self.assertEqual(p['gl'], 'TW')
         self.assertEqual(coverage['completed'], ['id'])
         self.assertEqual(rows, [])

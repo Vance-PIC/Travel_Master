@@ -129,6 +129,18 @@ def engine_parameters(params, api, engine):
     return result
 
 
+def smoking_from_room_name(name):
+    """Use only an unambiguous smoking label in the room name."""
+    if not isinstance(name, str):
+        return None
+    non_smoking = re.search(r'(?<!\w)non[\s-]*smoking(?!\w)', name, re.I)
+    other = re.sub(r'(?<!\w)non[\s-]*smoking(?!\w)', ' ', name, flags=re.I)
+    smoking = re.search(r'(?<!\w)smoking(?!\w)', other, re.I)
+    if bool(non_smoking) == bool(smoking):
+        return None
+    return 'non-smoking' if non_smoking else 'smoking'
+
+
 def room_quotes(data, currency):
     """Only room/rate-level values; do not inherit hotel or OTA aggregate prices."""
     prop = data.get('property', {})
@@ -145,7 +157,7 @@ def room_quotes(data, currency):
                         'nightly_amount': rate.get('price_per_night', {}).get('extracted_price'),
                         'query_currency': currency, 'price_scope': 'unknown',
                         'reported_num_guests': rate.get('num_guests'),
-                        'room_size_m2': None, 'beds': None, 'smoking': None,
+                        'room_size_m2': None, 'beds': None, 'smoking': smoking_from_room_name(room.get('name')),
                         'cancellation': rate.get('has_free_cancellation'),
                         'payment': None, 'benefits': None, 'tax_fee_inclusion': 'unknown',
                         'room_match': 'uncertain', 'comparison_status': 'pending_confirmation',

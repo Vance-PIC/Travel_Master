@@ -203,6 +203,13 @@ def collect(config, m, client):
             for field in ('hotel_data_id', 'room_name', 'total_amount', 'nightly_amount', 'reported_num_guests'):
                 if q.get(field) is not None:
                     q['evidence'][field] = {'field': field, 'literal_value': q[field], 'source': 'searchapi.io', 'repo_path': q['evidence_path'], 'observed_at': stamp}
+            if q.get('smoking') is not None:
+                room_path = q['evidence_path'].split('.rates[', 1)[0] + '.name'
+                q['evidence']['smoking'] = {
+                    'field': 'smoking', 'literal_value': q['smoking'],
+                    'source': 'searchapi.io', 'repo_path': room_path,
+                    'observed_at': stamp, 'derived_from': 'room_name',
+                    'source_text': q['room_name']}
             rows.append(q)
         completed.append(key)
     # Stage 2 covers only the locked hotel; unrelated discovery pages are irrelevant.

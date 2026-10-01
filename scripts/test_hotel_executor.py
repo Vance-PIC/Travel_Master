@@ -81,6 +81,26 @@ class ExecutorTests(unittest.TestCase):
         del q['evidence']['beds']
         self.assertIsNone(assess(m, q, 1, q['observed_at'])['difference'])
 
+    def test_live_smoking_label_is_excluded_without_price_alert(self):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True, 'max_quote_age_hours': 1},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            client = Mock(attempts=2, limit=5)
+            client.search.side_effect = [
+                {'properties': [{'name': 'Hotel', 'type': 'hotel', 'data_id': 'hotel1', 'property_token': 'token'}]},
+                {'property': {'name': 'Hotel', 'data_id': 'hotel1', 'featured_offers': [{'source': 'Booking.com',
+                    'rooms': [{'name': 'Twin Room - Smoking', 'rates': [{'total_price': {'extracted_price': 76273}}]}]}]}}]
+            self.assertEqual(execute(cfg, 'test', Path(tmp), client)['status'], 'success')
+            q = json.loads((Path(tmp)/'hotels/test/latest.json').read_text())['observations'][0]
+            self.assertEqual(q['field_status']['smoking'], 'fail')
+            self.assertEqual(q['room_match'], 'mismatch')
+            self.assertEqual(q['comparison_status'], 'not_comparable')
+            self.assertIsNone(q['alert_reached'])
+            self.assertEqual(q['evidence']['smoking']['derived_from'], 'room_name')
+
     def test_baseline_unknown_stale_mismatch(self):
         m = monitor('booked_room_compare'); q = quote(m)
         m['booking_baseline']['currency'] = None

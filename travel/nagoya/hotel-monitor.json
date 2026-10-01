@@ -105,7 +105,19 @@
           {
             "type": "user_statement",
             "reference": "current_task"
+          },
+          {
+            "type": "source_page",
+            "reference": "https://www.google.com/travel/hotels/entity/ChoI_pGn7-aqoe6KARoNL2cvMTFyZnB2Zm1obRAB",
+            "fields": [
+              "discovery_aliases"
+            ],
+            "note": "Discovery names only; not room or occupancy evidence"
           }
+        ],
+        "discovery_aliases": [
+          "Hotel Live Max PREMIUM Nagoya Marunouchi",
+          "天然温泉ホテルリブマックスPREMIUM名古屋丸の内"
         ]
       },
       "room_baseline": {
@@ -205,7 +217,12 @@
         "booking_baseline.benefits",
         "alert.currency",
         "alert.price_scope"
-      ]
+      ],
+      "search": {
+        "query": "Hotels in Marunouchi Nagoya Japan",
+        "property_token": null,
+        "property_token_evidence": null
+      }
     }
   ],
   "api": {
@@ -214,6 +231,13 @@
     "query_currency": "JPY",
     "max_verification_requests": 5,
     "mode": "manual_capability_verification",
-    "max_requests_per_run": 5
+    "max_requests_per_run": 5,
+    "hl": "en",
+    "gl": "TW",
+    "engine_parameters": {
+      "google_hotels_property": {
+        "hl": null
+      }
+    }
   }
 }

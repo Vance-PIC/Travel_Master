@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import uuid
 from datetime import datetime, timezone
-from hotel_searchapi import Client, parameters, room_quotes
+from hotel_searchapi import Client, SearchAPIError, parameters, room_quotes, engine_parameters
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = 'schema_version run_id monitor_id stage comparison_key observed_at source hotel_key room_key rate_key status amount currency price_scope tax_fee_inclusion filter_status room_match comparison_status evidence_ref'.split()
@@ -155,22 +155,39 @@ def location(config, monitor_id, root):
 
 
 def collect(config, m, client):
-    p = parameters(m, config['api']['query_currency'])
-    query = m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels'
-    data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
+    p = parameters(m, config['api']['query_currency'], config['api']['hl'], config['api']['gl'])
+    query = m.get('search', {}).get('query') or (m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels')
+    pinned = m.get('search', {}).get('property_token')
+    if pinned:
+        token_evidence = m.get('search', {}).get('property_token_evidence') or {}
+        if (m['stage'] != 'booked_room_compare' or not token_evidence.get('source') or
+                not token_evidence.get('reference') or not m['hotel_identity'].get('source_ids', {}).get('searchapi.io')):
+            raise ValueError('Confirmed token evidence required for booked hotel')
+        # kgmid and arbitrary name-derived IDs are not property tokens.
+        if not isinstance(pinned, str) or pinned.startswith('/'):
+            raise ValueError('Invalid property token')
+        data = {'properties': [{'type': 'hotel', 'name': m['hotel_identity']['name'],
+                               'data_id': m['hotel_identity'].get('source_ids', {}).get('searchapi.io'),
+                               'property_token': pinned}]}
+    else:
+        data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
     if not isinstance(data.get('properties'), list): raise ValueError('Missing hotel results')
     hotels = data['properties']
     if m['stage'] == 'booked_room_compare':
         source_id = m['hotel_identity'].get('source_ids', {}).get('searchapi.io')
-        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else h.get('name', '').casefold() == query.casefold())]
+        names = [m['hotel_identity']['name']] + m['hotel_identity'].get('discovery_aliases', [])
+        normalize = lambda value: re.sub(r'[^\w]', '', value.casefold())
+        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else normalize(h.get('name', '')) in {normalize(n) for n in names})]
     completed, deferred, rows = [], [], []
+    if m['stage'] == 'booked_room_compare' and not hotels:
+        deferred.append('target_hotel_not_identified')
     for h in hotels:
         if h.get('type') != 'hotel': continue
         key = h.get('data_id') or h.get('name')
         if not h.get('property_token'): raise ValueError('Hotel token missing')
         if client.attempts >= client.limit:
             deferred.append(key); continue
-        detail = client.search(dict(p, engine='google_hotels_property', property_token=h['property_token']))
+        detail = client.search(dict(engine_parameters(p, config['api'], 'google_hotels_property'), engine='google_hotels_property', property_token=h['property_token']))
         if not isinstance(detail.get('property'), dict) or not detail['property'].get('name'):
             raise ValueError('Malformed hotel detail')
         for group in ('featured_offers', 'all_offers'):
@@ -188,7 +205,9 @@ def collect(config, m, client):
                     q['evidence'][field] = {'field': field, 'literal_value': q[field], 'source': 'searchapi.io', 'repo_path': q['evidence_path'], 'observed_at': stamp}
             rows.append(q)
         completed.append(key)
-    if data.get('pagination', {}).get('next_page_token'): deferred.append('additional_results_page')
+    # Stage 2 covers only the locked hotel; unrelated discovery pages are irrelevant.
+    if m['stage'] == 'candidate_search' and data.get('pagination', {}).get('next_page_token'):
+        deferred.append('additional_results_page')
     return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels], 'completed': completed, 'deferred': deferred, 'failed': [], 'provider': 'searchapi.io'}
 
 
@@ -219,11 +238,12 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
                         'coverage': coverage, 'observations': [assess(m, q, config['execution'].get('max_quote_age_hours'), last['ended_at']) for q in rows]}
             last.update(status='success', snapshot_run_id=last['run_id'])
             persist(directory, snapshot, last)
-        except Exception:
+        except Exception as exc:
             if (directory/'.transaction.json').exists():
                 # Prepared complete transaction: roll forward before another query.
                 raise RuntimeError('Persistence interrupted; recovery required') from None
             last.update(status='error', ended_at=now(), error='Hotel query or validation failed', attempted_requests=getattr(client, 'attempts', 0))
+            if isinstance(exc, SearchAPIError): last['error_diagnostics'] = exc.diagnostics
             last['coverage']['failed'] = ['searchapi.io']
             atomic(directory/'last-run.json', json.dumps(last, ensure_ascii=False, indent=2))
         return last

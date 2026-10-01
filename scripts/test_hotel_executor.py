@@ -30,7 +30,7 @@ class ExecutorTests(unittest.TestCase):
     def test_success_empty_partial_disabled_and_paths(self):
         from unittest.mock import Mock
         cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True, 'max_quote_age_hours': 1},
-               'api': {'query_currency': 'JPY'}, 'monitors': [monitor()]}
+               'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}, 'monitors': [monitor()]}
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             client = Mock(attempts=1, limit=5)
@@ -122,7 +122,7 @@ class ExecutorTests(unittest.TestCase):
         from unittest.mock import Mock
         with tempfile.TemporaryDirectory() as tmp:
             cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True, 'max_quote_age_hours': 1},
-                   'api': {'query_currency': 'JPY'}, 'monitors': [monitor('booked_room_compare')]}
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}, 'monitors': [monitor('booked_room_compare')]}
             cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
             client = Mock(attempts=2, limit=5)
             client.search.side_effect = [
@@ -149,7 +149,7 @@ class ExecutorTests(unittest.TestCase):
     def test_api_failure_preserves_snapshot(self):
         with tempfile.TemporaryDirectory() as tmp:
             cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True, 'max_quote_age_hours': 1},
-                   'api': {'query_currency': 'JPY', 'max_verification_requests': 5}, 'monitors': [monitor()]}
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'max_verification_requests': 5}, 'monitors': [monitor()]}
             class Broken:
                 attempts = 1
                 def search(self, params): raise RuntimeError('secret')

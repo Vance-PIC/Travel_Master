@@ -205,7 +205,9 @@ def collect(config, m, client):
                     q['evidence'][field] = {'field': field, 'literal_value': q[field], 'source': 'searchapi.io', 'repo_path': q['evidence_path'], 'observed_at': stamp}
             rows.append(q)
         completed.append(key)
-    if data.get('pagination', {}).get('next_page_token'): deferred.append('additional_results_page')
+    # Stage 2 covers only the locked hotel; unrelated discovery pages are irrelevant.
+    if m['stage'] == 'candidate_search' and data.get('pagination', {}).get('next_page_token'):
+        deferred.append('additional_results_page')
     return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels], 'completed': completed, 'deferred': deferred, 'failed': [], 'provider': 'searchapi.io'}
 
 

@@ -5,6 +5,21 @@ from test_hotel_executor import monitor
 
 
 class SearchNameTests(unittest.TestCase):
+    def test_pagination_only_blocks_candidate_search(self):
+        for stage in ('booked_room_compare', 'candidate_search'):
+            with self.subTest(stage=stage):
+                m = monitor(stage)
+                m['hotel_identity'] = {'name': 'Hotel', 'source_ids': {}}
+                m['search'] = {'query': 'Hotels'}
+                client = Mock(attempts=2, limit=5)
+                client.search.side_effect = [
+                    {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'id', 'property_token': 'token'}],
+                     'pagination': {'next_page_token': 'next'}},
+                    {'property': {'name': 'Hotel', 'data_id': 'id'}}]
+                _, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+                self.assertEqual(coverage['completed'], ['id'])
+                self.assertEqual(coverage['deferred'], ['additional_results_page'] if stage == 'candidate_search' else [])
+
     def test_confirmed_property_token_skips_discovery(self):
         m = monitor('booked_room_compare')
         m['hotel_identity']['name'] = 'Hotel'

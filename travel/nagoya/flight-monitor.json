@@ -1,0 +1,12 @@
+{
+  "origin": "TPE",
+  "destination": "NGO",
+  "outbound_date": "2027-07-11",
+  "inbound_date": "2027-07-18",
+  "passengers": {"adults": 2, "children": 2},
+  "full_service_airlines": ["CI", "CX", "JX", "BR", "NH", "JL"],
+  "preferences": {"outbound_before": "12:00", "inbound_arrival_before": "21:00"},
+  "family_target_twd": 50000,
+  "target_margin_fraction": 0.10,
+  "drop_fraction": 0.05
+}

@@ -60,3 +60,15 @@ Each variant makes exactly one flight request, never expands departure tokens, a
 Record eligible distinct flight count, raw offer count, every eligible flight's returned price/local preference, measured client response seconds, safe server metadata, and quota before/after. Time only the market HTTP response/JSON decode, excluding Account API and local preference evaluation. Do not label sequential or cached observations as a guaranteed causal improvement, exact browser match, or final billing charge. Do not force `no_cache`; record metadata so cache effects remain visible.
 
 Experiments write only below `travel/nagoya/flights/experiments/`, with a unique run directory. Actions retain JSON as an artifact and never commit any monitoring data. Hash latest, history, itinerary_history and last-run before/after to verify isolation. Experiment failures also go only into experiment reports, never production last-run. An incomplete pair has no completed comparison.
+
+## Isolated passenger price-scope experiment
+
+Use the separate trip's `price-scope-experiment.json` and `scripts/price_scope_experiment.py`. The configuration pins an outbound and return via the documented [selected_flights_json parameter](https://serpapi.com/google-flights-api), enabling a direct booking-options query without market scans or tokens. Read [booking-options schema](https://serpapi.com/google-flights-booking-options) for seller/fare fields.
+
+Two authorized cases only: one adult versus two adults plus two children. All other request parameters must be identical. Maximum two flight requests total, with Account API before/after each and no paid retries, token expansion, booking clicks or production writes. The dedicated workflow is manual-only with read-only repository permission and shares monitoring concurrency.
+
+Record returned `selected_flights` and validate both pinned legs' flight number, route, date, nonstop and Economy. For every `booking_options` entry retain `together`/`departing`/`returning` scopes, `book_with`, `price`, `local_prices`, `option_title`, `extensions`, `baggage_prices` and marketed flight numbers. Retain top-level baggage evidence too. Strip booking/departure tokens and booking request URLs; do not submit bookings.
+
+Match by scope, seller, fare title, extensions, baggage, marketed flights and separate-ticket flag, never by seller alone. Compare only uniquely matched positive finite prices; exclude duplicate ambiguous fare matches. Calculate B/A for each matched option and same-currency local price. Only non-separate `together` fares provide complete-trip scope evidence. Mixed adults/children need not have a ratio of exactly four; child fares, inventory, taxes, rounding and sequential sampling remain limitations.
+
+Higher same-fare prices with more passengers support party-size-sensitive or party-total pricing for the selected booking option; the comparison alone does not establish the scope of every market-stage price. Preserve unknown production scope, null family total and unknown baggage. Save everything solely below `experiments/price-scope/`, and verify all four production file hashes stayed unchanged.

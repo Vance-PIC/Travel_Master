@@ -13,6 +13,8 @@ Use `full_query` to establish the main outbound flights' return combinations; us
 
 For an explicitly requested SerpApi `deep_search` test, use the isolated `scripts/flight_market_test.py` entry point and the experiment section of [search-policy.md](references/search-policy.md). This API parameter applies to Market Scan and is distinct from departure-token return expansion. Do not change production defaults or write experiment observations into baseline/history.
 
+For an explicitly requested passenger price-scope experiment, use `scripts/price_scope_experiment.py` with its separate trip configuration. Pin the same itinerary using `selected_flights_json`, vary only passenger counts, and compare uniquely matched seller/fare options. Follow the price-scope section of [search-policy.md](references/search-policy.md); never promote an experimental inference into production price scope automatically.
+
 Hard Filters define API eligibility. Evaluate time Preferences locally; retain eligible flights even if they fail a Preference. Unknown return times remain unknown. Never enable business-cabin queries as routine monitoring.
 
 Use actual Account API usage and remaining quota, with conservative bounds for delayed counters. Defer deep/full refreshes when quota requires it; report missing, deferred and stale coverage instead of claiming a full baseline.

@@ -1,0 +1,36 @@
+name: Price scope pinned itinerary A/B experiment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nagoya-flight-monitor
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test price-scope isolation and monitoring regressions without API usage
+        run: python3 -m unittest discover -s tests -v
+      - name: Compare one adult and two adults plus two children (maximum two searches)
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+        run: python3 scripts/price_scope_experiment.py
+      - name: Retain isolated evidence without committing monitoring files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: price-scope-${{ github.run_id }}
+          path: travel/nagoya/flights/experiments/price-scope/**/results.json
+          if-no-files-found: warn

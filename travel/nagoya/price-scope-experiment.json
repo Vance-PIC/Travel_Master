@@ -1,0 +1,17 @@
+{
+  "common_parameters": {
+    "engine": "google_flights", "type": 1,
+    "departure_id": "TPE", "arrival_id": "NGO",
+    "outbound_date": "2027-07-11", "return_date": "2027-07-18",
+    "travel_class": 1, "stops": 1, "include_airlines": "CI",
+    "currency": "TWD", "gl": "tw", "hl": "zh-tw"
+  },
+  "selected_flights": {
+    "outbound": [{"flight_number": "CI154", "departure_id": "TPE", "arrival_id": "NGO", "date": "2027-07-11"}],
+    "return": [{"flight_number": "CI151", "departure_id": "NGO", "arrival_id": "TPE", "date": "2027-07-18"}]
+  },
+  "cases": [
+    {"label": "A", "adults": 1, "children": 0},
+    {"label": "B", "adults": 2, "children": 2}
+  ]
+}

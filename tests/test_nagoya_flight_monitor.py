@@ -58,6 +58,7 @@ class MonitorTests(unittest.TestCase):
         params = req.call_args_list[1].args[0]
         self.assertNotIn("outbound_times", params)
         self.assertNotIn("return_times", params)
+        self.assertNotIn("deep_search", params)
         self.assertEqual(params["travel_class"], 1)
 
     def test_drop_deep_uses_token_and_keeps_return_mismatch(self):

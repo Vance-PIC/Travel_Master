@@ -48,3 +48,15 @@ Read account before searching, after market and after every expansion. Before ea
 Price is the raw displayed API fare. Do not infer per-person/family scope or calculate price × passenger count. Maintain unknown scope, null family total and unknown baggage until independently verified. Preserve extension text only as unverified evidence if needed; it does not establish baggage entitlement. The v2 executor does not trigger family-budget comparisons.
 
 Finish all flight parsing before writing snapshots or histories. API/network/malformed response failure, including a failure late in Full Query, preserves the whole previous valid run and writes sanitized `last-run.json` diagnostics. A documented empty response is a successful empty observation. Never bypass CAPTCHA or anti-bot blocks.
+
+## Isolated Market Scan deep_search experiment
+
+SerpApi's `deep_search=true/false` controls market result precision/performance. It is not the departure-token Deep Search described above. See [official parameters](https://serpapi.com/google-flights-api). Production full/monitor queries continue to omit this optional parameter and retain their existing default.
+
+Run `python scripts/flight_market_test.py --deep-search false` or `--deep-search true` for one Market Scan. Use `--compare` to run false then true sequentially with the same trip/configuration and all other API parameters identical. The dedicated `flight-market-test.yml` workflow offers `single_scan` with a boolean `deep_search`, or `ab_comparison`. Manual dispatch only; no schedule/push trigger.
+
+Each variant makes exactly one flight request, never expands departure tokens, and reads Account API before/after. An A/B pair plans at most two flight requests and four free Account API calls. Respect quota preservation at >=240 or no remaining credit; abort/defer the second variant if the actual or conservative estimated usage reaches that boundary. No paid retries. The experimental flight timeout is 120 seconds; production remains 45 seconds.
+
+Record eligible distinct flight count, raw offer count, every eligible flight's returned price/local preference, measured client response seconds, safe server metadata, and quota before/after. Time only the market HTTP response/JSON decode, excluding Account API and local preference evaluation. Do not label sequential or cached observations as a guaranteed causal improvement, exact browser match, or final billing charge. Do not force `no_cache`; record metadata so cache effects remain visible.
+
+Experiments write only below `travel/nagoya/flights/experiments/`, with a unique run directory. Actions retain JSON as an artifact and never commit any monitoring data. Hash latest, history, itinerary_history and last-run before/after to verify isolation. Experiment failures also go only into experiment reports, never production last-run. An incomplete pair has no completed comparison.

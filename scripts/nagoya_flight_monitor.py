@@ -30,10 +30,10 @@ HISTORY_HEADER = [
 def iso_now():
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
-def request_json(params, endpoint=API_BASE):
+def request_json(params, endpoint=API_BASE, timeout=45):
     url = endpoint + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={"User-Agent": "Travel_Master flight monitor"})
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
         data = json.load(resp)
     if not isinstance(data, dict) or data.get("error"):
         raise RuntimeError("Invalid response or SerpApi error")
@@ -285,6 +285,16 @@ def persist(latest, observed, removed, cfg):
     atomic_json(LATEST, latest)
 
 
+def market_scan_params(cfg, key):
+    return {"engine": "google_flights", "departure_id": cfg["origin"],
+            "arrival_id": cfg["destination"], "outbound_date": cfg["outbound_date"],
+            "return_date": cfg["inbound_date"], "type": 1, "travel_class": 1,
+            "adults": cfg["passengers"]["adults"], "children": cfg["passengers"]["children"],
+            "stops": 1, "currency": cfg["currency"], "gl": cfg["market"].lower(),
+            "hl": cfg["locale"].lower(), "include_airlines": ",".join(cfg["full_service_airlines"]),
+            "api_key": key}
+
+
 def main(mode="monitor_query", now=None):
     searches = account_calls = 0
     before = after = None
@@ -318,13 +328,7 @@ def main(mode="monitor_query", now=None):
                     and row.get("price_scope") == "unknown" and row.get("currency") == "TWD"):
                 previous_rows[row["itinerary_key"]] = dict(row, displayed_price_twd=float(row["displayed_price_twd"]))
         refreshed = dict(previous.get("outbound_refresh", {}))
-        base = {"engine": "google_flights", "departure_id": cfg["origin"],
-                "arrival_id": cfg["destination"], "outbound_date": cfg["outbound_date"],
-                "return_date": cfg["inbound_date"], "type": 1, "travel_class": 1,
-                "adults": cfg["passengers"]["adults"], "children": cfg["passengers"]["children"],
-                "stops": 1, "currency": cfg["currency"], "gl": cfg["market"].lower(),
-                "hl": cfg["locale"].lower(), "include_airlines": ",".join(cfg["full_service_airlines"]),
-                "api_key": key}
+        base = market_scan_params(cfg, key)
         stage = "account_before"
         account_calls += 1
         before = quota_state(request_json({"api_key": key}, ACCOUNT_BASE))

@@ -23,3 +23,11 @@ Record `planned_searches` after selecting expansions, alongside actual attempted
 State mode, trip dates/passengers/cabin, market airline coverage including preference mismatches, expanded outbound coverage and itinerary count, raw displayed prices with unknown scope, each quote's observation time, new lows/price changes, deferred/missing coverage, attempted searches versus Account API deltas, and remaining quota. Mark stale quotes and unconfirmed family prices/baggage explicitly. Say the refresh check runs on invocation when schedules are disabled.
 
 Do not claim availability guarantees, verified family totals, baggage entitlement, full refresh completion, or quota billing facts that the recorded evidence does not establish.
+
+## Experimental A/B report
+
+Separate experiment `results.json` records `single_scan` or `ab_comparison`, a hash and safe copy of shared query conditions, planned/attempted searches and Account-call count. Each variant has the explicit boolean `deep_search`, request/parse status, raw offers and eligible distinct flight count, exact flight prices, response time seconds, safe search metadata, quota before/after and observed account-wide delta. Keep unknown price scope, null family total and unknown baggage.
+
+For successful A/B pairs, report added/removed flight numbers, common-flight price differences and response-time difference (true minus false). Flag sequential timing, caching and delayed quota-counter limitations. Failed or quota-limited pairs must not claim a complete comparison. Store sanitized errors and SHA-256 checks showing whether all four production monitoring files stayed unchanged. These hashes are evidence of isolation, not additional writes to the baseline.
+
+The experiment artifact is independent of all formal snapshots/history. It is suitable for deciding whether to change a production default later; running the experiment does not authorize that change.

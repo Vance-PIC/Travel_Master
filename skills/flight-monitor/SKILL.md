@@ -11,6 +11,8 @@ Read [search-policy.md](references/search-policy.md) before querying or changing
 
 Use `full_query` to establish the main outbound flights' return combinations; use `monitor_query` for one default market scan, conditionally expanding return flights or refreshing overdue itineraries. A market fare is a detection signal. Only the price of an explicitly expanded outbound + inbound combination belongs in itinerary price history.
 
+For an explicitly requested SerpApi `deep_search` test, use the isolated `scripts/flight_market_test.py` entry point and the experiment section of [search-policy.md](references/search-policy.md). This API parameter applies to Market Scan and is distinct from departure-token return expansion. Do not change production defaults or write experiment observations into baseline/history.
+
 Hard Filters define API eligibility. Evaluate time Preferences locally; retain eligible flights even if they fail a Preference. Unknown return times remain unknown. Never enable business-cabin queries as routine monitoring.
 
 Use actual Account API usage and remaining quota, with conservative bounds for delayed counters. Defer deep/full refreshes when quota requires it; report missing, deferred and stale coverage instead of claiming a full baseline.

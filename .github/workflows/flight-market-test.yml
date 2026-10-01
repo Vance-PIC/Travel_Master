@@ -1,0 +1,61 @@
+name: Flight Market Scan deep_search experiment
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "One Market Scan or false/true A/B comparison"
+        required: true
+        type: choice
+        default: single_scan
+        options:
+          - single_scan
+          - ab_comparison
+      deep_search:
+        description: "SerpApi deep_search for single_scan (A/B always runs false then true)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nagoya-flight-monitor
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test experiment isolation and monitoring regressions without API usage
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Run isolated Market Scan experiment
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          TEST_MODE: ${{ inputs.test_mode }}
+          DEEP_SEARCH: ${{ inputs.deep_search }}
+        run: |
+          if [ "$TEST_MODE" = "ab_comparison" ]; then
+            python3 scripts/flight_market_test.py --compare
+          else
+            python3 scripts/flight_market_test.py --deep-search "$DEEP_SEARCH"
+          fi
+
+      - name: Retain experiment results without committing production data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flight-market-deep-search-${{ github.run_id }}
+          path: travel/nagoya/flights/experiments/deep-search/**/results.json
+          if-no-files-found: warn

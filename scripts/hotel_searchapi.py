@@ -39,8 +39,10 @@ def safe_text(value, key):
     return re.sub(r'[\x00-\x1f\x7f]', ' ', text)[:500]
 
 
-def diagnostics(category, status, data, key):
+def diagnostics(category, status, data, key, params=None):
     result = {'provider': 'searchapi.io', 'category': category, 'http_status': status}
+    allowed = ('engine', 'q', 'check_in_date', 'check_out_date', 'adults', 'children_ages', 'currency', 'hl', 'gl', 'property_type')
+    result['request_parameters'] = {k: safe_text(str(v), key) for k, v in (params or {}).items() if k in allowed}
     if isinstance(data, dict):
         error = data.get('error') or data.get('errors')
         if isinstance(error, list): error = error[0] if error else None
@@ -78,24 +80,26 @@ class Client:
                 status = getattr(response, 'status', None)
                 data = json.load(response)
             if not isinstance(data, dict) or data.get('error') or data.get('errors'):
-                raise SearchAPIError(diagnostics('api_error', status, data, self.key))
+                raise SearchAPIError(diagnostics('api_error', status, data, self.key, params))
             return data
         except urllib.error.HTTPError as exc:
             try:
                 data = json.loads(exc.read(65536))
             except Exception:
                 data = None
-            raise SearchAPIError(diagnostics('http_error', exc.code, data, self.key)) from None
+            raise SearchAPIError(diagnostics('http_error', exc.code, data, self.key, params)) from None
         except SearchAPIError:
             raise
         except (ValueError, UnicodeError):
-            raise SearchAPIError(diagnostics('invalid_json', status, None, self.key)) from None
+            raise SearchAPIError(diagnostics('invalid_json', status, None, self.key, params)) from None
         except Exception:
             # Never expose URLs, headers or upstream bodies in logs. No retry.
-            raise SearchAPIError(diagnostics('transport_error', None, None, self.key)) from None
+            raise SearchAPIError(diagnostics('transport_error', None, None, self.key, params)) from None
 
 
-def parameters(monitor, currency):
+def parameters(monitor, currency, hl, gl):
+    if not hl or not gl or not currency:
+        raise ValueError('Explicit currency, hl and gl configuration required')
     party = monitor['party']
     ages = party.get('child_ages')
     if not isinstance(ages, list) or len(ages) != party['children']:
@@ -107,7 +111,7 @@ def parameters(monitor, currency):
         raise ValueError('Invalid stay dates')
     return {'check_in_date': stay['check_in'], 'check_out_date': stay['check_out'],
             'adults': party['adults'], 'children_ages': ','.join(map(str, ages)),
-            'currency': currency, 'hl': 'en', 'gl': 'tw'}
+            'currency': currency, 'hl': hl, 'gl': gl}
 
 
 def room_quotes(data, currency):
@@ -136,7 +140,7 @@ def room_quotes(data, currency):
 
 def verify(config, monitor_id, client):
     m = next(m for m in config['monitors'] if m['monitor_id'] == monitor_id)
-    p = parameters(m, config['api']['query_currency'])
+    p = parameters(m, config['api']['query_currency'], config['api']['hl'], config['api']['gl'])
     query = m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor'] + ' hotels'
     listing = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
     properties = listing.get('properties', [])

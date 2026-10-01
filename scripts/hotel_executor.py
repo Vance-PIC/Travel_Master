@@ -155,7 +155,7 @@ def location(config, monitor_id, root):
 
 
 def collect(config, m, client):
-    p = parameters(m, config['api']['query_currency'])
+    p = parameters(m, config['api']['query_currency'], config['api']['hl'], config['api']['gl'])
     query = m.get('search', {}).get('query') or (m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels')
     data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
     if not isinstance(data.get('properties'), list): raise ValueError('Missing hotel results')

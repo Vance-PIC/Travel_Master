@@ -229,6 +229,8 @@
     "query_currency": "JPY",
     "max_verification_requests": 5,
     "mode": "manual_capability_verification",
-    "max_requests_per_run": 5
+    "max_requests_per_run": 5,
+    "hl": "en-US",
+    "gl": "TW"
   }
 }

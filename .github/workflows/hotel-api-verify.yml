@@ -1,0 +1,26 @@
+name: Hotel API verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline safety tests
+        run: python -m unittest discover -s scripts -p test_hotel_searchapi.py
+      - name: Manually verify booked hotel API (maximum five requests)
+        env:
+          SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
+        run: python scripts/hotel_searchapi.py --live --output work/hotel-api-verification.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hotel-api-verification
+          path: work/hotel-api-verification.json
+          retention-days: 7

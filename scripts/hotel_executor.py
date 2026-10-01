@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import uuid
 from datetime import datetime, timezone
-from hotel_searchapi import Client, parameters, room_quotes
+from hotel_searchapi import Client, SearchAPIError, parameters, room_quotes
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = 'schema_version run_id monitor_id stage comparison_key observed_at source hotel_key room_key rate_key status amount currency price_scope tax_fee_inclusion filter_status room_match comparison_status evidence_ref'.split()
@@ -219,11 +219,12 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
                         'coverage': coverage, 'observations': [assess(m, q, config['execution'].get('max_quote_age_hours'), last['ended_at']) for q in rows]}
             last.update(status='success', snapshot_run_id=last['run_id'])
             persist(directory, snapshot, last)
-        except Exception:
+        except Exception as exc:
             if (directory/'.transaction.json').exists():
                 # Prepared complete transaction: roll forward before another query.
                 raise RuntimeError('Persistence interrupted; recovery required') from None
             last.update(status='error', ended_at=now(), error='Hotel query or validation failed', attempted_requests=getattr(client, 'attempts', 0))
+            if isinstance(exc, SearchAPIError): last['error_diagnostics'] = exc.diagnostics
             last['coverage']['failed'] = ['searchapi.io']
             atomic(directory/'last-run.json', json.dumps(last, ensure_ascii=False, indent=2))
         return last

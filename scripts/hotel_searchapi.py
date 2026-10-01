@@ -1,13 +1,59 @@
 """Bounded SearchAPI hotel capability verification; no alerts or monitor snapshots."""
 import argparse
+import base64
 from datetime import datetime, timezone
 import json
 import os
+import re
 from pathlib import Path
 import urllib.parse
 import urllib.request
+import urllib.error
 
 ENDPOINT = 'https://www.searchapi.io/api/v1/search'
+
+
+class SearchAPIError(RuntimeError):
+    def __init__(self, diagnostics):
+        super().__init__('SearchAPI request failed')
+        self.diagnostics = diagnostics
+
+
+def safe_text(value, key):
+    if not isinstance(value, str): return None
+    text = value
+    # Decode escaped credentials before redaction; never retain raw response.
+    for _ in range(3): text = urllib.parse.unquote(text)
+    secrets = [key] + [v for k, v in os.environ.items()
+                       if re.search(r'KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|AUTH', k, re.I) and v]
+    variants = set()
+    for secret in secrets:
+        if secret:
+            variants.update((secret, base64.b64encode(secret.encode()).decode(),
+                             json.dumps(secret)[1:-1]))
+    for secret in sorted(variants, key=len, reverse=True): text = text.replace(secret, '[REDACTED]')
+    text = re.sub(r'https?://\S+', '[URL REDACTED]', text, flags=re.I)
+    text = re.sub(r'Authorization[\"\x27]?\s*[:=][^\r\n]*', '[HEADER REDACTED]', text, flags=re.I)
+    text = re.sub(r'\bBearer\s+\S+', '[CREDENTIAL REDACTED]', text, flags=re.I)
+    text = re.sub(r'\b(?:[\w-]*(?:api[_-]?key|token|secret|password|credential))[\"\x27]?\s*[:=]\s*(?:\"[^\"]*\"|\x27[^\x27]*\x27|[^\s,;]+)', '[CREDENTIAL REDACTED]', text, flags=re.I)
+    return re.sub(r'[\x00-\x1f\x7f]', ' ', text)[:500]
+
+
+def diagnostics(category, status, data, key):
+    result = {'provider': 'searchapi.io', 'category': category, 'http_status': status}
+    if isinstance(data, dict):
+        error = data.get('error') or data.get('errors')
+        if isinstance(error, list): error = error[0] if error else None
+        if isinstance(error, dict):
+            typ = error.get('type') or error.get('code')
+            message = error.get('message')
+        else:
+            typ = data.get('error_type') or data.get('type')
+            message = error if isinstance(error, str) else data.get('message')
+        for field, value in (('error_type', typ), ('message', message)):
+            cleaned = safe_text(value, key)
+            if cleaned: result[field] = cleaned
+    return result
 
 
 class Client:
@@ -26,15 +72,27 @@ class Client:
         self.attempts += 1
         request = urllib.request.Request(ENDPOINT + '?' + urllib.parse.urlencode(params),
                                         headers={'Authorization': 'Bearer ' + self.key})
+        status = None
         try:
             with self.opener(request, timeout=60) as response:
+                status = getattr(response, 'status', None)
                 data = json.load(response)
             if not isinstance(data, dict) or data.get('error') or data.get('errors'):
-                raise ValueError('Invalid response')
+                raise SearchAPIError(diagnostics('api_error', status, data, self.key))
             return data
+        except urllib.error.HTTPError as exc:
+            try:
+                data = json.loads(exc.read(65536))
+            except Exception:
+                data = None
+            raise SearchAPIError(diagnostics('http_error', exc.code, data, self.key)) from None
+        except SearchAPIError:
+            raise
+        except (ValueError, UnicodeError):
+            raise SearchAPIError(diagnostics('invalid_json', status, None, self.key)) from None
         except Exception:
             # Never expose URLs, headers or upstream bodies in logs. No retry.
-            raise RuntimeError('SearchAPI request failed') from None
+            raise SearchAPIError(diagnostics('transport_error', None, None, self.key)) from None
 
 
 def parameters(monitor, currency):
@@ -123,6 +181,7 @@ def main():
     except RuntimeError as exc:
         report = {'mode': 'capability_verification', 'status': 'failed',
                   'attempted_requests': client.attempts, 'error': str(exc)}
+        if isinstance(exc, SearchAPIError): report['error_diagnostics'] = exc.diagnostics
     # Verification artifacts must never overwrite operational persistence.
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')

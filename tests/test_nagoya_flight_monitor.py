@@ -95,7 +95,9 @@ class MonitorTests(unittest.TestCase):
         self.assertIn("near_family_target", m.deep_reasons(row, [row], {}, CFG))
 
     def test_api_and_parse_failures_preserve_files_and_redact_secret(self):
-        for failure in (RuntimeError("https://example/?api_key=fake-secret"), {}, {"best_flights": "bad"}, {"best_flights": [{"flights": None}]}):
+        missing_airport = offer()
+        del missing_airport["flights"][0]["departure_airport"]["id"]
+        for failure in (RuntimeError("https://example/?api_key=fake-secret"), {}, {"best_flights": "bad"}, {"best_flights": [{"flights": None}]}, {"best_flights": [missing_airport]}):
             with self.subTest(failure=failure):
                 self.seed([offer()])
                 self.history.write_text("custom_column\noriginal\n")

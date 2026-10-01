@@ -83,6 +83,8 @@ def candidate(item, cfg, inbound=False):
     seg = flights[0]
     code = airline_code(seg.get("flight_number"))
     dep, arr = seg.get("departure_airport", {}), seg.get("arrival_airport", {})
+    if not code or not dep.get("id") or not arr.get("id") or not seg.get("travel_class"):
+        raise ValueError("Required segment fields missing")
     origin, destination = (cfg["destination"], cfg["origin"]) if inbound else (cfg["origin"], cfg["destination"])
     date = cfg["inbound_date"] if inbound else cfg["outbound_date"]
     if code not in cfg["full_service_airlines"]:

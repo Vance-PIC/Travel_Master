@@ -16,9 +16,9 @@ class DiagnosticsTests(unittest.TestCase):
         with self.assertRaises(SearchAPIError) as caught:
             Client('private-key', opener=opener).search({'engine': 'google_hotels_property',
                 'q': 'Hotel private-key', 'property_token': 'opaque-value', 'Authorization': 'private-key',
-                'check_in_date': '2027-07-11', 'hl': 'en-US', 'gl': 'TW', 'currency': 'JPY'})
+                'check_in_date': '2027-07-11', 'hl': 'en', 'gl': 'TW', 'currency': 'JPY'})
         d = caught.exception.diagnostics
-        self.assertEqual(d['request_parameters']['hl'], 'en-US')
+        self.assertEqual(d['request_parameters']['hl'], 'en')
         self.assertEqual(d['request_parameters']['check_in_date'], '2027-07-11')
         self.assertNotIn('private-key', json.dumps(d))
         self.assertNotIn('opaque-value', json.dumps(d))
@@ -61,7 +61,7 @@ class DiagnosticsTests(unittest.TestCase):
 
     def test_executor_saves_safe_diagnostics_and_protects_history(self):
         cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
-               'api': {'query_currency': 'JPY', 'hl': 'en-US', 'gl': 'TW'}, 'monitors': [monitor()]}
+               'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}, 'monitors': [monitor()]}
         body = io.BytesIO(b'{"error":{"type":"quota_exceeded","message":"No remaining credits"}}')
         client = Client('private-key', opener=Mock(side_effect=urllib.error.HTTPError('url', 429, 'reason', {}, body)))
         with tempfile.TemporaryDirectory() as tmp:

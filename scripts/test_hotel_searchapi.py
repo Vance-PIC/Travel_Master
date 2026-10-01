@@ -17,7 +17,7 @@ class HotelTests(unittest.TestCase):
         listing = {'properties': [{'type': 'hotel', 'name': str(i), 'property_token': str(i)} for i in range(8)]}
         opener = Mock(side_effect=[io.StringIO(json.dumps(listing))] + [io.StringIO('{"property": {}}') for _ in range(4)])
         client = Client('test', 5, opener)
-        config = {'api': {'query_currency': 'JPY', 'hl': 'en-US', 'gl': 'TW'}, 'monitors': [{'monitor_id': 'test',
+        config = {'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}, 'monitors': [{'monitor_id': 'test',
                   'stage': 'candidate_search', 'stay': {'check_in': '2027-07-17', 'check_out': '2027-07-18'},
                   'party': {'adults': 2, 'children': 2, 'child_ages': [9, 7]},
                   'hard_filters': {'location': {'anchor': 'airport'}}}]}
@@ -29,10 +29,10 @@ class HotelTests(unittest.TestCase):
     def test_children_are_explicit(self):
         m = {'stay': {'check_in': '2027-07-11', 'check_out': '2027-07-17'},
              'party': {'adults': 2, 'children': 2, 'child_ages': [9, 7]}}
-        self.assertEqual(parameters(m, 'JPY', 'en-US', 'TW')['children_ages'], '9,7')
+        self.assertEqual(parameters(m, 'JPY', 'en', 'TW')['children_ages'], '9,7')
         m['party']['child_ages'] = None
         with self.assertRaises(ValueError):
-            parameters(m, 'JPY', 'en-US', 'TW')
+            parameters(m, 'JPY', 'en', 'TW')
 
     def test_aggregate_is_never_a_room_quote(self):
         self.assertEqual(room_quotes({'property': {'total_price': {'extracted_price': 1},

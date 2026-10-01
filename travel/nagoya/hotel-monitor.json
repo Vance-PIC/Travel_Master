@@ -230,7 +230,7 @@
     "max_verification_requests": 5,
     "mode": "manual_capability_verification",
     "max_requests_per_run": 5,
-    "hl": "en-US",
+    "hl": "en",
     "gl": "TW"
   }
 }

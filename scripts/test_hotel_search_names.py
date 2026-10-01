@@ -15,7 +15,7 @@ class SearchNameTests(unittest.TestCase):
             {'type': 'hotel', 'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id', 'property_token': 'token'},
             {'type': 'hotel', 'name': 'Hotel Live Max Nagoya OTHER', 'property_token': 'wrong'}]},
             {'property': {'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id'}}]
-        rows, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en-US', 'gl': 'TW'}}, m, client)
+        rows, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
         self.assertEqual(client.search.call_count, 2)
         first = client.search.call_args_list[0].args[0]
         self.assertEqual(first['q'], m['search']['query'])
@@ -26,7 +26,7 @@ class SearchNameTests(unittest.TestCase):
             self.assertEqual(p['check_in_date'], '2027-07-11')
             self.assertEqual(p['check_out_date'], '2027-07-17')
             self.assertEqual(p['currency'], 'JPY')
-            self.assertEqual(p['hl'], 'en-US')
+            self.assertEqual(p['hl'], 'en')
             self.assertEqual(p['gl'], 'TW')
         self.assertEqual(coverage['completed'], ['id'])
         self.assertEqual(rows, [])

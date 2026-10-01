@@ -1,21 +1,21 @@
 {
-  "run_id": "8443bd7effb04b2ebabf5f39e91b7de0",
+  "run_id": "394d2ca253c0496e914aecb5ed710286",
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "started_at": "2026-10-01T08:24:44.155676+00:00",
-  "status": "error",
-  "snapshot_run_id": null,
+  "started_at": "2026-10-01T10:28:59.266586+00:00",
+  "status": "success",
+  "snapshot_run_id": "394d2ca253c0496e914aecb5ed710286",
   "coverage": {
     "requested": [
-      "searchapi.io"
+      "0x6003711bc3781f9b:0x8adc85566de9c8fe"
     ],
-    "completed": [],
+    "completed": [
+      "0x6003711bc3781f9b:0x8adc85566de9c8fe"
+    ],
     "deferred": [],
-    "failed": [
-      "searchapi.io"
-    ]
+    "failed": [],
+    "provider": "searchapi.io"
   },
-  "ended_at": "2026-10-01T08:24:45.287072+00:00",
-  "error": "Hotel query or validation failed",
-  "attempted_requests": 1
+  "attempted_requests": 2,
+  "ended_at": "2026-10-01T10:29:03.875842+00:00"
 }

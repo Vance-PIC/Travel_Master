@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "monitor_id": "marunouchi-booked",
+  "stage": "booked_room_compare",
+  "run_id": "394d2ca253c0496e914aecb5ed710286",
+  "checked_at": "2026-10-01T10:29:03.875842+00:00",
+  "config_fingerprint": "4bbd75d1b7dcd03e5c7f046251353ba5eebd52ed966403d97b8892da21eba7ef",
+  "comparison_key": "2cafd26920a4651a60616a127b14084f7abc3e2250df6b963b33aaa176d918ed",
+  "coverage": {
+    "requested": [
+      "0x6003711bc3781f9b:0x8adc85566de9c8fe"
+    ],
+    "completed": [
+      "0x6003711bc3781f9b:0x8adc85566de9c8fe"
+    ],
+    "deferred": [],
+    "failed": [],
+    "provider": "searchapi.io"
+  },
+  "observations": [
+    {
+      "hotel_name": "Hotel Live Max PREMIUM Nagoya Marunouchi",
+      "hotel_data_id": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
+      "source": "Booking.com",
+      "room_name": "Twin Room - Smoking",
+      "evidence_path": "property.featured_offers[1].rooms[0].rates[0]",
+      "total_amount": 76273,
+      "nightly_amount": 12712,
+      "query_currency": "JPY",
+      "price_scope": "unknown",
+      "reported_num_guests": null,
+      "room_size_m2": null,
+      "beds": null,
+      "smoking": null,
+      "cancellation": true,
+      "payment": null,
+      "benefits": null,
+      "tax_fee_inclusion": "unknown",
+      "room_match": "uncertain",
+      "comparison_status": "pending_confirmation",
+      "alert_eligible": false,
+      "observed_at": "2026-10-01T10:29:03.875605+00:00",
+      "stay": {
+        "check_in": "2027-07-11",
+        "check_out": "2027-07-17"
+      },
+      "party": {
+        "adults": 2,
+        "children": 2,
+        "child_ages": [
+          9,
+          7
+        ],
+        "rooms": 1
+      },
+      "rate_key": "291c55cfcab88ec4495abc11d55a888472d82731fa088735948a68327a680238",
+      "evidence": {
+        "hotel_data_id": {
+          "field": "hotel_data_id",
+          "literal_value": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
+          "source": "searchapi.io",
+          "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
+          "observed_at": "2026-10-01T10:29:03.875605+00:00"
+        },
+        "room_name": {
+          "field": "room_name",
+          "literal_value": "Twin Room - Smoking",
+          "source": "searchapi.io",
+          "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
+          "observed_at": "2026-10-01T10:29:03.875605+00:00"
+        },
+        "total_amount": {
+          "field": "total_amount",
+          "literal_value": 76273,
+          "source": "searchapi.io",
+          "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
+          "observed_at": "2026-10-01T10:29:03.875605+00:00"
+        },
+        "nightly_amount": {
+          "field": "nightly_amount",
+          "literal_value": 12712,
+          "source": "searchapi.io",
+          "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
+          "observed_at": "2026-10-01T10:29:03.875605+00:00"
+        }
+      },
+      "field_status": {
+        "stay": "unknown",
+        "party": "unknown",
+        "availability": "unknown",
+        "room_size_m2": "unknown",
+        "beds.count": "unknown",
+        "beds.type": "unknown",
+        "smoking": "unknown",
+        "hotel_identity": "unknown"
+      },
+      "filter_status": "pending_confirmation",
+      "fresh": true,
+      "retained": false,
+      "difference": null,
+      "alert_reached": null,
+      "comparison_checks": {
+        "currency": "unknown",
+        "price_scope": "unknown",
+        "tax_fee_inclusion": "unknown",
+        "cancellation": "unknown",
+        "payment": "unknown",
+        "benefits": "unknown",
+        "scope": "unknown",
+        "eligibility": "unknown",
+        "baseline_source": "unknown",
+        "amount": "pass",
+        "amount_evidence": "pass",
+        "freshness": "unknown"
+      }
+    }
+  ]
+}

@@ -22,7 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: master
+          ref: ${{ github.sha }}
+          persist-credentials: ${{ github.ref == 'refs/heads/master' }}
+      - name: Verify triggering commit
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -35,8 +40,9 @@ jobs:
           MONITOR_ID: ${{ inputs.monitor }}
         run: python scripts/hotel_executor.py run --monitor "$MONITOR_ID" --allow-query
       - name: Save monitoring records including failed-run diagnostics
-        if: always() && steps.query.outcome != 'skipped'
+        if: always() && github.ref == 'refs/heads/master' && (steps.query.outcome == 'success' || steps.query.outcome == 'failure')
         run: |
+          if [ "$GITHUB_REF" != "refs/heads/master" ]; then exit 0; fi
           if [ ! -d travel/nagoya/hotels ]; then exit 0; fi
           git add travel/nagoya/hotels
           if git diff --cached --quiet; then exit 0; fi

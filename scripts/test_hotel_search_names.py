@@ -5,6 +5,22 @@ from test_hotel_executor import monitor
 
 
 class SearchNameTests(unittest.TestCase):
+    def test_confirmed_property_token_skips_discovery(self):
+        m = monitor('booked_room_compare')
+        m['hotel_identity']['name'] = 'Hotel'
+        m['search'] = {'property_token': 'ChConfirmed', 'property_token_evidence': {'source': 'searchapi.io', 'reference': 'confirmed response'}}
+        client = Mock(attempts=1, limit=5)
+        client.search.return_value = {'property': {'name': 'Hotel', 'data_id': 'hotel1'}}
+        collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+        client.search.assert_called_once()
+        params = client.search.call_args.args[0]
+        self.assertEqual(params['engine'], 'google_hotels_property')
+        self.assertEqual(params['property_token'], 'ChConfirmed')
+        self.assertNotIn('q', params)
+        m['search']['property_token'] = '/g/kgmid'
+        with self.assertRaises(ValueError):
+            collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+
     def test_query_alias_preserves_exact_party_dates_and_currency(self):
         m = monitor('booked_room_compare')
         m['hotel_identity'] = {'name': 'Hotel LiVEMAX PREMIUM Nagoya Marunouchi', 'source_ids': {},

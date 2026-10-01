@@ -157,7 +157,20 @@ def location(config, monitor_id, root):
 def collect(config, m, client):
     p = parameters(m, config['api']['query_currency'], config['api']['hl'], config['api']['gl'])
     query = m.get('search', {}).get('query') or (m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels')
-    data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
+    pinned = m.get('search', {}).get('property_token')
+    if pinned:
+        token_evidence = m.get('search', {}).get('property_token_evidence') or {}
+        if (m['stage'] != 'booked_room_compare' or not token_evidence.get('source') or
+                not token_evidence.get('reference') or not m['hotel_identity'].get('source_ids', {}).get('searchapi.io')):
+            raise ValueError('Confirmed token evidence required for booked hotel')
+        # kgmid and arbitrary name-derived IDs are not property tokens.
+        if not isinstance(pinned, str) or pinned.startswith('/'):
+            raise ValueError('Invalid property token')
+        data = {'properties': [{'type': 'hotel', 'name': m['hotel_identity']['name'],
+                               'data_id': m['hotel_identity'].get('source_ids', {}).get('searchapi.io'),
+                               'property_token': pinned}]}
+    else:
+        data = client.search(dict(p, engine='google_hotels', q=query, property_type='hotel'))
     if not isinstance(data.get('properties'), list): raise ValueError('Missing hotel results')
     hotels = data['properties']
     if m['stage'] == 'booked_room_compare':
@@ -166,6 +179,8 @@ def collect(config, m, client):
         normalize = lambda value: re.sub(r'[^\w]', '', value.casefold())
         hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else normalize(h.get('name', '')) in {normalize(n) for n in names})]
     completed, deferred, rows = [], [], []
+    if m['stage'] == 'booked_room_compare' and not hotels:
+        deferred.append('target_hotel_not_identified')
     for h in hotels:
         if h.get('type') != 'hotel': continue
         key = h.get('data_id') or h.get('name')

@@ -219,7 +219,9 @@
         "alert.price_scope"
       ],
       "search": {
-        "query": "Hotel Live Max PREMIUM Nagoya Marunouchi"
+        "query": "Hotels in Marunouchi Nagoya Japan",
+        "property_token": null,
+        "property_token_evidence": null
       }
     }
   ],

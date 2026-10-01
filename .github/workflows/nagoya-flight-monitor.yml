@@ -2,6 +2,15 @@ name: Nagoya SerpApi flight monitor
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Full itinerary baseline or daily market monitoring"
+        required: true
+        type: choice
+        default: monitor_query
+        options:
+          - monitor_query
+          - full_query
 
 permissions:
   contents: write
@@ -39,12 +48,16 @@ jobs:
       - name: Search Google Flights exact-date fares
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-        run: python3 scripts/nagoya_flight_monitor.py
+          QUERY_MODE: ${{ inputs.mode }}
+        run: python3 scripts/nagoya_flight_monitor.py --mode "$QUERY_MODE"
 
       - name: Commit monitoring data
         if: always()
         run: |
           git add travel/nagoya/flights/latest.json travel/nagoya/flights/history.csv
+          if [ -f travel/nagoya/flights/itinerary_history.csv ]; then
+            git add travel/nagoya/flights/itinerary_history.csv
+          fi
           if [ -f travel/nagoya/flights/last-run.json ]; then
             git add travel/nagoya/flights/last-run.json
           fi
@@ -66,3 +79,4 @@ jobs:
           path: |
             travel/nagoya/flights/latest.json
             travel/nagoya/flights/last-run.json
+            travel/nagoya/flights/itinerary_history.csv

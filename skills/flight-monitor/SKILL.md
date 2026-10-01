@@ -1,20 +1,22 @@
 ---
 name: flight-monitor
-description: Monitor flight fares within a limited API budget, distinguish mandatory filters from preferences, compare market snapshots, and report verified price scope. Use for recurring fare monitoring or adapting an existing flight monitor to another route.
+description: Build full round-trip itinerary baselines and monitor fare changes within an API budget, separating market signals from itinerary price history and mandatory filters from preferences. Use for flight fare baselines, recurring monitoring, or adapting a monitor to another trip.
 ---
 
-# Flight Monitor
+# Flight Monitor v2
 
-Load the trip's existing configuration for route, dates, passengers, cabin, market, airline eligibility, preferences and price target. Keep trip-specific values outside this Skill. The current executor is `scripts/nagoya_flight_monitor.py`; its trip configuration lives under `travel/nagoya/flight-monitor.json`.
+Load route, dates, passengers, cabin, airline eligibility, market/currency, time preferences, main outbound flights and budget from the trip configuration. Keep trip-specific values outside this Skill. The current executor is `scripts/nagoya_flight_monitor.py`, with trip configuration under `travel/nagoya/flight-monitor.json`.
 
-Read [search-policy.md](references/search-policy.md) before searching or changing an executor. Read [report-format.md](references/report-format.md) when persisting or presenting results.
+Read [search-policy.md](references/search-policy.md) before querying or changing execution. Read [report-format.md](references/report-format.md) when persisting or presenting results.
 
-Use mandatory Hard Filters in the API request. Evaluate Preferences locally and retain all eligible market candidates, including preference mismatches. An unknown return time is unknown, not a failed preference.
+Use `full_query` to establish the main outbound flights' return combinations; use `monitor_query` for one default market scan, conditionally expanding return flights or refreshing overdue itineraries. A market fare is a detection signal. Only the price of an explicitly expanded outbound + inbound combination belongs in itinerary price history.
 
-Start with one Market Scan. Compare like-for-like observations and use a returned departure token for at most one Deep Search when the policy permits. Check actual account usage and remaining quota; do not infer quota from this monitor's history alone. Business cabin searches require a separate explicit request.
+Hard Filters define API eligibility. Evaluate time Preferences locally; retain eligible flights even if they fail a Preference. Unknown return times remain unknown. Never enable business-cabin queries as routine monitoring.
 
-Store the API's displayed price without assuming per-person or family-total semantics, multiplying by passenger count, or claiming baggage inclusion. A family target comparison requires independently verified price scope and matching passengers/currency.
+Use actual Account API usage and remaining quota, with conservative bounds for delayed counters. Defer deep/full refreshes when quota requires it; report missing, deferred and stale coverage instead of claiming a full baseline.
 
-Keep the last valid snapshot on API or parsing failure. Record a separate sanitized error with stage, timestamp, attempted searches and known quota. Never log keys, token URLs, account identity or raw account responses.
+Never multiply price by passenger count. Maintain `price_scope: unknown`, `family_total_twd: null`, and `baggage_status: unknown` until independently verified. Do not use an unverified fare as a family-budget claim.
 
-Use authorized data sources. Stop on CAPTCHA or anti-bot blocks; do not circumvent them. Respect the user's authorization for paid usage and remote writes. Do not enable recurring schedules unless explicitly requested.
+On API/parsing failure preserve the last valid snapshot and histories. Save a separate sanitized error including stage and attempted searches. Never persist keys, departure tokens, credential URLs, account identity or raw account responses.
+
+Use authorized data sources. Stop at CAPTCHA or anti-bot blocks without bypass attempts. Respect the user's authorization for quota usage and remote writes. Periodic refresh checks happen when a query runs; they do not authorize enabling a schedule.

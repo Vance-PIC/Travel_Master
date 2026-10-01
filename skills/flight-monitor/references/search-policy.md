@@ -1,42 +1,50 @@
-# Search policy
+# Search policy v2
 
-## Hard Filters and Preferences
+## Hard Filters versus Preferences
 
-Hard Filters define eligibility: route, travel dates, passenger counts, cabin, nonstop requirement, approved full-service airline codes, currency and country/locale. API adapters must enforce these and validate returned segments. A market result is an outbound candidate, not a confirmed round-trip pair.
+Hard Filters: route, outbound/return dates, passenger counts, cabin, nonstop, approved full-service airline codes, currency and market/locale. Validate both outbound and return segments against them. Keep all distinct eligible outbound flights in Market Scan, using the lowest displayed offer when the API returns duplicates of one flight.
 
-Preferences rank or label eligible results: departure/arrival time cutoffs, airline preference and target budget. Never translate time preferences into API `outbound_times` or `return_times`, or delete legal airlines because of them. Use airport-local times. Boundary comparisons are strictly before the configured cutoff. Record true/false/null per leg; combined preference is false if either fails, true only if both pass, otherwise null.
+Time cutoffs and airline preferences label/rank results locally. Never send `outbound_times` or `return_times`. A strict before cutoff excludes the exact boundary from preference matches but never removes that flight. Airport times are local. Combined preference is false if either leg fails, true if both pass, otherwise null.
 
-## Market Scan and Local preference evaluation
+## Execution modes
 
-Read the account before searching. One round-trip Economy market request is the default. Parse both best and other flight groups; retain every eligible candidate without an arbitrary shortlist. Apply outbound preference locally; inbound preference stays null until a return segment is retrieved. Do not routinely search business class.
+`full_query`:
 
-## Deep Search triggers
+1. Check account and perform one Market Scan.
+2. Preserve all eligible outbound candidates, including time mismatches.
+3. Take the configured main outbound flights' current departure tokens and expand each flight's eligible return options within quota.
+4. Store every distinct outbound + inbound combination and its returned price; deduplicate identical itinerary keys by lowest displayed price.
+5. Report baseline coverage, missing tokens/flights, and deferred expansions. Full Query does not imply every market outbound was expanded; its coverage is the configured main list.
 
-Compare the same configured trip and outbound flight, with the same displayed-price basis and unknown scope treated only as a displayed-price observation. Never compare market prices with a return-stage price as if interchangeable.
+`monitor_query` (default):
 
-- New low: below the maintained historical market low for that flight.
-- Price drop: at least the configured fraction (default 5%) below the preceding market observation for that flight.
-- Near family target: verified family total at or below target plus the configured margin (default 10%). Unknown scope disables this trigger; do not substitute raw API price.
-- New airline or outbound flight since the previous valid market snapshot.
-- Initial baseline: only when no valid prior market exists; clearly label it.
+1. Perform one Market Scan and compare with the previous valid market snapshot for the same Hard Filters.
+2. Deep Search triggers: below historical market low, >=5% drop from previous market price, new airline, or new outbound flight. Do not compare market-stage prices with return-stage itinerary prices.
+3. Normally expand at most one triggered outbound. Retain other itinerary observations with their original checked time; do not create synthetic price-history rows from a market price.
+4. Even if market prices are unchanged, refresh main outbounds after a configured 3–5 days (default four; reduced quota five). Without a prior refresh timestamp they are due. At normal quota, expand the main due flights within the full refresh cap. At reduced quota, refresh one and rotate oldest checks first on subsequent runs.
+5. Compare each fresh itinerary price against its own last observed price and historical low in `itinerary_history.csv`, for the same route, currency and scope. Record drops, increases, new lows and new itineraries.
 
-Use the token from the current result, with the original hard parameters, for at most one additional request. Prioritize a substantial drop, then lowest displayed price among triggered candidates. Preserve all other market candidates. Validate return hard filters independently; mixed eligible full-service carriers are permitted. Do not claim return completeness from a single deep lookup.
+Substantial market drops have expansion priority, followed by oldest refresh timestamp, configured main-flight order and displayed price. Missing/deferred flights remain visible. A budget-limited refresh can stay overdue; never advance an outbound's refresh timestamp unless its query and parse succeeded.
 
-## Quota policy
+Retain unserved triggers in `pending_deep_search`. Carry them into the next monitor run even when its market scan is unchanged; remove a pending outbound only after its expansion succeeds. This prevents a one-expansion cap from permanently losing simultaneous new-flight signals. A missing token keeps the request deferred.
 
-Use SerpApi Account API `this_month_usage`, `total_searches_left`, `plan_searches_left`, and renewal date. Persist only these safe fields. Account calls are free and not counted as searches: [official documentation](https://serpapi.com/account-api). Search parameters and departure token behavior: [Google Flights API](https://serpapi.com/google-flights-api).
+Refresh is checked on execution, with no autonomous scheduling. If no queries run for several days, prices cannot be observed during that gap. A return combination absent from a successfully expanded outbound is `not_returned`, not a zero price or guaranteed sold-out flight. Unqueried outbounds' return combinations retain their previous timestamp; absence from the market scan alone is not proof of a price or availability change.
 
-| Actual monthly usage | Policy |
+## Quota
+
+Use safe Account API fields: `this_month_usage`, `total_searches_left`, `plan_searches_left`, renewal date. Account calls do not consume search quota: [official account documentation](https://serpapi.com/account-api). Departure tokens and parameters: [Google Flights API](https://serpapi.com/google-flights-api).
+
+| Monthly usage | Policy |
 | --- | --- |
-| <200 | One market scan; at most one triggered deep search |
-| 200–224 | Deep search only for >=5% drop or verified near-target total |
-| 225–239 | Market scan only |
-| >=240, or no remaining searches | Preserve quota; zero flight requests |
+| <200 | One market scan; normal monitor maximum one triggered expansion; full/due refresh up to configured main cap |
+| 200–224 | Full/deep/due refresh limited to one outbound per run; interval extended to five days |
+| 225–239 | Market scan only; mark refreshes deferred |
+| >=240 or no remaining searches | Stop nonessential queries; this executor makes zero flight requests |
 
-Recheck account after market and after deep search. For the next request use the more conservative of actual account values and starting usage plus attempted requests, so delayed counters cannot cross a boundary. Missing/invalid Account API data stops the run. No automatic paid retries. Concurrent users of the same key can affect account deltas; serialize this monitor and label the delta as account-wide, not exclusive billing proof.
+Read account before searching, after market and after every expansion. Before each further request use the larger of actual usage and initial usage plus attempted searches, and the smaller of actual remaining and initial remaining minus attempts. Reevaluate tier during Full Query; a run crossing 200 or 225 reduces/stops expansion. Account failure stops the run; no automatic paid retries. Account deltas cover all consumers of the key and can lag, so report attempted requests separately from observed account changes.
 
-## Failure and price semantics
+## Price semantics and failure
 
-Keep `price_scope: unknown` and `family_total_twd: null` until verified from a documented source for the same itinerary and passenger set. Never multiply displayed fare by passenger count. Baggage text is unverified unless separately confirmed.
+Price is the raw displayed API fare. Do not infer per-person/family scope or calculate price × passenger count. Maintain unknown scope, null family total and unknown baggage until independently verified. Preserve extension text only as unverified evidence if needed; it does not establish baggage entitlement. The v2 executor does not trigger family-budget comparisons.
 
-API/network/malformed payload failure preserves latest and history. A documented empty result is a successful empty observation. A deep failure fails the run and preserves the previous snapshot rather than publishing partial data as complete. Persist a separate sanitized last-run record, including failures and quota skips. Stop at CAPTCHA/anti-bot responses without bypass attempts.
+Finish all flight parsing before writing snapshots or histories. API/network/malformed response failure, including a failure late in Full Query, preserves the whole previous valid run and writes sanitized `last-run.json` diagnostics. A documented empty response is a successful empty observation. Never bypass CAPTCHA or anti-bot blocks.

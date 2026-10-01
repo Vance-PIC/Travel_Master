@@ -13,5 +13,11 @@
   "preferences": {"outbound_before": "12:00", "inbound_arrival_before": "21:00"},
   "family_target_twd": 50000,
   "target_margin_fraction": 0.10,
-  "drop_fraction": 0.05
+  "drop_fraction": 0.05,
+  "full_query_outbounds": ["CI154", "CX530", "JX838"],
+  "itinerary_refresh_days": 4,
+  "reduced_refresh_days": 5,
+  "full_max_expansions": 3,
+  "monitor_max_expansions": 1,
+  "reduced_max_expansions": 1
 }

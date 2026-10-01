@@ -1,4 +1,3 @@
-import copy
 import csv
 import importlib.util
 import json
@@ -37,7 +36,8 @@ class MonitorTests(unittest.TestCase):
         return {"this_month_usage": used, "total_searches_left": 250 - used}
 
     def seed(self, items):
-        self.latest.write_text(json.dumps({"market_candidates": [m.candidate(i, CFG) for i in items]}))
+        self.latest.write_text(json.dumps({"market_candidates": [m.candidate(i, CFG) for i in items],
+            "outbound_refresh": {n: m.iso_now() for n in CFG["full_query_outbounds"]}}))
 
     def run_monitor(self, responses):
         with patch.dict(m.os.environ, {"SERPAPI_KEY": "fake-secret"}), patch.object(m, "request_json", side_effect=responses) as req:
@@ -71,12 +71,14 @@ class MonitorTests(unittest.TestCase):
         self.assertEqual(req.call_args_list[3].args[0]["departure_token"], "test-token")
 
     def test_quota_boundaries_and_delayed_counters(self):
-        for start, count in ((199, 1), (200, 1), (224, 1), (225, 1), (239, 1), (240, 0)):
+        for start, count in ((199, 2), (200, 2), (224, 1), (225, 1), (239, 1), (240, 0)):
             with self.subTest(start=start):
                 self.seed([offer()])
                 responses = [self.account(start)]
                 if count:
                     responses += [{"best_flights": [offer("JX")]}, self.account(start)]
+                if count == 2:
+                    responses += [{"best_flights": []}, self.account(start)]
                 result, req = self.run_monitor(responses)
                 self.assertEqual(result, 0)
                 run = json.loads((self.latest.parent / "last-run.json").read_text())
@@ -92,7 +94,7 @@ class MonitorTests(unittest.TestCase):
         row = m.candidate(offer(price=50000), CFG)
         self.assertNotIn("near_family_target", m.deep_reasons(row, [row], {}, CFG))
         row.update(price_scope="family_total", family_total_twd=50000)
-        self.assertIn("near_family_target", m.deep_reasons(row, [row], {}, CFG))
+        self.assertNotIn("near_family_target", m.deep_reasons(row, [row], {}, CFG))
 
     def test_api_and_parse_failures_preserve_files_and_redact_secret(self):
         missing_airport = offer()

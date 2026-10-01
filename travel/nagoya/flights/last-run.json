@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-10-01T02:21:42+00:00",
+  "status": "ok",
+  "searches_used": 2,
+  "api_searches_used": 2,
+  "account_calls": 3,
+  "quota_before": {
+    "usage": 7,
+    "remaining": 243,
+    "tier": "normal",
+    "plan_searches_left": 243,
+    "renewal_date": "2026-10-30"
+  },
+  "quota_after": {
+    "usage": 8,
+    "remaining": 242,
+    "tier": "normal",
+    "plan_searches_left": 242,
+    "renewal_date": "2026-10-30"
+  },
+  "actual_usage_delta": 1,
+  "monitoring_mode": "market_plus_return"
+}

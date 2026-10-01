@@ -14,7 +14,7 @@ INBOUND_DATE = "2027-07-18"
 ORIGIN = "TPE"
 DESTINATION = "NGO"
 FULL_SERVICE_ALLOWLIST = {"CI", "CX", "JX", "BR", "NH", "JL"}
-MAX_OUTBOUND_LOOKUPS = 4
+MAX_OUTBOUND_LOOKUPS = 1
 
 ROOT = Path(__file__).resolve().parents[1]
 LATEST = ROOT / "travel/nagoya/flights/latest.json"
@@ -118,6 +118,9 @@ def main():
         "gl": "tw",
         "hl": "zh-tw",
         "sort_by": 2,
+        "include_airlines": "CI,CX,JX,BR,NH,JL",
+        "outbound_times": "0,11",
+        "return_times": "0,23,0,20",
         "api_key": api_key,
     }
 
@@ -127,6 +130,30 @@ def main():
         rows = []
         lookups = 0
 
+        # Keep the first-stage market scan so we can detect new eligible
+        # full-service nonstop options without expanding every outbound leg.
+        market_candidates = []
+        for item in outbound_options:
+            flights = item.get("flights") or []
+            if len(flights) != 1:
+                continue
+            seg = flights[0]
+            code = airline_code(seg.get("flight_number"))
+            if code not in FULL_SERVICE_ALLOWLIST:
+                continue
+            market_candidates.append({
+                "airline": seg.get("airline"),
+                "airline_iata": code,
+                "outbound_flight": seg.get("flight_number"),
+                "outbound_departure": (seg.get("departure_airport") or {}).get("time"),
+                "outbound_arrival": (seg.get("arrival_airport") or {}).get("time"),
+                "displayed_price_twd": item.get("price"),
+                "price_scope": "unknown",
+                "departure_token_available": bool(item.get("departure_token")),
+            })
+
+        # Expand only the best eligible outbound result. This keeps a normal
+        # monitoring cycle at exactly two SerpApi searches: market + return.
         for item in outbound_options:
             if lookups >= MAX_OUTBOUND_LOOKUPS:
                 break
@@ -217,9 +244,11 @@ def main():
         "source": "SerpApi Google Flights",
         "source_validation": "single_source_unverified",
         "api_searches_used": 1 + lookups,
+        "monitoring_mode": "two_search_market_plus_return",
+        "market_candidates": market_candidates[:20],
         "options": rows[:20],
         "notes": (
-            "Exact-date Google Flights results via SerpApi. displayed_price_twd is stored exactly as returned, "
+            "Exact-date Google Flights results via SerpApi. Normal monitoring uses one filtered market scan plus one return lookup. displayed_price_twd is stored exactly as returned, "
             "but price_scope remains unknown and family_total_twd stays null unless independently verified. "
             "Do not multiply the displayed fare by four. Checked baggage inclusion is not assumed."
         ),

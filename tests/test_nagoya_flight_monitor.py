@@ -52,7 +52,8 @@ class MonitorTests(unittest.TestCase):
         data = json.loads(self.latest.read_text())
         self.assertEqual({r["airline_iata"] for r in data["market_candidates"]}, {"CI", "CX", "JX"})
         self.assertFalse(data["market_candidates"][2]["outbound_preference_match"])
-        self.assertIsNone(data["market_candidates"][2]["time_preference_match"])
+        self.assertFalse(data["market_candidates"][2]["time_preference_match"])
+        self.assertIsNone(data["market_candidates"][2]["inbound_preference_match"])
         self.assertEqual(data["searches_used"], 1)
         params = req.call_args_list[1].args[0]
         self.assertNotIn("outbound_times", params)

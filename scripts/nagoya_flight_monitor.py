@@ -104,7 +104,9 @@ def candidate(item, cfg, inbound=False):
             prefix + "_departure": dep.get("time"), prefix + "_arrival": arr.get("time"),
             "displayed_price_twd": price, "price_scope": "unknown", "family_total_twd": None,
             "currency": "TWD", "baggage_status": baggage_status(item),
-            prefix + "_preference_match": match, "time_preference_match": None,
+            "inbound_preference_match": None,
+            prefix + "_preference_match": match,
+            "time_preference_match": False if match is False else None,
             "departure_token_available": bool(item.get("departure_token"))}
 
 

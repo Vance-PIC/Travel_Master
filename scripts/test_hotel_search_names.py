@@ -16,9 +16,24 @@ class SearchNameTests(unittest.TestCase):
                     {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'id', 'property_token': 'token'}],
                      'pagination': {'next_page_token': 'next'}},
                     {'property': {'name': 'Hotel', 'data_id': 'id'}}]
-                _, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+                _, coverage, _ = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
                 self.assertEqual(coverage['completed'], ['id'])
                 self.assertEqual(coverage['deferred'], ['additional_results_page'] if stage == 'candidate_search' else [])
+
+    def test_confirmed_id_rejects_other_hotel_name_and_detail_token(self):
+        m = monitor('booked_room_compare')
+        m['hotel_identity']['name'] = 'Hotel'
+        client = Mock(attempts=2, limit=5)
+        client.search.side_effect = [
+            {'properties': [{'type': 'hotel', 'name': 'Other Hotel', 'data_id': 'hotel1', 'property_token': 'token'}]}]
+        with self.assertRaisesRegex(ValueError, 'name conflicts'):
+            collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
+        client = Mock(attempts=2, limit=5)
+        client.search.side_effect = [
+            {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'hotel1', 'property_token': 'token'}]},
+            {'property': {'name': 'Hotel', 'data_id': 'hotel1', 'property_token': 'different-token'}}]
+        with self.assertRaisesRegex(ValueError, 'token changed'):
+            collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'}}, m, client)
 
     def test_confirmed_property_token_skips_discovery(self):
         m = monitor('booked_room_compare')
@@ -47,7 +62,7 @@ class SearchNameTests(unittest.TestCase):
             {'type': 'hotel', 'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id', 'property_token': 'token'},
             {'type': 'hotel', 'name': 'Hotel Live Max Nagoya OTHER', 'property_token': 'wrong'}]},
             {'property': {'name': 'Hotel Live Max PREMIUM Nagoya Marunouchi', 'data_id': 'id'}}]
-        rows, coverage = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'engine_parameters': {'google_hotels_property': {'hl': None}}}}, m, client)
+        rows, coverage, _ = collect({'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW', 'engine_parameters': {'google_hotels_property': {'hl': None}}}}, m, client)
         self.assertEqual(client.search.call_count, 2)
         first = client.search.call_args_list[0].args[0]
         self.assertEqual(first['q'], m['search']['query'])

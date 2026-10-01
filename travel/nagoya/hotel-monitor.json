@@ -100,7 +100,9 @@
       "hotel_identity": {
         "name": "Hotel LiVEMAX PREMIUM Nagoya Marunouchi",
         "address": null,
-        "source_ids": {},
+        "source_ids": {
+          "searchapi.io": "0x6003711bc3781f9b:0x8adc85566de9c8fe"
+        },
         "evidence": [
           {
             "type": "user_statement",
@@ -113,6 +115,14 @@
               "discovery_aliases"
             ],
             "note": "Discovery names only; not room or occupancy evidence"
+          },
+          {
+            "type": "source_response",
+            "reference": "travel/nagoya/hotels/marunouchi-booked/snapshots/394d2ca253c0496e914aecb5ed710286.json#/observations/0",
+            "fields": [
+              "source_ids.searchapi.io"
+            ],
+            "note": "Confirmed by user after master Run 36849388436; this is data_id, not property_token"
           }
         ],
         "discovery_aliases": [
@@ -206,7 +216,6 @@
         }
       ],
       "needs_evidence": [
-        "hotel_identity address or source IDs",
         "room_baseline.beds",
         "booking_baseline.currency",
         "booking_baseline.source",
@@ -216,7 +225,8 @@
         "booking_baseline.payment",
         "booking_baseline.benefits",
         "alert.currency",
-        "alert.price_scope"
+        "alert.price_scope",
+        "hotel_identity address"
       ],
       "search": {
         "query": "Hotels in Marunouchi Nagoya Japan",

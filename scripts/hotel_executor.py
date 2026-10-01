@@ -1,5 +1,6 @@
 """Hotel monitor executor. Search, persistence and read-only report are separate."""
 import argparse
+import copy
 import csv
 import hashlib
 import io
@@ -121,7 +122,7 @@ def recover(directory):
         journal.unlink()
 
 
-def persist(directory, snapshot, last):
+def persist(directory, snapshot, last, resolution=None):
     directory.mkdir(parents=True, exist_ok=True)
     recover(directory)
     run_id = snapshot['run_id']
@@ -143,6 +144,8 @@ def persist(directory, snapshot, last):
     encoded = json.dumps(snapshot, ensure_ascii=False, indent=2)
     files = {version: encoded, 'history.csv': old+buf.getvalue(), 'latest.json': encoded,
              'last-run.json': json.dumps(last, ensure_ascii=False, indent=2)}
+    if resolution is not None:
+        files['property-resolution.json'] = json.dumps(resolution, ensure_ascii=False, indent=2)
     atomic(directory/'.transaction.json', json.dumps({'files': files}, ensure_ascii=False))
     recover(directory)
 
@@ -152,6 +155,31 @@ def location(config, monitor_id, root):
     path = (root/config['persistence_root']/monitor_id).resolve()
     if not path.is_relative_to(root.resolve()): raise ValueError('Persistence outside repository')
     return path
+
+
+def normalized_name(value):
+    return re.sub(r'[^\w]', '', value.casefold()) if isinstance(value, str) else ''
+
+
+def trusted_resolution(directory, m):
+    path = directory/'property-resolution.json'
+    if m['stage'] != 'booked_room_compare' or not path.exists():
+        return None
+    resolution = json.loads(path.read_text(encoding='utf-8'))
+    source_id = m['hotel_identity'].get('source_ids', {}).get('searchapi.io')
+    names = [m['hotel_identity']['name']] + m['hotel_identity'].get('discovery_aliases', [])
+    token = resolution.get('property_token')
+    if (resolution.get('provider') != 'searchapi.io' or not source_id or
+            resolution.get('data_id') != source_id or
+            normalized_name(resolution.get('hotel_name')) not in {normalized_name(name) for name in names} or
+            not isinstance(token, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', token) or
+            not resolution.get('evidence', {}).get('source') or
+            not resolution.get('evidence', {}).get('observed_at')):
+        raise ValueError('Stored hotel property resolution conflicts with configured identity')
+    configured = m.get('search', {}).get('property_token')
+    if configured and configured != token:
+        raise ValueError('Configured and stored hotel property tokens conflict')
+    return resolution
 
 
 def collect(config, m, client):
@@ -164,7 +192,7 @@ def collect(config, m, client):
                 not token_evidence.get('reference') or not m['hotel_identity'].get('source_ids', {}).get('searchapi.io')):
             raise ValueError('Confirmed token evidence required for booked hotel')
         # kgmid and arbitrary name-derived IDs are not property tokens.
-        if not isinstance(pinned, str) or pinned.startswith('/'):
+        if not isinstance(pinned, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', pinned):
             raise ValueError('Invalid property token')
         data = {'properties': [{'type': 'hotel', 'name': m['hotel_identity']['name'],
                                'data_id': m['hotel_identity'].get('source_ids', {}).get('searchapi.io'),
@@ -176,13 +204,15 @@ def collect(config, m, client):
     if m['stage'] == 'booked_room_compare':
         source_id = m['hotel_identity'].get('source_ids', {}).get('searchapi.io')
         names = [m['hotel_identity']['name']] + m['hotel_identity'].get('discovery_aliases', [])
-        normalize = lambda value: re.sub(r'[^\w]', '', value.casefold())
-        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else normalize(h.get('name', '')) in {normalize(n) for n in names})]
+        hotels = [h for h in hotels if (h.get('data_id') == source_id if source_id else normalized_name(h.get('name')) in {normalized_name(n) for n in names})]
     completed, deferred, rows = [], [], []
+    resolution = None
     if m['stage'] == 'booked_room_compare' and not hotels:
         deferred.append('target_hotel_not_identified')
     for h in hotels:
         if h.get('type') != 'hotel': continue
+        if m['stage'] == 'booked_room_compare' and normalized_name(h.get('name')) not in {normalized_name(n) for n in names}:
+            raise ValueError('Discovered hotel name conflicts with configured identity')
         key = h.get('data_id') or h.get('name')
         if not h.get('property_token'): raise ValueError('Hotel token missing')
         if client.attempts >= client.limit:
@@ -195,7 +225,18 @@ def collect(config, m, client):
                 raise ValueError('Malformed offer group')
         if h.get('data_id') and detail['property'].get('data_id') != h['data_id']:
             raise ValueError('Hotel identity changed')
+        if detail['property'].get('property_token') and detail['property']['property_token'] != h['property_token']:
+            raise ValueError('Hotel property token changed')
+        if m['stage'] == 'booked_room_compare' and normalized_name(detail['property']['name']) not in {normalized_name(n) for n in names}:
+            raise ValueError('Hotel name changed')
         stamp = now()
+        if m['stage'] == 'booked_room_compare' and source_id:
+            resolution = {'schema_version': 1, 'provider': 'searchapi.io',
+                          'data_id': source_id, 'hotel_name': detail['property']['name'],
+                          'property_token': h['property_token'],
+                          'evidence': {'source': 'searchapi.io/google_hotels' if not pinned else 'configured_property_token',
+                                       'source_path': 'properties[matching data_id].property_token' if not pinned else m['search']['property_token_evidence']['reference'],
+                                       'observed_at': stamp}}
         for q in room_quotes(detail, p['currency']):
             if any(q.get(k) is not None and not positive(q[k]) for k in ('total_amount', 'nightly_amount')):
                 raise ValueError('Malformed room price')
@@ -215,7 +256,7 @@ def collect(config, m, client):
     # Stage 2 covers only the locked hotel; unrelated discovery pages are irrelevant.
     if m['stage'] == 'candidate_search' and data.get('pagination', {}).get('next_page_token'):
         deferred.append('additional_results_page')
-    return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels], 'completed': completed, 'deferred': deferred, 'failed': [], 'provider': 'searchapi.io'}
+    return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels], 'completed': completed, 'deferred': deferred, 'failed': [], 'provider': 'searchapi.io'}, resolution
 
 
 def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
@@ -233,7 +274,15 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
                 'status': 'error', 'snapshot_run_id': prior.get('run_id'), 'coverage': {'requested': ['searchapi.io'], 'completed': [], 'deferred': [], 'failed': []}}
         try:
             client = client or Client(os.environ.get(config['api']['key_env']), config['api'].get('max_requests_per_run', 5))
-            rows, coverage = collect(config, m, client)
+            cached = trusted_resolution(directory, m)
+            query_monitor = copy.deepcopy(m)
+            if cached and not query_monitor.get('search', {}).get('property_token'):
+                query_monitor.setdefault('search', {})['property_token'] = cached['property_token']
+                query_monitor['search']['property_token_evidence'] = {
+                    'source': 'searchapi.io', 'reference': 'property-resolution.json'}
+            rows, coverage, resolution = collect(config, query_monitor, client)
+            if cached:
+                resolution = cached
             last.update(coverage=coverage, attempted_requests=client.attempts, ended_at=now())
             if coverage['deferred']:
                 last['status'] = 'partial'
@@ -243,8 +292,10 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
             snapshot = {'schema_version': 1, 'monitor_id': monitor_id, 'stage': m['stage'], 'run_id': last['run_id'],
                         'checked_at': last['ended_at'], 'config_fingerprint': fingerprint, 'comparison_key': digest(m),
                         'coverage': coverage, 'observations': [assess(m, q, config['execution'].get('max_quote_age_hours'), last['ended_at']) for q in rows]}
+            if resolution is not None:
+                snapshot['property_resolution'] = resolution
             last.update(status='success', snapshot_run_id=last['run_id'])
-            persist(directory, snapshot, last)
+            persist(directory, snapshot, last, resolution)
         except Exception as exc:
             if (directory/'.transaction.json').exists():
                 # Prepared complete transaction: roll forward before another query.

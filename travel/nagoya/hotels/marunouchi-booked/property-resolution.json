@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "provider": "searchapi.io",
+  "data_id": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
+  "hotel_name": "Hotel Live Max PREMIUM Nagoya Marunouchi",
+  "property_token": "ChoI_pGn7-aqoe6KARoNL2cvMTFyZnB2Zm1obRAB",
+  "evidence": {
+    "source": "searchapi.io/google_hotels",
+    "source_path": "properties[matching data_id].property_token",
+    "observed_at": "2026-10-01T10:50:38.236237+00:00"
+  }
+}

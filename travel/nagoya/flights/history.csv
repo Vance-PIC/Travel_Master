@@ -12,3 +12,7 @@ checked_at,status,source,airline,airline_iata,outbound_flight,outbound_departure
 2026-10-01T02:21:42+00:00,ok,SerpApi Google Flights,中華航空,CI,CI 150,2027-07-11 17:15,2027-07-11 21:05,CI 151,2027-07-18 09:55,2027-07-18 11:55,51640,unknown,,TWD,unknown,False,,round_trip,2,normal,8,242,False,True,CI,new_flight
 2026-10-01T02:21:42+00:00,ok,SerpApi Google Flights,中華航空,CI,CI 150,2027-07-11 17:15,2027-07-11 21:05,CI 155,2027-07-18 12:20,2027-07-18 14:30,58192,unknown,,TWD,unknown,False,,round_trip,2,normal,8,242,False,True,CI,new_flight
 2026-10-01T02:21:42+00:00,ok,SerpApi Google Flights,中華航空,CI,CI 150,2027-07-11 17:15,2027-07-11 21:05,CX 531,2027-07-18 16:40,2027-07-18 18:50,211436,unknown,,TWD,unknown,False,,round_trip,2,normal,8,242,False,True,CX,new_flight
+2026-10-01T02:23:43+00:00,ok,SerpApi Google Flights,中華航空,CI,CI 150,2027-07-11 17:15,2027-07-11 21:05,,,,51640,unknown,,TWD,unknown,False,,market,1,normal,9,241,False,,,
+2026-10-01T02:23:43+00:00,ok,SerpApi Google Flights,中華航空,CI,CI 154,2027-07-11 07:30,2027-07-11 11:20,,,,63064,unknown,,TWD,unknown,,,market,1,normal,9,241,True,,,
+2026-10-01T02:23:43+00:00,ok,SerpApi Google Flights,國泰航空,CX,CX 530,2027-07-11 11:30,2027-07-11 15:30,,,,80554,unknown,,TWD,unknown,,,market,1,normal,9,241,True,,,
+2026-10-01T02:23:43+00:00,ok,SerpApi Google Flights,星宇航空,JX,JX 838,2027-07-11 14:55,2027-07-11 18:45,,,,97960,unknown,,TWD,unknown,False,,market,1,normal,9,241,False,,,

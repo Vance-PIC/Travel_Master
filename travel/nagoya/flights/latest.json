@@ -1,25 +1,25 @@
 {
-  "checked_at": "2026-10-01T02:21:42+00:00",
+  "checked_at": "2026-10-01T02:23:43+00:00",
   "status": "ok",
-  "searches_used": 2,
-  "api_searches_used": 2,
-  "account_calls": 3,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 7,
-    "remaining": 243,
+    "usage": 9,
+    "remaining": 241,
     "tier": "normal",
-    "plan_searches_left": 243,
+    "plan_searches_left": 241,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 8,
-    "remaining": 242,
+    "usage": 9,
+    "remaining": 241,
     "tier": "normal",
-    "plan_searches_left": 242,
+    "plan_searches_left": 241,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 1,
-  "monitoring_mode": "market_plus_return",
+  "actual_usage_delta": 0,
+  "monitoring_mode": "market_only",
   "schema_version": 5,
   "route": {
     "origin": "TPE",
@@ -30,6 +30,11 @@
       "adults": 2,
       "children": 2
     },
+    "cabin_class": "economy",
+    "nonstop_only": true,
+    "currency": "TWD",
+    "market": "TW",
+    "locale": "zh-TW",
     "full_service_airlines": [
       "CI",
       "CX",
@@ -60,12 +65,11 @@
       "family_total_twd": null,
       "currency": "TWD",
       "baggage_status": "unknown",
+      "inbound_preference_match": null,
       "outbound_preference_match": false,
-      "time_preference_match": null,
+      "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_flight"
-      ]
+      "deep_search_triggers": []
     },
     {
       "airline": "中華航空",
@@ -78,6 +82,7 @@
       "family_total_twd": null,
       "currency": "TWD",
       "baggage_status": "unknown",
+      "inbound_preference_match": null,
       "outbound_preference_match": true,
       "time_preference_match": null,
       "departure_token_available": true,
@@ -94,6 +99,7 @@
       "family_total_twd": null,
       "currency": "TWD",
       "baggage_status": "unknown",
+      "inbound_preference_match": null,
       "outbound_preference_match": true,
       "time_preference_match": null,
       "departure_token_available": true,
@@ -110,85 +116,14 @@
       "family_total_twd": null,
       "currency": "TWD",
       "baggage_status": "unknown",
+      "inbound_preference_match": null,
       "outbound_preference_match": false,
-      "time_preference_match": null,
+      "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_airline"
-      ]
+      "deep_search_triggers": []
     }
   ],
-  "options": [
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 150",
-      "outbound_departure": "2027-07-11 17:15",
-      "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 51640,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "outbound_preference_match": false,
-      "time_preference_match": false,
-      "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_flight"
-      ],
-      "inbound_flight": "CI 151",
-      "inbound_departure": "2027-07-18 09:55",
-      "inbound_arrival": "2027-07-18 11:55",
-      "inbound_preference_match": true,
-      "inbound_airline_iata": "CI"
-    },
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 150",
-      "outbound_departure": "2027-07-11 17:15",
-      "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 58192,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "outbound_preference_match": false,
-      "time_preference_match": false,
-      "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_flight"
-      ],
-      "inbound_flight": "CI 155",
-      "inbound_departure": "2027-07-18 12:20",
-      "inbound_arrival": "2027-07-18 14:30",
-      "inbound_preference_match": true,
-      "inbound_airline_iata": "CI"
-    },
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 150",
-      "outbound_departure": "2027-07-11 17:15",
-      "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 211436,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "outbound_preference_match": false,
-      "time_preference_match": false,
-      "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_flight"
-      ],
-      "inbound_flight": "CX 531",
-      "inbound_departure": "2027-07-18 16:40",
-      "inbound_arrival": "2027-07-18 18:50",
-      "inbound_preference_match": true,
-      "inbound_airline_iata": "CX"
-    }
-  ],
+  "options": [],
   "market_price_lows": {
     "CI 154": 63064,
     "CX 530": 80554,

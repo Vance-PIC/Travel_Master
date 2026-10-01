@@ -15,11 +15,34 @@
     },
     "nonstop_only": true
   },
-  "checked_at": "2026-10-01T01:34:53+00:00",
+  "checked_at": "2026-10-01T01:41:34+00:00",
   "status": "ok",
   "source": "SerpApi Google Flights",
   "source_validation": "single_source_unverified",
-  "api_searches_used": 5,
+  "api_searches_used": 2,
+  "monitoring_mode": "two_search_market_plus_return",
+  "market_candidates": [
+    {
+      "airline": "中華航空",
+      "airline_iata": "CI",
+      "outbound_flight": "CI 154",
+      "outbound_departure": "2027-07-11 07:30",
+      "outbound_arrival": "2027-07-11 11:20",
+      "displayed_price_twd": 63064,
+      "price_scope": "unknown",
+      "departure_token_available": true
+    },
+    {
+      "airline": "國泰航空",
+      "airline_iata": "CX",
+      "outbound_flight": "CX 530",
+      "outbound_departure": "2027-07-11 11:30",
+      "outbound_arrival": "2027-07-11 15:30",
+      "displayed_price_twd": 80554,
+      "price_scope": "unknown",
+      "departure_token_available": true
+    }
+  ],
   "options": [
     {
       "airline": "中華航空",
@@ -37,58 +60,7 @@
       "baggage_status": "unknown",
       "time_preference_match": true,
       "source": "SerpApi Google Flights"
-    },
-    {
-      "airline": "國泰航空",
-      "airline_iata": "CX",
-      "outbound_flight": "CX 530",
-      "outbound_departure": "2027-07-11 11:30",
-      "outbound_arrival": "2027-07-11 15:30",
-      "inbound_flight": "CX 531",
-      "inbound_departure": "2027-07-18 16:40",
-      "inbound_arrival": "2027-07-18 18:50",
-      "displayed_price_twd": 80554,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "time_preference_match": true,
-      "source": "SerpApi Google Flights"
-    },
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 150",
-      "outbound_departure": "2027-07-11 17:15",
-      "outbound_arrival": "2027-07-11 21:05",
-      "inbound_flight": "CI 151",
-      "inbound_departure": "2027-07-18 09:55",
-      "inbound_arrival": "2027-07-18 11:55",
-      "displayed_price_twd": 51640,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "time_preference_match": false,
-      "source": "SerpApi Google Flights"
-    },
-    {
-      "airline": "星宇航空",
-      "airline_iata": "JX",
-      "outbound_flight": "JX 838",
-      "outbound_departure": "2027-07-11 14:55",
-      "outbound_arrival": "2027-07-11 18:45",
-      "inbound_flight": "JX 839",
-      "inbound_departure": "2027-07-18 19:55",
-      "inbound_arrival": "2027-07-18 22:00",
-      "displayed_price_twd": 97960,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "time_preference_match": false,
-      "source": "SerpApi Google Flights"
     }
   ],
-  "notes": "Exact-date Google Flights results via SerpApi. displayed_price_twd is stored exactly as returned, but price_scope remains unknown and family_total_twd stays null unless independently verified. Do not multiply the displayed fare by four. Checked baggage inclusion is not assumed."
+  "notes": "Exact-date Google Flights results via SerpApi. Normal monitoring uses one filtered market scan plus one return lookup. displayed_price_twd is stored exactly as returned, but price_scope remains unknown and family_total_twd stays null unless independently verified. Do not multiply the displayed fare by four. Checked baggage inclusion is not assumed."
 }

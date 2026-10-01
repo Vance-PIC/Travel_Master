@@ -36,7 +36,7 @@ equivalence. Candidate rooms are unqualified pending occupancy, size, beds,
 smoking and geography evidence. Baseline 77,836 and threshold 70,000 retain unknown
 currency and price scope even though the query currency is JPY. No alert is eligible.
 
-Follow-up: real response inspection; source hotel ID/address confirmation; room
-evidence mapping; full Stage 1 filters and Stage 2 comparison evaluator;
-operational persistence/failure recovery; account allowance check. Enable normal
-queries and scheduling only after those checks and explicit user authorization.
+Formal executor and Stage evaluators now exist: see [executor.md](executor.md).
+This capability-verification entry point remains isolated. Source ID/address and
+room evidence mapping still require actual evidence; account allowance is not
+inferred from request counts. Scheduling remains disabled.

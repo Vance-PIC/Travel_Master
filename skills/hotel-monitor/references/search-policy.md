@@ -46,4 +46,4 @@ Stage 2 額外有 `hotel_identity`、`room_baseline`、`booking_baseline`、`ale
 
 ## 本期邊界
 
-只建立契約，不提供 API adapter、不查價、不重跑住宿實驗、不排程、不寫虛構 snapshot/history。之後新增 executor 時先檢查現有 API 成果並引用，不自行重新實驗。
+已提供 SearchAPI adapter 與正式 executor：`scripts/hotel_searchapi.py`、`scripts/hotel_executor.py`。executor 沿用已完成 adapter，僅在明確授權的單次 run 查詢；report 不查詢。GitHub Actions `Hotel monitor executor` 為 workflow_dispatch，無 schedule。不得重跑已完成住宿 API 實驗，不寫虛構 snapshot/history。API 回傳不足時仍按上述 unknown 與 pending 規則保存，不推定已確認房型或家庭總價。執行與恢復方式見 [executor.md](executor.md)。

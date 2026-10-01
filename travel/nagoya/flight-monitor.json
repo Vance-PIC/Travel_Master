@@ -19,5 +19,6 @@
   "reduced_refresh_days": 5,
   "full_max_expansions": 3,
   "monitor_max_expansions": 1,
-  "reduced_max_expansions": 1
+  "reduced_max_expansions": 1,
+  "booking_verifications_per_run": 1
 }

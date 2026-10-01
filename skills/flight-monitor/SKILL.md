@@ -21,6 +21,8 @@ Use actual Account API usage and remaining quota, with conservative bounds for d
 
 Never multiply price by passenger count. Maintain `price_scope: unknown`, `family_total_twd: null`, and `baggage_status: unknown` until independently verified. Do not use an unverified fare as a family-budget claim.
 
+Extra Booking Options verification is allowed only for a fresh itinerary near the configured price target, a genuine historical new low, a drop at least the configured threshold, or an explicitly requested purchase itinerary. New airlines/flights and initial baselines alone do not authorize verification. Limit it to one additional search per run and obey quota. Confirm both selected legs and the exact displayed price for the configured two-adult/two-child party before marking that specific quote `family_total`; store literal seller-specific baggage evidence separately. Never backfill old quotes or apply one itinerary's verification to others.
+
 On API/parsing failure preserve the last valid snapshot and histories. Save a separate sanitized error including stage and attempted searches. Never persist keys, departure tokens, credential URLs, account identity or raw account responses.
 
 Use authorized data sources. Stop at CAPTCHA or anti-bot blocks without bypass attempts. Respect the user's authorization for quota usage and remote writes. Periodic refresh checks happen when a query runs; they do not authorize enabling a schedule.

@@ -27,7 +27,10 @@ class MonitorTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.latest = Path(self.temp.name) / "latest.json"
         self.history = Path(self.temp.name) / "history.csv"
-        for target, value in (("LATEST", self.latest), ("HISTORY", self.history)):
+        config = Path(self.temp.name) / "config.json"
+        config.write_text(json.dumps(dict(CFG, booking_verifications_per_run=0)))
+        # These regressions isolate Market/Itinerary request budgets.
+        for target, value in (("LATEST", self.latest), ("HISTORY", self.history), ("CONFIG", config)):
             p = patch.object(m, target, value)
             p.start()
             self.addCleanup(p.stop)

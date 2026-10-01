@@ -206,7 +206,7 @@ def itinerary_lows(history, trip_key):
     for row in history:
         if row.get("route_key") != trip_key or row.get("status") != "observed":
             continue
-        if row.get("price_scope") != "unknown" or row.get("currency") != "TWD":
+        if row.get("price_scope") not in ("unknown", "family_total") or row.get("currency") != "TWD":
             continue
         price = float(row["displayed_price_twd"])
         if not math.isfinite(price) or price <= 0:
@@ -255,12 +255,79 @@ def stage_csv(path, observations, header):
     return temp
 
 
+def booking_reasons(row, cfg, purchase=False):
+    if purchase:
+        return ["purchase"]
+    if not row.get("observed_this_run"):
+        return []
+    reasons = [r for r in row.get("price_changes", []) if r in ("new_low", "drop_5_percent")]
+    if row["displayed_price_twd"] <= cfg["family_target_twd"] * (1 + cfg["target_margin_fraction"]):
+        reasons.append("near_target")
+    return reasons
+
+
+def booking_params(base, row, cfg):
+    segments = {}
+    for prefix, date, origin, destination in (
+            ("outbound", cfg["outbound_date"], cfg["origin"], cfg["destination"]),
+            ("inbound", cfg["inbound_date"], cfg["destination"], cfg["origin"])):
+        segments["return" if prefix == "inbound" else prefix] = [{"flight_number": flight_id(row[prefix + "_flight"]),
+                             "departure_id": origin, "arrival_id": destination, "date": date}]
+    return dict(base, selected_flights_json=json.dumps(segments, separators=(",", ":")))
+
+
+def verify_booking(data, row, cfg, stamp):
+    if cfg["passengers"] != {"adults": 2, "children": 2} or cfg["currency"] != "TWD":
+        raise ValueError("Family verification requires 2A2C TWD")
+    echoed = data.get("search_parameters", {})
+    for key, expected in (("adults", 2), ("children", 2), ("currency", "TWD")):
+        if key in echoed and str(echoed[key]) != str(expected):
+            raise ValueError("Booking passenger/currency mismatch")
+    selected = data.get("selected_flights")
+    if not isinstance(selected, list) or len(selected) != 2:
+        raise ValueError("Selected itinerary missing")
+    for prefix, group, origin, destination, date in (
+            ("outbound", selected[0], cfg["origin"], cfg["destination"], cfg["outbound_date"]),
+            ("inbound", selected[1], cfg["destination"], cfg["origin"], cfg["inbound_date"])):
+        flights = group.get("flights", [])
+        if len(flights) != 1:
+            raise ValueError("Selected flight is not nonstop")
+        seg = flights[0]
+        dep, arr = seg.get("departure_airport", {}), seg.get("arrival_airport", {})
+        if (flight_id(seg.get("flight_number", "")) != flight_id(row[prefix + "_flight"])
+                or dep.get("id") != origin or arr.get("id") != destination
+                or not str(dep.get("time", "")).startswith(date + " ")
+                or dep.get("time") != row[prefix + "_departure"]
+                or seg.get("travel_class") != "Economy"):
+            raise ValueError("Selected itinerary mismatch")
+    options = data.get("booking_options")
+    if not isinstance(options, list):
+        raise ValueError("Booking options missing")
+    for group in options:
+        option = group.get("together") or {}
+        price = option.get("price")
+        marketed = option.get("marketed_as")
+        if (group.get("separate_tickets") or option.get("separate_tickets") or not option.get("book_with")
+                or type(price) not in (int, float) or not math.isfinite(price)
+                or price != row["displayed_price_twd"]
+                or (marketed and [flight_id(n) for n in marketed] !=
+                    [flight_id(row["outbound_flight"]), flight_id(row["inbound_flight"])])):
+            continue
+        return dict(source="SerpApi Booking Options", verified_at=stamp,
+                    itinerary_key=row["itinerary_key"], quote_checked_at=row["checked_at"],
+                    passengers=cfg["passengers"], currency="TWD",
+                    **{k: option.get(k) for k in ("book_with", "price", "local_prices", "option_title",
+                                                "extensions", "baggage_prices", "marketed_as")})
+    return None
+
+
 def persist(latest, observed, removed, cfg):
     attempt = {k: latest[k] for k in ("checked_at", "status", "searches_used", "quota_after")}
     fields = HISTORY_HEADER + ["record_type", "mode", "searches_used", "quota_status", "quota_usage",
                               "quota_remaining", "outbound_preference_match", "inbound_preference_match",
                               "inbound_airline_iata", "deep_search_triggers", "itinerary_key", "route_key",
-                              "refresh_reasons", "price_changes", "previous_displayed_price_twd", "historical_low_twd"]
+                              "refresh_reasons", "price_changes", "previous_displayed_price_twd", "historical_low_twd",
+                              "price_verification", "baggage_verification"]
     def history_row(row, kind, status):
         result = dict(row, checked_at=attempt["checked_at"], status=status, record_type=kind,
                       mode=latest["mode"], searches_used=latest["searches_used"],
@@ -269,6 +336,9 @@ def persist(latest, observed, removed, cfg):
                       source="SerpApi Google Flights")
         for key in ("deep_search_triggers", "refresh_reasons", "price_changes"):
             result[key] = ";".join(result.get(key, []))
+        for key in ("price_verification", "baggage_verification"):
+            if result.get(key):
+                result[key] = json.dumps(result[key], ensure_ascii=False)
         return result
     market_rows = [history_row(r, "market", "observed") for r in latest["market_candidates"]]
     if not market_rows:
@@ -277,6 +347,9 @@ def persist(latest, observed, removed, cfg):
     itinerary_path = LATEST.parent / "itinerary_history.csv"
     itinerary_rows = [history_row(r, "itinerary", "observed") for r in observed]
     itinerary_rows += [history_row(r, "itinerary", "not_returned") for r in removed]
+    itinerary_rows += [history_row(r, "verification", "verified") for r in latest["itineraries"]
+                       if not r.get("observed_this_run")
+                       and r.get("price_verification", {}).get("verified_at") == latest["checked_at"]]
     if itinerary_rows:
         stages.append((stage_csv(itinerary_path, itinerary_rows, fields), itinerary_path))
     # Finish all parsing and stage every CSV before publishing the new snapshot.
@@ -295,7 +368,7 @@ def market_scan_params(cfg, key):
             "api_key": key}
 
 
-def main(mode="monitor_query", now=None):
+def main(mode="monitor_query", now=None, purchase_itinerary=None):
     searches = account_calls = 0
     before = after = None
     stage = "configuration"
@@ -306,6 +379,9 @@ def main(mode="monitor_query", now=None):
         if mode not in ("full_query", "monitor_query"):
             raise ValueError("Unsupported execution mode")
         cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
+        booking_limit = cfg.get("booking_verifications_per_run", 1)
+        if type(booking_limit) is not int or booking_limit not in (0, 1):
+            raise ValueError("Booking verification limit must be 0 or 1")
         if cfg["cabin_class"] != "economy" or not cfg["nonstop_only"]:
             raise ValueError("This executor requires nonstop Economy")
         if not 3 <= cfg["itinerary_refresh_days"] <= cfg["reduced_refresh_days"] <= 5:
@@ -325,7 +401,7 @@ def main(mode="monitor_query", now=None):
         low_itineraries = itinerary_lows(historic, route_key(cfg))
         for row in historic:
             if (row.get("route_key") == route_key(cfg) and row.get("status") == "observed"
-                    and row.get("price_scope") == "unknown" and row.get("currency") == "TWD"):
+                    and row.get("price_scope") in ("unknown", "family_total") and row.get("currency") == "TWD"):
                 previous_rows[row["itinerary_key"]] = dict(row, displayed_price_twd=float(row["displayed_price_twd"]))
         refreshed = dict(previous.get("outbound_refresh", {}))
         base = market_scan_params(cfg, key)
@@ -402,6 +478,43 @@ def main(mode="monitor_query", now=None):
                          observation_status="retained" if flight_id(r["outbound_flight"]) in by_outbound else "outbound_not_observed")
                     for r in old_itineraries if flight_id(r["outbound_flight"]) not in completed]
         itineraries = retained + observed
+        booking_checks = []
+        eligible = [(r, booking_reasons(r, cfg, purchase_itinerary == r["itinerary_key"]))
+                    for r in itineraries]
+        eligible = [(r, reasons) for r, reasons in eligible if reasons]
+        eligible.sort(key=lambda pair: ("purchase" not in pair[1], pair[0]["displayed_price_twd"]))
+        if purchase_itinerary and not any(r["itinerary_key"] == purchase_itinerary for r in itineraries):
+            booking_checks.append({"itinerary_key": purchase_itinerary, "status": "itinerary_unavailable"})
+        for index, (row, reasons) in enumerate(eligible):
+            budget = effective_budget(before, after, searches)
+            check = dict(itinerary_key=row["itinerary_key"], reasons=reasons, status="deferred",
+                         quota_before=after)
+            booking_checks.append(check)
+            if index >= booking_limit or budget["tier"] in ("market_only", "preserve"):
+                check["deferred_reason"] = "run_limit" if index >= booking_limit else "quota"
+                continue
+            attempt["planned_searches"] += 1
+            stage = "booking_options:" + row["itinerary_key"]
+            row.update(price_scope="unknown", family_total_twd=None, baggage_status="unknown")
+            row.pop("price_verification", None)
+            row.pop("baggage_verification", None)
+            searches += 1
+            try:
+                evidence = verify_booking(request_json(booking_params(base, row, cfg)), row, cfg, checked_at)
+                check["status"] = "verified" if evidence else "price_not_matched"
+                if evidence:
+                    row.update(price_scope="family_total", family_total_twd=row["displayed_price_twd"],
+                               price_verification=evidence,
+                               baggage_status="booking_option_verified" if evidence.get("baggage_prices") else "unknown",
+                               baggage_verification=evidence if evidence.get("baggage_prices") else None)
+            except Exception as exc:
+                check.update(status="error", error_type=type(exc).__name__,
+                             error="Booking verification failed; raw quote remains unchanged.")
+            stage = "account_after_booking"
+            account_calls += 1
+            after = quota_state(request_json({"api_key": key}, ACCOUNT_BASE))
+            check["quota_after"] = after
+        budget = effective_budget(before, after, searches)
         for row in market:
             number, price = flight_id(row["outbound_flight"]), row["displayed_price_twd"]
             lows[number] = min(lows.get(number, price), price)
@@ -421,14 +534,15 @@ def main(mode="monitor_query", now=None):
                        monitoring_mode="market_plus_return" if completed else "market_only",
                        refreshed_outbounds=completed, deferred_outbounds=deferred,
                        missing_required_outbounds=missing, baseline_complete=baseline_complete,
+                       booking_verification_checks=booking_checks,
                        refresh_complete=bool(wanted) and not deferred and not missing)
-        latest = dict(attempt, schema_version=6, skill_version=2, route=cfg,
+        latest = dict(attempt, schema_version=7, skill_version=2, route=cfg,
                       source="SerpApi Google Flights", source_validation="single_source_unverified",
                       market_candidates=market, itineraries=itineraries,
                       options=observed, market_price_lows=lows, outbound_refresh=refreshed,
                       pending_deep_search=pending,
                       itinerary_refresh_days=cfg["reduced_refresh_days"] if budget["tier"] == "reduced" else cfg["itinerary_refresh_days"],
-                      notes="Market prices are detection signals. Only freshly expanded itinerary prices enter itinerary_history. Retained quotes keep their original checked_at. Prices and baggage remain unverified; family totals are null.")
+                      notes="Raw market/itinerary prices remain unchanged. Only exact 2A2C Booking Options matches verify that specific quote. Baggage evidence is seller-specific literal text. Historical rows are not backfilled.")
         stage = "persistence"
         persist(latest, observed, removed, cfg)
         atomic_json(LATEST.parent / "last-run.json", attempt)
@@ -447,4 +561,6 @@ def main(mode="monitor_query", now=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Budget-aware flight monitoring")
     parser.add_argument("--mode", choices=("full_query", "monitor_query"), default="monitor_query")
-    raise SystemExit(main(mode=parser.parse_args().mode))
+    parser.add_argument("--purchase-itinerary", help="Explicit purchase preparation, e.g. CI154+CI151")
+    args = parser.parse_args()
+    raise SystemExit(main(mode=args.mode, purchase_itinerary=args.purchase_itinerary))

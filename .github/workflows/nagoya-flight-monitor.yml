@@ -11,6 +11,11 @@ on:
         options:
           - monitor_query
           - full_query
+      purchase_itinerary:
+        description: "Optional explicit purchase preparation itinerary key (e.g. CI154+CI151)"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -49,7 +54,13 @@ jobs:
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           QUERY_MODE: ${{ inputs.mode }}
-        run: python3 scripts/nagoya_flight_monitor.py --mode "$QUERY_MODE"
+          PURCHASE_ITINERARY: ${{ inputs.purchase_itinerary }}
+        run: |
+          if [ -n "$PURCHASE_ITINERARY" ]; then
+            python3 scripts/nagoya_flight_monitor.py --mode "$QUERY_MODE" --purchase-itinerary "$PURCHASE_ITINERARY"
+          else
+            python3 scripts/nagoya_flight_monitor.py --mode "$QUERY_MODE"
+          fi
 
       - name: Commit monitoring data
         if: always()

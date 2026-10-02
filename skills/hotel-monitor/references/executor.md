@@ -73,3 +73,18 @@ conflicting token fails before any snapshot is replaced; a detail identity
 mismatch also fails and preserves the previous resolution. An unverified name
 match without a configured ID is never promoted to a reusable token. No
 schedule or live query is triggered by configuring the ID.
+
+The resolution file now records schema version 2, monitor ID, provider,
+configured hotel name, provider hotel name, data ID, token, and discovery
+evidence. Existing version 1 files can be read only when their provider, data
+ID, hotel name, token shape, and timestamped discovery evidence match the
+current monitor; the next successful direct request upgrades the file. A
+trusted token normally requires one `google_hotels_property` request. If that
+request explicitly reports an invalid/expired/unknown property token and at
+least two requests remain in the configured budget, one bounded discovery and
+property request may replace it after the same identity checks. Generic HTTP
+errors, quota failures, malformed responses, identity conflicts, and an
+insufficient budget do not trigger discovery. A failed fallback retains the
+previous resolution, latest snapshot, and history; only last-run diagnostics
+change. The first run that creates a token still needs discovery and property
+requests.

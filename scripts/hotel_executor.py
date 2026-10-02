@@ -161,6 +161,27 @@ def normalized_name(value):
     return re.sub(r'[^\w]', '', value.casefold()) if isinstance(value, str) else ''
 
 
+def invalid_property_token_error(error):
+    """Retry discovery only for an explicit provider rejection of this token."""
+    if not isinstance(error, SearchAPIError):
+        return False
+    d = error.diagnostics
+    if (d.get('provider') != 'searchapi.io' or
+            d.get('request_parameters', {}).get('engine') != 'google_hotels_property'):
+        return False
+    if d.get('category') == 'http_error':
+        if d.get('http_status') not in (400, 404, 422):
+            return False
+    elif d.get('category') == 'api_error':
+        if d.get('http_status') not in (None, 200):
+            return False
+    else:
+        return False
+    description = ' '.join(str(d.get(k) or '') for k in ('error_type', 'message'))
+    return bool(re.search(r'property[_\s-]*token', description, re.I) and
+                re.search(r'\b(?:invalid|expired|unknown|not[_\s-]*found|malformed)\b', description, re.I))
+
+
 def trusted_resolution(directory, m):
     path = directory/'property-resolution.json'
     if m['stage'] != 'booked_room_compare' or not path.exists():
@@ -169,20 +190,32 @@ def trusted_resolution(directory, m):
     source_id = m['hotel_identity'].get('source_ids', {}).get('searchapi.io')
     names = [m['hotel_identity']['name']] + m['hotel_identity'].get('discovery_aliases', [])
     token = resolution.get('property_token')
-    if (resolution.get('provider') != 'searchapi.io' or not source_id or
+    proof = resolution.get('evidence', {})
+    try:
+        observed = datetime.fromisoformat(proof['observed_at'])
+        proof_valid = observed.tzinfo is not None and observed <= datetime.now(timezone.utc)
+    except (KeyError, TypeError, ValueError):
+        proof_valid = False
+    version = resolution.get('schema_version')
+    if (version not in (1, 2) or resolution.get('provider') != 'searchapi.io' or not source_id or
             resolution.get('data_id') != source_id or
             normalized_name(resolution.get('hotel_name')) not in {normalized_name(name) for name in names} or
-            not isinstance(token, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', token) or
-            not resolution.get('evidence', {}).get('source') or
-            not resolution.get('evidence', {}).get('observed_at')):
+            (token not in (None, '') and
+             (not isinstance(token, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', token))) or
+            proof.get('source') not in ('searchapi.io/google_hotels', 'configured_property_token') or
+            not proof.get('source_path') or not proof_valid or
+            (version == 2 and (not resolution.get('monitor_id') or not resolution.get('configured_hotel_name'))) or
+            (resolution.get('monitor_id') and resolution['monitor_id'] != m['monitor_id']) or
+            (resolution.get('configured_hotel_name') and
+             normalized_name(resolution['configured_hotel_name']) != normalized_name(m['hotel_identity']['name']))):
         raise ValueError('Stored hotel property resolution conflicts with configured identity')
     configured = m.get('search', {}).get('property_token')
     if configured and configured != token:
         raise ValueError('Configured and stored hotel property tokens conflict')
-    return resolution
+    return resolution if token else None
 
 
-def collect(config, m, client):
+def collect(config, m, client, rejected_token=None):
     p = parameters(m, config['api']['query_currency'], config['api']['hl'], config['api']['gl'])
     query = m.get('search', {}).get('query') or (m['hotel_identity']['name'] if m['stage'] == 'booked_room_compare' else m['hard_filters']['location']['anchor']+' hotels')
     pinned = m.get('search', {}).get('property_token')
@@ -215,6 +248,8 @@ def collect(config, m, client):
             raise ValueError('Discovered hotel name conflicts with configured identity')
         key = h.get('data_id') or h.get('name')
         if not h.get('property_token'): raise ValueError('Hotel token missing')
+        if h['property_token'] == rejected_token:
+            raise ValueError('Discovery returned rejected property token')
         if client.attempts >= client.limit:
             deferred.append(key); continue
         detail = client.search(dict(engine_parameters(p, config['api'], 'google_hotels_property'), engine='google_hotels_property', property_token=h['property_token']))
@@ -231,7 +266,8 @@ def collect(config, m, client):
             raise ValueError('Hotel name changed')
         stamp = now()
         if m['stage'] == 'booked_room_compare' and source_id:
-            resolution = {'schema_version': 1, 'provider': 'searchapi.io',
+            resolution = {'schema_version': 2, 'monitor_id': m['monitor_id'],
+                          'provider': 'searchapi.io', 'configured_hotel_name': m['hotel_identity']['name'],
                           'data_id': source_id, 'hotel_name': detail['property']['name'],
                           'property_token': h['property_token'],
                           'evidence': {'source': 'searchapi.io/google_hotels' if not pinned else 'configured_property_token',
@@ -256,7 +292,10 @@ def collect(config, m, client):
     # Stage 2 covers only the locked hotel; unrelated discovery pages are irrelevant.
     if m['stage'] == 'candidate_search' and data.get('pagination', {}).get('next_page_token'):
         deferred.append('additional_results_page')
-    return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels], 'completed': completed, 'deferred': deferred, 'failed': [], 'provider': 'searchapi.io'}, resolution
+    return rows, {'requested': [h.get('data_id') or h.get('name') for h in hotels],
+                  'completed': completed, 'deferred': deferred, 'failed': [],
+                  'provider': 'searchapi.io',
+                  'resolution_mode': 'direct_token' if pinned else 'discovery'}, resolution
 
 
 def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
@@ -280,9 +319,21 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
                 query_monitor.setdefault('search', {})['property_token'] = cached['property_token']
                 query_monitor['search']['property_token_evidence'] = {
                     'source': 'searchapi.io', 'reference': 'property-resolution.json'}
-            rows, coverage, resolution = collect(config, query_monitor, client)
-            if cached:
-                resolution = cached
+            try:
+                rows, coverage, resolution = collect(config, query_monitor, client)
+            except SearchAPIError as exc:
+                if (not cached or m.get('search', {}).get('property_token') or
+                        not invalid_property_token_error(exc) or
+                        client.limit - client.attempts < 2):
+                    raise
+                rows, coverage, resolution = collect(config, m, client,
+                                                      rejected_token=cached['property_token'])
+                coverage['resolution_mode'] = 'fallback_discovery'
+            else:
+                if cached:
+                    resolution = {**cached, 'schema_version': 2, 'monitor_id': monitor_id,
+                                  'configured_hotel_name': m['hotel_identity']['name'],
+                                  'hotel_name': resolution['hotel_name']}
             last.update(coverage=coverage, attempted_requests=client.attempts, ended_at=now())
             if coverage['deferred']:
                 last['status'] = 'partial'

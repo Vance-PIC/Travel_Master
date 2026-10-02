@@ -1,0 +1,29 @@
+name: Hotel OTA offer diagnostic
+on:
+  push:
+    branches:
+      - test/hotel-december-offers
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline diagnostic tests
+        run: python -m unittest discover -s scripts -p 'test_hotel_offer_probe.py'
+      - name: Inspect one alternate-stay property response
+        env:
+          SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
+        run: python scripts/hotel_offer_probe.py --check-in 2026-12-11 --check-out 2026-12-12 --output work/hotel-offer-probe.json
+      - name: Retain redacted summary only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-offer-probe-${{ github.run_id }}
+          path: work/hotel-offer-probe.json
+          if-no-files-found: warn

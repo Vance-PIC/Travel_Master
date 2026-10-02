@@ -3,7 +3,26 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from hotel_executor import assess, persist, recover, execute, report
+from hotel_executor import assess, persist, recover, execute, report, invalid_property_token_error
+from hotel_searchapi import SearchAPIError
+
+
+class CountedClient:
+    def __init__(self, replies, limit=5):
+        self.replies = iter(replies)
+        self.limit = limit
+        self.attempts = 0
+        self.calls = []
+
+    def search(self, params):
+        if self.attempts >= self.limit:
+            raise RuntimeError('SearchAPI request budget exhausted')
+        self.attempts += 1
+        self.calls.append(params)
+        reply = next(self.replies)
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
 
 
 def monitor(stage='candidate_search'):
@@ -27,6 +46,201 @@ def quote(m):
 
 
 class ExecutorTests(unittest.TestCase):
+    def test_trusted_legacy_resolution_reuses_property_in_one_request(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            m = cfg['monitors'][0]
+            m['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'property-resolution.json').write_text(json.dumps({
+                'schema_version': 1, 'provider': 'searchapi.io', 'data_id': 'hotel1',
+                'hotel_name': 'Hotel', 'property_token': 'old-token',
+                'evidence': {'source': 'searchapi.io/google_hotels',
+                             'source_path': 'properties[0].property_token',
+                             'observed_at': '2026-10-01T00:00:00+00:00'}}))
+            client = CountedClient([{'property': {'name': 'Hotel', 'data_id': 'hotel1',
+                                                  'property_token': 'old-token', 'featured_offers': []}}])
+            result = execute(cfg, 'test', Path(tmp), client)
+            self.assertEqual(result['status'], 'success')
+            self.assertEqual(result['attempted_requests'], 1)
+            self.assertEqual([call['engine'] for call in client.calls], ['google_hotels_property'])
+            self.assertEqual(client.calls[0]['property_token'], 'old-token')
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['monitor_id'], 'test')
+
+    def test_missing_resolution_discovers_then_saves_monitor_binding(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            listing = {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'hotel1',
+                                       'property_token': 'new-token'}]}
+            detail = {'property': {'name': 'Hotel', 'data_id': 'hotel1', 'property_token': 'new-token'}}
+            client = CountedClient([listing, detail])
+            result = execute(cfg, 'test', Path(tmp), client)
+            self.assertEqual(result['status'], 'success')
+            self.assertEqual(result['attempted_requests'], 2)
+            self.assertEqual([call['engine'] for call in client.calls], ['google_hotels', 'google_hotels_property'])
+            saved = json.loads((Path(tmp)/'hotels/test/property-resolution.json').read_text())
+            self.assertEqual((saved['monitor_id'], saved['provider'], saved['data_id']),
+                             ('test', 'searchapi.io', 'hotel1'))
+            self.assertEqual(saved['configured_hotel_name'], 'Hotel')
+
+    def test_resolution_without_token_discovers_again(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'property-resolution.json').write_text(json.dumps({
+                'schema_version': 2, 'monitor_id': 'test', 'provider': 'searchapi.io',
+                'data_id': 'hotel1', 'hotel_name': 'Hotel', 'configured_hotel_name': 'Hotel',
+                'property_token': None, 'evidence': {'source': 'searchapi.io/google_hotels',
+                    'source_path': 'properties[0].property_token', 'observed_at': '2026-10-01T00:00:00+00:00'}}))
+            client = CountedClient([
+                {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'hotel1',
+                                 'property_token': 'new-token'}]},
+                {'property': {'name': 'Hotel', 'data_id': 'hotel1', 'property_token': 'new-token'}}])
+            result = execute(cfg, 'test', Path(tmp), client)
+            self.assertEqual(result['status'], 'success')
+            self.assertEqual(result['attempted_requests'], 2)
+            self.assertEqual([call['engine'] for call in client.calls],
+                             ['google_hotels', 'google_hotels_property'])
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'],
+                             'new-token')
+
+    def test_explicit_invalid_cached_token_safely_refreshes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'property-resolution.json').write_text(json.dumps({
+                'schema_version': 2, 'monitor_id': 'test', 'provider': 'searchapi.io',
+                'data_id': 'hotel1', 'hotel_name': 'Hotel', 'configured_hotel_name': 'Hotel',
+                'property_token': 'old-token', 'evidence': {'source': 'searchapi.io/google_hotels',
+                    'source_path': 'properties[0].property_token', 'observed_at': '2026-10-01T00:00:00+00:00'}}))
+            invalid = SearchAPIError({'provider': 'searchapi.io', 'category': 'http_error',
+                'http_status': 400, 'error_type': 'InvalidParameter',
+                'message': 'Invalid property_token', 'request_parameters': {'engine': 'google_hotels_property'}})
+            listing = {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'hotel1',
+                                       'property_token': 'new-token'}]}
+            detail = {'property': {'name': 'Hotel', 'data_id': 'hotel1', 'property_token': 'new-token'}}
+            client = CountedClient([invalid, listing, detail])
+            result = execute(cfg, 'test', Path(tmp), client)
+            self.assertEqual(result['status'], 'success')
+            self.assertEqual(result['attempted_requests'], 3)
+            self.assertEqual([call['engine'] for call in client.calls],
+                             ['google_hotels_property', 'google_hotels', 'google_hotels_property'])
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'], 'new-token')
+            saved_snapshot = (directory/'latest.json').read_bytes()
+            wrong_hotel = {'property': {'name': 'Other Hotel', 'data_id': 'other-id',
+                                        'property_token': 'third-token'}}
+            client = CountedClient([invalid,
+                {'properties': [{'type': 'hotel', 'name': 'Hotel', 'data_id': 'hotel1',
+                                 'property_token': 'third-token'}]}, wrong_hotel])
+            self.assertEqual(execute(cfg, 'test', Path(tmp), client)['status'], 'error')
+            self.assertEqual(client.attempts, 3)
+            self.assertEqual((directory/'latest.json').read_bytes(), saved_snapshot)
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'],
+                             'new-token')
+            repeated_invalid = CountedClient([invalid, listing])
+            self.assertEqual(execute(cfg, 'test', Path(tmp), repeated_invalid)['status'], 'error')
+            self.assertEqual(repeated_invalid.attempts, 2)
+            self.assertEqual((directory/'latest.json').read_bytes(), saved_snapshot)
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'], 'new-token')
+
+    def test_fallback_requires_explicit_token_error_and_enough_budget(self):
+        invalid = SearchAPIError({'provider': 'searchapi.io', 'category': 'http_error',
+            'http_status': 400, 'message': 'Invalid property_token',
+            'request_parameters': {'engine': 'google_hotels_property'}})
+        unsupported_locale = SearchAPIError({'provider': 'searchapi.io', 'category': 'http_error',
+            'http_status': 400, 'message': 'Unsupported value in hl parameter',
+            'request_parameters': {'engine': 'google_hotels_property'}})
+        quota = SearchAPIError({'provider': 'searchapi.io', 'category': 'http_error',
+            'http_status': 429, 'message': 'Invalid property_token',
+            'request_parameters': {'engine': 'google_hotels_property'}})
+        self.assertTrue(invalid_property_token_error(invalid))
+        self.assertFalse(invalid_property_token_error(unsupported_locale))
+        self.assertFalse(invalid_property_token_error(quota))
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'latest.json').write_text('{"run_id":"old"}')
+            (directory/'property-resolution.json').write_text(json.dumps({
+                'schema_version': 2, 'monitor_id': 'test', 'provider': 'searchapi.io',
+                'data_id': 'hotel1', 'hotel_name': 'Hotel', 'configured_hotel_name': 'Hotel',
+                'property_token': 'old-token', 'evidence': {'source': 'searchapi.io/google_hotels',
+                    'source_path': 'properties[0].property_token', 'observed_at': '2026-10-01T00:00:00+00:00'}}))
+            for response, limit in ((unsupported_locale, 5), (quota, 5), (invalid, 2)):
+                with self.subTest(message=response.diagnostics['message'], limit=limit):
+                    client = CountedClient([response], limit=limit)
+                    self.assertEqual(execute(cfg, 'test', Path(tmp), client)['status'], 'error')
+                    self.assertEqual(client.attempts, 1)
+                    self.assertEqual(json.loads((directory/'latest.json').read_text())['run_id'], 'old')
+                    self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'], 'old-token')
+
+    def test_mismatched_monitor_or_property_fails_without_replacing_snapshot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'latest.json').write_text('{"run_id":"old"}')
+            cache = {'schema_version': 2, 'monitor_id': 'other-monitor', 'provider': 'searchapi.io',
+                     'data_id': 'hotel1', 'hotel_name': 'Hotel', 'configured_hotel_name': 'Hotel',
+                     'property_token': 'old-token', 'evidence': {'source': 'searchapi.io/google_hotels',
+                         'source_path': 'properties[0].property_token', 'observed_at': '2026-10-01T00:00:00+00:00'}}
+            (directory/'property-resolution.json').write_text(json.dumps(cache))
+            client = CountedClient([])
+            self.assertEqual(execute(cfg, 'test', Path(tmp), client)['status'], 'error')
+            self.assertEqual(client.attempts, 0)
+            cache['monitor_id'] = 'test'
+            (directory/'property-resolution.json').write_text(json.dumps(cache))
+            client = CountedClient([{'property': {'name': 'Other Hotel', 'data_id': 'other-id'}}])
+            self.assertEqual(execute(cfg, 'test', Path(tmp), client)['status'], 'error')
+            self.assertEqual(client.attempts, 1)
+            self.assertEqual(json.loads((directory/'latest.json').read_text())['run_id'], 'old')
+            self.assertEqual(json.loads((directory/'property-resolution.json').read_text())['property_token'], 'old-token')
+
+    def test_cached_token_preserves_room_comparison_gates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True},
+                   'api': {'query_currency': 'JPY', 'hl': 'en', 'gl': 'TW'},
+                   'monitors': [monitor('booked_room_compare')]}
+            cfg['monitors'][0]['hotel_identity']['name'] = 'Hotel'
+            directory = Path(tmp)/'hotels/test'
+            directory.mkdir(parents=True)
+            (directory/'property-resolution.json').write_text(json.dumps({
+                'schema_version': 2, 'monitor_id': 'test', 'provider': 'searchapi.io',
+                'data_id': 'hotel1', 'hotel_name': 'Hotel', 'configured_hotel_name': 'Hotel',
+                'property_token': 'old-token', 'evidence': {'source': 'searchapi.io/google_hotels',
+                    'source_path': 'properties[0].property_token', 'observed_at': '2026-10-01T00:00:00+00:00'}}))
+            detail = {'property': {'name': 'Hotel', 'data_id': 'hotel1',
+                'featured_offers': [{'source': 'Booking.com', 'rooms': [
+                    {'name': 'Twin Room - Smoking',
+                     'rates': [{'total_price': {'extracted_price': 60000}}]}
+                ]}]}}
+            result = execute(cfg, 'test', Path(tmp), CountedClient([detail]))
+            self.assertEqual(result['attempted_requests'], 1)
+            q = json.loads((directory/'latest.json').read_text())['observations'][0]
+            self.assertEqual((q['room_match'], q['comparison_status']), ('mismatch', 'not_comparable'))
+            self.assertIsNone(q['alert_reached'])
+            self.assertIsNone(q['difference'])
+
     def test_success_empty_partial_disabled_and_paths(self):
         from unittest.mock import Mock
         cfg = {'persistence_root': 'hotels', 'execution': {'query_enabled': True, 'max_quote_age_hours': 1},
@@ -116,7 +330,10 @@ class ExecutorTests(unittest.TestCase):
             (directory/'latest.json').write_text('{"run_id":"old"}')
             (directory/'property-resolution.json').write_text(json.dumps({
                 'provider': 'searchapi.io', 'data_id': 'hotel1', 'hotel_name': 'Hotel',
-                'property_token': 'confirmed-token', 'evidence': {'source': 'searchapi.io/google_hotels', 'observed_at': '2026-10-01T00:00:00+00:00'}}))
+                'property_token': 'confirmed-token', 'schema_version': 1,
+                'evidence': {'source': 'searchapi.io/google_hotels',
+                             'source_path': 'properties[0].property_token',
+                             'observed_at': '2026-10-01T00:00:00+00:00'}}))
             detail = {'property': {'name': 'Different Hotel', 'data_id': 'other-id'}}
             client = Mock(attempts=1, limit=5)
             client.search.return_value = detail

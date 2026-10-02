@@ -1,10 +1,10 @@
 {
-  "run_id": "24cce84554fb45de9df70588e89079e1",
+  "run_id": "2011169ad8ce4e8287bfcfd57a88887a",
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "started_at": "2026-10-01T10:50:33.961758+00:00",
+  "started_at": "2026-10-02T03:24:15.327405+00:00",
   "status": "success",
-  "snapshot_run_id": "24cce84554fb45de9df70588e89079e1",
+  "snapshot_run_id": "2011169ad8ce4e8287bfcfd57a88887a",
   "coverage": {
     "requested": [
       "0x6003711bc3781f9b:0x8adc85566de9c8fe"
@@ -14,8 +14,9 @@
     ],
     "deferred": [],
     "failed": [],
-    "provider": "searchapi.io"
+    "provider": "searchapi.io",
+    "resolution_mode": "direct_token"
   },
-  "attempted_requests": 2,
-  "ended_at": "2026-10-01T10:50:38.236724+00:00"
+  "attempted_requests": 1,
+  "ended_at": "2026-10-02T03:24:18.057880+00:00"
 }

@@ -2,11 +2,36 @@
 import argparse
 from datetime import date
 import json
+import math
 import os
 from pathlib import Path
 
 from hotel_executor import ROOT, location, normalized_name, trusted_resolution
 from hotel_searchapi import Client, SearchAPIError, engine_parameters, parameters, room_quotes, safe_text
+
+
+def public_value(value, key):
+    if isinstance(value, str):
+        return safe_text(value, key)
+    if type(value) is bool or type(value) is int:
+        return value
+    if type(value) is float and math.isfinite(value):
+        return value
+    return None
+
+
+def selected_fields(item, key, fields):
+    if not isinstance(item, dict):
+        return {}
+    return {field: public_value(item[field], key) for field in fields if field in item}
+
+
+def price_fields(item, key):
+    if not isinstance(item, dict):
+        return {}
+    return {field: selected_fields(item[field], key,
+            ('price', 'extracted_price', 'price_before_taxes', 'extracted_price_before_taxes'))
+            for field in ('price_per_night', 'total_price') if isinstance(item.get(field), dict)}
 
 
 def summarize(data, monitor, key, check_in, check_out, currency, request_count):
@@ -29,17 +54,33 @@ def summarize(data, monitor, key, check_in, check_out, currency, request_count):
             rooms = offer.get('rooms') or []
             if not isinstance(rooms, list):
                 raise ValueError('Malformed room group')
-            total = offer.get('total_price')
-            amount = total.get('extracted_price') if isinstance(total, dict) else None
+            room_details = []
+            for room_index, room in enumerate(rooms):
+                if not isinstance(room, dict):
+                    raise ValueError('Malformed room')
+                rates = room.get('rates') or []
+                if not isinstance(rates, list):
+                    raise ValueError('Malformed rates')
+                room_details.append({'index': room_index,
+                    'fields': selected_fields(room, key, ('name', 'num_guests')),
+                    'prices': price_fields(room, key),
+                    'rates': [dict(index=rate_index,
+                                   fields=selected_fields(rate, key,
+                                       ('num_guests', 'has_free_cancellation', 'free_cancellation_until')),
+                                   prices=price_fields(rate, key))
+                              for rate_index, rate in enumerate(rates) if isinstance(rate, dict)]})
             offers.append({'group': group, 'index': index,
                            'source': safe_text(offer.get('source'), key),
-                           'offer_level_total_amount': amount if type(amount) in (int, float) else None,
-                           'room_count': len(rooms),
-                           'room_rate_count': sum(len(room.get('rates') or [room])
-                                                  for room in rooms if isinstance(room, dict))})
+                           'offer_fields': selected_fields(offer, key,
+                               ('num_guests', 'has_free_cancellation', 'is_official')),
+                           'offer_prices': price_fields(offer, key),
+                           'booking_link_present': bool(offer.get('link') or offer.get('tracking_link')),
+                           'rooms': room_details})
     parsed = room_quotes(data, currency)
     return {'monitor_id': monitor['monitor_id'], 'check_in': check_in, 'check_out': check_out,
             'hotel_data_id': source_id, 'query_currency': currency, 'request_count': request_count,
+            'property_fields_present': [field for field in
+                ('type', 'name', 'data_id', 'address', 'featured_offers', 'all_offers') if field in prop],
             'offer_count': len(offers), 'offers': offers,
             'saved_by_current_room_parser': len(parsed),
             'parsed_sources': sorted({safe_text(q['source'], key) for q in parsed if q.get('source')})}
@@ -89,3 +130,4 @@ def main():
 
 if __name__ == '__main__':
     raise SystemExit(main())
+

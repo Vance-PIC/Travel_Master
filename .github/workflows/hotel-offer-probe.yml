@@ -1,6 +1,8 @@
 name: Hotel OTA offer diagnostic
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - test/hotel-december-offers
 permissions:
   contents: read
 jobs:

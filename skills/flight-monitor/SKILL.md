@@ -26,3 +26,16 @@ Extra Booking Options verification is allowed only for a fresh itinerary near th
 On API/parsing failure preserve the last valid snapshot and histories. Save a separate sanitized error including stage and attempted searches. Never persist keys, departure tokens, credential URLs, account identity or raw account responses.
 
 Use authorized data sources. Stop at CAPTCHA or anti-bot blocks without bypass attempts. Respect the user's authorization for quota usage and remote writes. Periodic refresh checks happen when a query runs; they do not authorize enabling a schedule.
+
+## Scheduled execution and report delivery
+
+Keep execution, monitoring logic, and report delivery as separate responsibilities:
+
+- This Skill defines query policy, persistence, and report formatting. Reading or invoking the Skill in a ChatGPT scheduled task does **not** prove that the remote flight query executed.
+- GitHub Actions is the authoritative scheduled executor for the current repository implementation. The production workflow is `.github/workflows/nagoya-flight-monitor.yml`.
+- For the Nagoya production case, the GitHub Actions schedule runs daily at 09:50 Asia/Taipei (01:50 UTC). Scheduled workflow events must explicitly resolve to `monitor_query`; do not rely on `workflow_dispatch.inputs.mode`, because scheduled events do not provide that input.
+- ChatGPT scheduled tasks are the presentation layer: after the GitHub run, read the repository's current `latest.json`, `last-run.json`, and itinerary history and render the Human report defined in `references/report-format.md`.
+- Produce a report on every scheduled presentation run, including runs with no meaningful fare change. If GitHub data did not advance as expected, report that execution/data freshness problem instead of presenting retained quotes as today's fresh prices.
+- A ChatGPT task invocation proves only that the presentation task ran. A GitHub Actions run plus updated run evidence proves that the flight monitor executed. Always check repository timestamps/status before calling a quote fresh.
+- Do not duplicate the production fare query in the ChatGPT task merely to compensate for a missing GitHub run. Diagnose or repair the execution chain instead, preserving GitHub as the monitoring system of record.
+

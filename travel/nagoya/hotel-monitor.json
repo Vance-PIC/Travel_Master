@@ -2,8 +2,8 @@
   "schema_version": 1,
   "trip_id": "nagoya",
   "execution": {
-    "query_enabled": false,
-    "schedule_enabled": false,
+    "query_enabled": true,
+    "schedule_enabled": true,
     "executor": "scripts/hotel_executor.py",
     "api_adapter": "scripts/hotel_searchapi.py",
     "max_quote_age_hours": null

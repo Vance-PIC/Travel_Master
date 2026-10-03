@@ -1,5 +1,8 @@
 name: Hotel monitor executor
 on:
+  schedule:
+    # GitHub Actions cron uses UTC. 01:50 UTC = 09:50 Asia/Taipei.
+    - cron: "50 1 * * *"
   workflow_dispatch:
     inputs:
       monitor:
@@ -31,14 +34,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check SearchAPI credential
+        env:
+          SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
+        run: |
+          if [ -z "$SEARCHAPI_KEY" ]; then
+            echo "::error::Repository secret SEARCHAPI_KEY is not configured."
+            exit 2
+          fi
       - name: Test executor without API calls
         run: python -m unittest discover -s scripts -p 'test_hotel*.py'
-      - name: Run selected monitor once
+      - name: Run hotel monitors
         id: query
         env:
           SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
           MONITOR_ID: ${{ inputs.monitor }}
-        run: python scripts/hotel_executor.py run --monitor "$MONITOR_ID" --allow-query
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            python scripts/hotel_executor.py run --monitor airport-candidate
+            python scripts/hotel_executor.py run --monitor marunouchi-booked
+          else
+            python scripts/hotel_executor.py run --monitor "$MONITOR_ID"
+          fi
       - name: Save monitoring records including failed-run diagnostics
         if: always() && github.ref == 'refs/heads/master' && (steps.query.outcome == 'success' || steps.query.outcome == 'failure')
         run: |
@@ -48,7 +66,7 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'data(hotel-monitor): save manual executor run'
+          git commit -m 'data(hotel-monitor): save executor run'
           git pull --rebase origin master
           git push origin HEAD:master
       - name: Retain persistence and recovery evidence

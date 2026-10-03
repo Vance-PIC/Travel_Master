@@ -23,7 +23,7 @@ uncertain 只能待確認，mismatch 排除；兩者的差額與通知判定均�
 
 ## 執行邊界
 
-目前提供 Skill、設定契約及 [SearchAPI 手動能力驗證 adapter](references/searchapi-adapter.md)。正式 executor 已提供 `scripts/hotel_executor.py`，按逐欄證據評估 Stage 1／Stage 2 並保存紀錄；資料不足不得宣稱已完成正式比價。`execution.query_enabled=false` 與 `schedule_enabled=false` 禁止自動監控查詢；使用者明確授權的單次 executor 可用 `--allow-query`，不修改設定或 schedule。能力驗證仍使用獨立入口，每次最多五個請求，只產生驗證 artifact。不得重跑已驗證住宿 API 實驗或建立 schedule。
+目前提供 Skill、設定契約及 [SearchAPI 手動能力驗證 adapter](references/searchapi-adapter.md)。正式 executor 已提供 `scripts/hotel_executor.py`，按逐欄證據評估 Stage 1／Stage 2 並保存紀錄；資料不足不得宣稱已完成正式比價。`execution.query_enabled=true` 與 `schedule_enabled=true` 代表此 trip-specific monitor 已啟用正式排程；Nagoya production workflow 每日 09:50（Asia/Taipei）執行，排程依序跑 `airport-candidate` 與 `marunouchi-booked`。手動 executor 仍可用 `--allow-query` 單次執行指定 monitor。能力驗證仍使用獨立入口，每次最多五個請求，只產生驗證 artifact。不得重跑已驗證住宿 API 實驗。
 
 來源實驗若已存在，引用其檔案與證據，不重新驗證，也不將實驗資料當正式 snapshot。未知維持 unknown/null，不猜兒童年齡、加床、免費同住、幣別、訂房來源或取消政策。報告只讀既有資料，不觸發查詢；無 snapshot 就說尚未執行。
 

@@ -14,13 +14,13 @@ python scripts/hotel_executor.py report --monitor marunouchi-booked
 python -m unittest discover -s scripts -p 'test_hotel*.py'
 ```
 
-query_enabled stays false. `--allow-query` explicitly permits just that manual
-invocation. schedule_enabled remains false; there is no scheduled workflow.
-The manual **Hotel monitor executor** workflow selects one monitor, runs offline
-tests, executes using the repository Secret, commits records to master, and
-uploads `hotel-monitor-<GitHub Run ID>`. Dispatch only after the workflow has
-been merged and the user authorizes the run. Existing **Hotel API verification**
-remains separate and unchanged.
+query_enabled and schedule_enabled are true for the production Nagoya monitor.
+The **Hotel monitor executor** workflow runs every day at 09:50 Asia/Taipei,
+matching the flight monitor cadence. Scheduled runs execute `airport-candidate`
+first and `marunouchi-booked` second, then commit monitoring records to master
+and upload `hotel-monitor-<GitHub Run ID>` evidence. Manual workflow dispatch
+still selects one monitor and uses the same executor path. Existing **Hotel API
+verification** remains separate and unchanged.
 
 Every attempted search counts toward max_requests_per_run (1–5). No retries.
 Additional hotels/pages beyond the budget produce partial, preserving latest
@@ -65,14 +65,13 @@ Stage 2 property resolution uses `hotel_identity.source_ids.searchapi.io` as the
 trusted `data_id` and checks both ID and configured hotel name/aliases against
 the listing and property response. SearchAPI's property engine requires a
 separate `property_token`; a `data_id` cannot replace it. When the token is not
-yet saved, the next manual run performs one hotel discovery, verifies the
+yet saved, the next production run performs one hotel discovery, verifies the
 listing and detail against the configured ID/name, and writes
 `property-resolution.json` in the same recovery transaction as the snapshot.
 Later runs use that token for a direct property request. A changed ID/name or
 conflicting token fails before any snapshot is replaced; a detail identity
 mismatch also fails and preserves the previous resolution. An unverified name
-match without a configured ID is never promoted to a reusable token. No
-schedule or live query is triggered by configuring the ID.
+match without a configured ID is never promoted to a reusable token. Configuring the ID alone does not trigger an extra query outside the scheduled or manually dispatched executor.
 
 The resolution file now records schema version 2, monitor ID, provider,
 configured hotel name, provider hotel name, data ID, token, and discovery

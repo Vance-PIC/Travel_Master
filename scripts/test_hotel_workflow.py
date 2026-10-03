@@ -20,15 +20,12 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertIn("steps.query.outcome == 'success' || steps.query.outcome == 'failure'", save)
         self.assertIn("persist-credentials: ${{ github.ref == 'refs/heads/master' }}", text)
 
-    def test_schedule_and_artifact_are_retained(self):
+    def test_branch_evidence_is_retained_without_schedule(self):
         text = WORKFLOW.read_text(encoding='utf-8')
         artifact = text.split('- name: Retain', 1)[1]
         self.assertIn('if: always()', artifact)
         self.assertIn('actions/upload-artifact@v4', artifact)
-        self.assertIn('schedule:', text)
-        self.assertIn('50 1 * * *', text)
-        self.assertIn('airport-candidate', text)
-        self.assertIn('marunouchi-booked', text)
+        self.assertNotIn('schedule:', text)
 
 
 if __name__ == '__main__': unittest.main()

@@ -2,8 +2,10 @@ name: Nagoya SerpApi flight monitor
 
 on:
   schedule:
-    # GitHub Actions cron uses UTC. 01:50 UTC = 09:50 Asia/Taipei.
-    - cron: "50 1 * * *"
+    # Daily production monitor at 09:50 Taiwan time.
+    # Changing the cron also reactivates a deactivated GitHub scheduled workflow.
+    - cron: "50 9 * * *"
+      timezone: "Asia/Taipei"
   workflow_dispatch:
     inputs:
       mode:

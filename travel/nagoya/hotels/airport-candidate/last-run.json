@@ -1,0 +1,60 @@
+{
+  "run_id": "efeafe9987f046119fdb9091dcdc6edc",
+  "monitor_id": "airport-candidate",
+  "stage": "candidate_search",
+  "started_at": "2026-10-04T07:27:39.619234+00:00",
+  "status": "partial",
+  "snapshot_run_id": null,
+  "coverage": {
+    "requested": [
+      "0x60047dec385d0ad9:0xc8fe87d05bd1b088",
+      "0x60047d8e91e03879:0x8f267b413b8f9f5a",
+      "0x60047d8c4a20df69:0xc83f5655a6941a10",
+      "0x60047d328d540db1:0x18d46af9d6250f91",
+      "0x60047d24055ce80b:0xa7d64170939ccc37",
+      "0x60047dec385d0ad9:0xabed8a09389b909e",
+      "0x60048757645da5ed:0x25fb97110816e7d0",
+      "0x600480ad621cccfd:0x7a80af3b86fff90d",
+      "0x6004874d9cc10255:0x9f2da06b14275aca",
+      "0x6004870e9e41becd:0x58503378f14d73bc",
+      "0x60048747ffdeadcf:0x6f0c884f842fcce1",
+      "0x60048100ad7dc371:0xec28c64828a71ab9",
+      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
+      "0x6004874ce9d95feb:0x89694bab0b51bb4",
+      "0x60048700688a6f17:0x304c4cf7aed2aea5",
+      "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
+      "0x600489b7708a923d:0xf1300858ec11d11c",
+      "ぽんぽこハウス",
+      "Villa Mariso “貸別荘マリソ“"
+    ],
+    "completed": [
+      "0x60047dec385d0ad9:0xc8fe87d05bd1b088",
+      "0x60047d8e91e03879:0x8f267b413b8f9f5a",
+      "0x60047d8c4a20df69:0xc83f5655a6941a10",
+      "0x60047d328d540db1:0x18d46af9d6250f91"
+    ],
+    "deferred": [
+      "0x60047d24055ce80b:0xa7d64170939ccc37",
+      "0x60047dec385d0ad9:0xabed8a09389b909e",
+      "0x60048757645da5ed:0x25fb97110816e7d0",
+      "0x600480ad621cccfd:0x7a80af3b86fff90d",
+      "0x6004874d9cc10255:0x9f2da06b14275aca",
+      "0x6004870e9e41becd:0x58503378f14d73bc",
+      "0x60048747ffdeadcf:0x6f0c884f842fcce1",
+      "0x60048100ad7dc371:0xec28c64828a71ab9",
+      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
+      "0x6004874ce9d95feb:0x89694bab0b51bb4",
+      "0x60048700688a6f17:0x304c4cf7aed2aea5",
+      "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
+      "0x600489b7708a923d:0xf1300858ec11d11c",
+      "additional_results_page"
+    ],
+    "failed": [],
+    "provider": "searchapi.io",
+    "resolution_mode": "discovery"
+  },
+  "attempted_requests": 5,
+  "ended_at": "2026-10-04T07:27:49.751114+00:00"
+}

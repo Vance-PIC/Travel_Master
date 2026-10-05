@@ -236,3 +236,23 @@ class RemoteRoutingTests(unittest.TestCase):
                 patch.object(github_store, "get_file", side_effect=github_store.GitHubStoreError("GitHub credential is missing")):
             with self.assertRaisesRegex(github_store.GitHubStoreError, "credential is missing"):
                 flight_server.flight_report("current")
+
+    def test_remote_current_rejects_malformed_itineraries_cleanly(self):
+        import flight_server
+        import github_store
+
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "get_file", return_value=b'{"itineraries":["bad"]}'):
+            with self.assertRaisesRegex(github_store.GitHubStoreError, "invalid"):
+                flight_server.flight_report("current")
+
+    def test_search_network_error_does_not_expose_key(self):
+        import flight_server
+
+        secret = "secret-serpapi-token"
+        with patch.dict(os.environ, {"SERPAPI_KEY": secret}), \
+                patch.object(flight_server.urllib.request, "urlopen",
+                             side_effect=urllib.error.URLError("request-url?api_key=" + secret)):
+            with self.assertRaises(RuntimeError) as failure:
+                flight_server._serpapi({"engine": "google_flights"})
+        self.assertNotIn(secret, str(failure.exception))

@@ -18,6 +18,7 @@ import os
 import subprocess
 import sys
 import urllib.parse
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any, Literal
@@ -85,9 +86,13 @@ def _serpapi(params: dict[str, Any]) -> dict[str, Any]:
         raise RuntimeError("SERPAPI_KEY is not configured")
     params = {**params, "api_key": key}
     url = SERPAPI_SEARCH + "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"User-Agent": "Travel_Master Flight MCP"})
-    with urllib.request.urlopen(req, timeout=45) as response:
-        data = json.load(response)
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Travel_Master Flight MCP"})
+        with urllib.request.urlopen(req, timeout=45) as response:
+            data = json.load(response)
+    except Exception:
+        # urllib exceptions can include the full URL and its api_key.
+        raise RuntimeError("SerpApi search request failed") from None
     if not isinstance(data, dict) or data.get("error"):
         raise RuntimeError("SerpApi search failed")
     return data
@@ -225,8 +230,14 @@ def flight_report(
         return {"status": "unsupported_trip", "trip_id": trip_id}
     if action == "current":
         latest = _monitor_json(NAGOYA_FLIGHTS / "latest.json")
+        candidates = latest.get("itineraries", [])
+        if _remote_mode() and (not isinstance(candidates, list) or any(
+            not isinstance(item, dict) or not isinstance(item.get("displayed_price_twd"), (int, float, type(None)))
+            for item in candidates
+        )):
+            raise github_store.GitHubStoreError("GitHub monitor itinerary data is invalid")
         itineraries = sorted(
-            [x for x in latest.get("itineraries", []) if isinstance(x.get("displayed_price_twd"), (int, float))],
+            [x for x in candidates if isinstance(x.get("displayed_price_twd"), (int, float))],
             key=lambda x: (x["displayed_price_twd"], x.get("itinerary_key", "")),
         )
         return {

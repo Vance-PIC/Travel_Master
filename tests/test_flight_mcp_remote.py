@@ -32,7 +32,7 @@ class GitHubStoreTests(unittest.TestCase):
         import github_store
 
         content = b'{"status":"ok"}'
-        encoded = base64.b64encode(content).decode()
+        encoded = base64.b64encode(content).decode() + "\n"
         requests = []
 
         def respond(req, timeout):
@@ -82,6 +82,23 @@ class GitHubStoreTests(unittest.TestCase):
                               return_value=Response(b'{"encoding":"base64","content":"?"}')):
                 with self.assertRaises(github_store.GitHubStoreError):
                     github_store.get_file("travel/nagoya/flights/latest.json")
+
+
+class CloudPackagingTests(unittest.TestCase):
+    def test_container_is_minimal_nonroot_and_docs_cover_remote_setup(self):
+        root = Path(__file__).resolve().parents[1]
+        dockerfile = (root / "mcp" / "Dockerfile").read_text(encoding="utf-8")
+        self.assertIn("FROM python:3.12-slim", dockerfile)
+        self.assertIn("COPY mcp/requirements.txt", dockerfile)
+        self.assertIn("COPY mcp/*.py", dockerfile)
+        self.assertNotIn("COPY .", dockerfile)
+        self.assertIn("USER app", dockerfile)
+        self.assertIn("mcp/remote_server.py", dockerfile)
+        docs = (root / "docs" / "flight-mcp.md").read_text(encoding="utf-8")
+        for setting in ("FLIGHT_MCP_BEARER_TOKEN", "FLIGHT_MCP_ALLOWED_HOST", "GITHUB_TOKEN",
+                        "GITHUB_REPO", "SERPAPI_KEY", "PORT", "FLIGHT_MCP_TOKEN"):
+            self.assertIn(setting, docs)
+        self.assertIn("--bearer-token-env-var", docs)
 
 
 @unittest.skipUnless(SDK_AVAILABLE, "Install mcp/requirements.txt for HTTP MCP tests")
@@ -149,6 +166,18 @@ class RemoteTransportTests(unittest.TestCase):
 
 @unittest.skipUnless(SDK_AVAILABLE, "Install mcp/requirements.txt for routing tests")
 class RemoteRoutingTests(unittest.TestCase):
+    def test_local_readonly_tools_do_not_use_github(self):
+        import flight_server
+        import github_store
+
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": ""}), \
+                patch.object(github_store, "get_file") as remote_read:
+            status = flight_server.flight_monitor("status")
+            report = flight_server.flight_report("current")
+        remote_read.assert_not_called()
+        self.assertEqual(status["trip_id"], "nagoya")
+        self.assertEqual(report["trip_id"], "nagoya")
+
     def test_remote_status_and_current_report_read_github_snapshot(self):
         import flight_server
         import github_store

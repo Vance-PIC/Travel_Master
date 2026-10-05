@@ -59,7 +59,9 @@ def get_file(path: str) -> bytes:
         result = json.loads(body)
         if result["encoding"] != "base64":
             raise ValueError("Unexpected encoding")
-        return base64.b64decode(result["content"], validate=True)
+        # GitHub Contents API line-wraps the base64 content field.
+        encoded = "".join(result["content"].split())
+        return base64.b64decode(encoded, validate=True)
     except (ValueError, KeyError, TypeError, binascii.Error):
         raise GitHubStoreError("GitHub file content is invalid") from None
 

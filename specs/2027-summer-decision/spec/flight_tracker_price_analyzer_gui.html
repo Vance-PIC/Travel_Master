@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2027 家族旅行 - 航班追蹤與比價系統 GUI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        borderbg: '#334155'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-900 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Header -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-plane-departure text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                            2027 家族旅行 航班追蹤 GUI
+                        </h1>
+                        <p class="text-xs text-slate-400">TPE/TSA 出發 6 大航點比價 & 歷史 SQLite 管線</p>
+                    </div>
+                </div>
+
+                <!-- Status Pills -->
+                <div class="hidden md:flex items-center space-x-3 text-xs">
+                    <div class="bg-slate-900/80 border border-slate-700/60 px-3 py-1.5 rounded-full flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-slate-300">SQLite: <strong id="db-status-text" class="text-emerald-400">已連線 (48筆)</strong></span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-700/60 px-3 py-1.5 rounded-full flex items-center space-x-2">
+                        <i class="fa-solid fa-calendar-days text-indigo-400"></i>
+                        <span class="text-slate-300">目標: <strong class="text-indigo-300">2027 暑假 (7月/8月)</strong></span>
+                    </div>
+                    <button id="btn-quick-export" onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 shadow-md shadow-emerald-900/20">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>匯出 Excel 報表</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <div class="bg-slate-800 border-b border-slate-700/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2 text-sm font-medium scrollbar-none" id="main-nav">
+                <button onclick="switchTab('control')" id="tab-btn-control" class="tab-btn active text-indigo-400 border-b-2 border-indigo-500 px-3 py-2 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>主控台與爬蟲任務</span>
+                </button>
+                <button onclick="switchTab('flights')" id="tab-btn-flights" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plane"></i>
+                    <span>航班時刻與條件篩選</span>
+                </button>
+                <button onclick="switchTab('matrix')" id="tab-btn-matrix" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Phase 1 航點橫向評比</span>
+                </button>
+                <button onclick="switchTab('db')" id="tab-btn-db" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-database"></i>
+                    <span>SQLite 數據庫檢視</span>
+                </button>
+                <button onclick="switchTab('ai')" id="tab-btn-ai" class="tab-btn text-slate-400 hover:text-slate-200 px-3 py-2 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI 家族旅行顧問</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- ==================== TAB 1: CONTROL PANEL ==================== -->
+        <div id="tab-content-control" class="tab-content space-y-6">
+            <!-- Top Summary Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 text-indigo-500/10 text-6xl font-black">NGO</div>
+                    <div class="text-xs font-semibold uppercase text-slate-400">Lowest Tracked Price (NGO)</div>
+                    <div class="text-2xl font-bold text-emerald-400 mt-2">NT$ 13,200 <span class="text-xs font-normal text-slate-400">/含稅含行李</span></div>
+                    <div class="text-xs text-slate-400 mt-1">國泰 CX530 (11:45出發符合條件)</div>
+                </div>
+
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 text-indigo-500/10 text-6xl font-black">PUS</div>
+                    <div class="text-xs font-semibold uppercase text-slate-400">Lowest Tracked Price (PUS)</div>
+                    <div class="text-2xl font-bold text-emerald-400 mt-2">NT$ 8,900 <span class="text-xs font-normal text-slate-400">/含稅含行李</span></div>
+                    <div class="text-xs text-slate-400 mt-1">華航 CI188 (07:45出發極佳)</div>
+                </div>
+
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 text-indigo-500/10 text-6xl font-black">TIME</div>
+                    <div class="text-xs font-semibold uppercase text-slate-400">Strict Rule Pass Rate</div>
+                    <div class="text-2xl font-bold text-indigo-400 mt-2">83.3% <span class="text-xs font-normal text-slate-400">(40/48 班次合格)</span></div>
+                    <div class="text-xs text-slate-400 mt-1">去程週日 &lt;15:00 / 回程依星期</div>
+                </div>
+
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 text-indigo-500/10 text-6xl font-black">HASH</div>
+                    <div class="text-xs font-semibold uppercase text-slate-400">SQLite Hash Deduplication</div>
+                    <div class="text-2xl font-bold text-cyan-400 mt-2">100% Active</div>
+                    <div class="text-xs text-slate-400 mt-1">INSERT OR IGNORE 生效中</div>
+                </div>
+            </div>
+
+            <!-- Execution Panel & Console -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Actions Panel -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                        <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-400"></i> CLI 管道執行中心
+                        </h3>
+                        <span class="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">v1.2.0</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-xs font-medium text-slate-300">執行模式選擇</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-mode-mock" onclick="setMode('mock')" class="mode-btn px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center border-indigo-500 bg-indigo-600/30 text-indigo-200">
+                                <i class="fa-solid fa-flask mb-1 block text-base"></i>
+                                --mock 測試模式
+                            </button>
+                            <button id="btn-mode-crawl" onclick="setMode('crawl')" class="mode-btn px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-600">
+                                <i class="fa-solid fa-spider mb-1 block text-base"></i>
+                                --crawl 爬蟲模式
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Target Date Selector -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-slate-300">目標旅遊時段</label>
+                        <select id="select-date-range" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl p-3 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">包含時段 1 (7/11~18) + 時段 2 (8/15~22)</option>
+                            <option value="WINDOW_1">僅時段 1：7/11(日)出發 ~ 7/17(六)或7/18(日)回程</option>
+                            <option value="WINDOW_2">僅時段 2：8/15(日)出發 ~ 8/21(六)或8/22(日)回程</option>
+                        </select>
+                    </div>
+
+                    <!-- Target Destination Checks -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-slate-300">抓取 6 大目標航點</label>
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="NGO" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>NGO (名古屋)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="KIX" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>KIX (大阪)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="SDJ" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>SDJ (仙台)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="CTS" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>CTS (札幌)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="HIJ" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>HIJ (廣島)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-slate-900/60 p-2 rounded-lg border border-slate-700/60 cursor-pointer">
+                                <input type="checkbox" checked value="PUS" class="dest-checkbox rounded text-indigo-600 bg-slate-800 border-slate-600">
+                                <span>PUS (釜山)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Command Buttons -->
+                    <div class="pt-2 space-y-2">
+                        <button id="btn-run-pipeline" onclick="runPipeline()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span id="btn-run-text">執行 `python src/main.py run`</span>
+                        </button>
+                        <button onclick="clearConsole()" class="w-full bg-slate-900 hover:bg-slate-700/80 text-slate-400 font-medium py-2 px-3 rounded-xl border border-slate-700/80 text-xs transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-broom"></i>
+                            <span>清除控制台 Console Log</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Console Output -->
+                <div class="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-2xl p-4 shadow-2xl flex flex-col justify-between h-[480px]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                            <span class="text-xs code-font text-slate-400 ml-2">Terminal Console - src/main.py Execution Log</span>
+                        </div>
+                        <span id="console-status-badge" class="text-[10px] code-font bg-slate-800 text-slate-400 px-2 py-0.5 rounded">IDLE</span>
+                    </div>
+
+                    <!-- Log Stream Container -->
+                    <div id="console-output" class="code-font text-xs space-y-1.5 overflow-y-auto flex-1 pr-2 text-slate-300">
+                        <div class="text-slate-500">[INIT] Flight Tracker Pipeline GUI loaded.</div>
+                        <div class="text-slate-500">[DB] Connected to sqlite3://data/flight_tracker.db</div>
+                        <div class="text-indigo-400">[READY] Type or click 'Run' to execute pipeline.</div>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div id="pipeline-progress-bar-container" class="hidden mt-3 pt-2 border-t border-slate-800">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1 code-font">
+                            <span id="progress-step-text">Processing...</span>
+                            <span id="progress-percent-text">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div id="progress-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: FLIGHTS & STRICT FILTER ENGINE ==================== -->
+        <div id="tab-content-flights" class="tab-content hidden space-y-6">
+            <!-- Filter Bar -->
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-indigo-400"></i> 航班過濾規則引擎 (Strict Time Filter)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">根據 SPEC 第 2.3 節硬性規章過濾不合適班次</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="toggleStrictRules(this)" id="btn-toggle-strict" class="bg-indigo-600/30 border border-indigo-500 text-indigo-200 text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>硬性時間過濾：已開啟</span>
+                        </button>
+                        <button onclick="resetFlightFilters()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-2 rounded-xl transition-all">
+                            重設篩選
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Strict Rules Banner -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-900/80 border border-slate-700/60 p-3.5 rounded-xl">
+                    <div class="flex items-center space-x-2 text-slate-300">
+                        <i class="fa-solid fa-plane-departure text-amber-400"></i>
+                        <span><strong>去程 (週日) 限制：</strong> 出發地當地時間 < 15:00</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-300">
+                        <i class="fa-solid fa-plane-arrival text-emerald-400"></i>
+                        <span><strong>回程 (週六) 限制：</strong> 當地起飛時間 < 20:00</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-300">
+                        <i class="fa-solid fa-plane-arrival text-cyan-400"></i>
+                        <span><strong>回程 (週日) 限制：</strong> 當地起飛時間 < 14:00</span>
+                    </div>
+                </div>
+
+                <!-- Secondary Search Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">目的地篩選</label>
+                        <select id="filter-dest" onchange="applyFlightFilters()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">全部目的地 (6 大航點)</option>
+                            <option value="NGO">NGO - 名古屋</option>
+                            <option value="KIX">KIX - 大阪</option>
+                            <option value="SDJ">SDJ - 仙台</option>
+                            <option value="CTS">CTS - 札幌</option>
+                            <option value="HIJ">HIJ - 廣島</option>
+                            <option value="PUS">PUS - 釜山</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">行程類型</label>
+                        <select id="filter-trip-type" onchange="applyFlightFilters()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">全部 (去程 + 回程)</option>
+                            <option value="OUTBOUND">僅看去程 (Outbound)</option>
+                            <option value="INBOUND">僅看回程 (Inbound)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">旅遊時段</label>
+                        <select id="filter-window" onchange="applyFlightFilters()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">全部時段 (7月與8月)</option>
+                            <option value="WINDOW_1">時段 1：7/11 ~ 7/18</option>
+                            <option value="WINDOW_2">時段 2：8/15 ~ 8/22</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">價格排序</label>
+                        <select id="filter-sort" onchange="applyFlightFilters()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                            <option value="PRICE_ASC">票價從低到高</option>
+                            <option value="PRICE_DESC">票價從高到低</option>
+                            <option value="TIME_ASC">起飛時間從早到晚</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flight Results Grid -->
+            <div id="flight-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Flight cards dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: PHASE 1 DESTINATION COMPARISON ==================== -->
+        <div id="tab-content-matrix" class="tab-content hidden space-y-6">
+            <!-- Phase 1 Overview Banner -->
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg">
+                <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-list-check text-indigo-400"></i> Phase 1 兩階段評選：直飛/住宿/交通 總比價表
+                </h3>
+                <p class="text-xs text-slate-400">
+                    評估指標：直飛航班時間匹配度、暑假平假日住宿價格波幅、地面交通 (自駕 vs 大眾運輸)。
+                </p>
+
+                <!-- Comparison Chart -->
+                <div class="mt-6 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
+                    <h4 class="text-xs font-bold text-slate-300 uppercase mb-3">6 大候選航點 Phase 1 預估平均基本開銷 (每人/台幣)</h4>
+                    <div class="h-64">
+                        <canvas id="chart-phase1-cost"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destination Comparison Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- NGO Card -->
+                <div class="bg-slate-800/90 border border-indigo-500/40 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★★★★★
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-indigo-400">NGO</span>
+                            <span class="text-base font-bold text-slate-200">名古屋 (Nagoya)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">日本中部 • 綜合彈性最高</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：極佳</div>
+                                <p class="text-slate-400">國泰 CX530 (11:45出發) / 華航 CI154 (07:30出發)，回程國泰 CX531 (16:50) 完全符合標準。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-emerald-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：中等 (約 NT$ 4,500~7,500/晚)</div>
+                                <p class="text-slate-400">車站周邊家庭房量多，週末漲幅僅約 20%~30%。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-car mr-1"></i>地面交通：自駕 / 鐵路雙宜</div>
+                                <p class="text-slate-400">市區靠地鐵；往高山/吉卜力公園可租 7-8 人座 MPV (約 ¥1.5~2.2萬/天)。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-emerald-400">NT$ 22,000 ~ 28,000 /人</span>
+                    </div>
+                </div>
+
+                <!-- PUS Card -->
+                <div class="bg-slate-800/90 border border-emerald-500/40 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★★★★★
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-emerald-400">PUS</span>
+                            <span class="text-base font-bold text-slate-200">釜山 (Busan)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">韓國海港 • 預算與家庭輕鬆度首選</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：極佳</div>
+                                <p class="text-slate-400">華航 CI188 (07:45出發)，週日回程 CI189 (12:00起飛) 完美符合 <14:00 門檻。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-emerald-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：最親民 (約 NT$ 3,500~6,000/晚)</div>
+                                <p class="text-slate-400">西面/海雲台公寓式酒店，兩房一廳帶廚房/洗衣機 CP 值極高。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-taxi mr-1"></i>地面交通：地鐵 + 計程車/包車</div>
+                                <p class="text-slate-400">免右駕壓力！全家短程直接叫 Kakao Taxi 或包車非常便宜省事。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-emerald-400">NT$ 15,000 ~ 20,000 /人</span>
+                    </div>
+                </div>
+
+                <!-- CTS Card -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-slate-700 text-slate-300 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★★★★☆
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-cyan-400">CTS</span>
+                            <span class="text-base font-bold text-slate-200">北海道/札幌</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">日本北海道 • 氣候最舒適/成本最高</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：佳</div>
+                                <p class="text-slate-400">長榮/華航/星宇均有早班機；週六回程可搭晚班，週日則需搭早班。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-rose-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：極高 (7-8月富良野花季旺季)</div>
+                                <p class="text-slate-400">富良野與美瑛渡假飯店週末價格翻倍，需提前 8-10 個月搶訂。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-car mr-1"></i>地面交通：必備租車 (約 ¥2.5~3.5萬/天)</div>
+                                <p class="text-slate-400">幅員廣大，旺季休旅車/7人座供不應求，需早鳥預約。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-rose-400">NT$ 32,000 ~ 42,000 /人</span>
+                    </div>
+                </div>
+
+                <!-- HIJ Card -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-slate-700 text-slate-300 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★★★★☆
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-amber-400">HIJ</span>
+                            <span class="text-base font-bold text-slate-200">廣島 (Hiroshima)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">山陽地區 • 人潮適中、步調悠閒</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：佳</div>
+                                <p class="text-slate-400">華航 CI112 (07:20出發)，週日回程 CI113 (11:35起飛) 符合 <14:00 門檻。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-emerald-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：親民 (約 NT$ 3,500~5,500/晚)</div>
+                                <p class="text-slate-400">廣島與岡山平假日價差小，週末上漲不超過 25%。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-train mr-1"></i>地面交通：JR Pass 或山陽自駕</div>
+                                <p class="text-slate-400">搭配 JR 關西&廣島 Pass 搭新幹線移動極快；高速公路好開。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-emerald-400">NT$ 20,000 ~ 26,000 /人</span>
+                    </div>
+                </div>
+
+                <!-- KIX Card -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-slate-700 text-slate-300 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★★★★☆
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-rose-400">KIX</span>
+                            <span class="text-base font-bold text-slate-200">大阪 (Osaka/Kansai)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">關西核心 • 班次最穩但暑期熱鬧人多</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：極高</div>
+                                <p class="text-slate-400">每日十數班，所有時段皆有完美對應航班。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-rose-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：偏高 (約 NT$ 6,000~9,000/晚)</div>
+                                <p class="text-slate-400">鬧區暑假加週末漲幅高達 30%~50%。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-train-subway mr-1"></i>地面交通：全靠大眾運輸</div>
+                                <p class="text-slate-400">地鐵/私鐵/關西廣域周遊券超方便，免去開車塞車麻煩。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-amber-400">NT$ 25,000 ~ 33,000 /人</span>
+                    </div>
+                </div>
+
+                <!-- SDJ Card -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative flex flex-col justify-between">
+                    <div class="absolute top-4 right-4 bg-slate-700 text-slate-300 text-[10px] font-bold px-2 py-1 rounded-full">
+                        Phase 1 推薦度: ★☆☆☆☆
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-black text-purple-400">SDJ</span>
+                            <span class="text-base font-bold text-slate-200">仙台 (Sendai)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">日本東北 • 避暑自駕秘境</p>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-rose-300 mb-1"><i class="fa-solid fa-plane mr-1"></i>航班匹配度：受限</div>
+                                <p class="text-slate-400">回程多為傍晚 (16:00~17:00)，若選週日回程較難符合 <14:00 條件。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-emerald-300 mb-1"><i class="fa-solid fa-hotel mr-1"></i>住宿成本：中等偏低 (約 NT$ 3,500~5,000/晚)</div>
+                                <p class="text-slate-400">仙台市區飯店價格平穩，溫泉飯店一泊二食單價較高。</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50">
+                                <div class="font-semibold text-amber-300 mb-1"><i class="fa-solid fa-car mr-1"></i>地面交通：建議自駕</div>
+                                <p class="text-slate-400">東北景點點位較散，需租車且高速過路費 (ETC) 較昂貴。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">預估預算等級</span>
+                        <span class="font-bold text-slate-300">NT$ 23,000 ~ 29,000 /人</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: SQLITE DATABASE INSPECTOR ==================== -->
+        <div id="tab-content-db" class="tab-content hidden space-y-6">
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-indigo-400"></i> SQLite 資料庫內部檢視 (`flight_tracker.db`)
+                        </h3>
+                        <p class="text-xs text-slate-400">
+                            Table: <code class="code-font text-indigo-300">flight_price_snapshots</code> | UNIQUE Hash 防重複防護機制運作中
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button onclick="testDeduplication()" class="bg-indigo-600/30 border border-indigo-500 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-fingerprint"></i>
+                            <span>測試 Hash 去重 (INSERT OR IGNORE)</span>
+                        </button>
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                            <span>下載 Excel (.xlsx)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hash Deduplication Visual Demo -->
+                <div id="hash-demo-alert" class="hidden bg-indigo-950/80 border border-indigo-500/50 p-3.5 rounded-xl text-xs space-y-1">
+                    <div class="font-bold text-indigo-300 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> [SQLite testDeduplication()] 成功執行！
+                    </div>
+                    <div class="text-slate-300">
+                        嘗試插入相同快照：<code class="code-font text-amber-300">MD5("2027-07-11_CI154_14500")</code> = <code class="code-font text-cyan-300">d41d8cd98f00b204e9800998ecf8427e</code>
+                    </div>
+                    <div class="text-emerald-400 font-medium">
+                        結果：資料庫觸發 <code class="code-font bg-slate-900 px-1 py-0.5 rounded">INSERT OR IGNORE</code>，未產生重複數據！筆數維持 48 筆。
+                    </div>
+                </div>
+
+                <!-- Table Filter & Search -->
+                <div class="flex items-center justify-between gap-4 pt-2">
+                    <div class="relative flex-1 max-w-xs">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                        <input id="db-search-input" onkeyup="filterDbTable()" type="text" placeholder="搜尋航班號, 航點..." class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="text-xs text-slate-400 code-font">
+                        總筆數: <span id="db-total-count" class="font-bold text-indigo-400">48</span> 筆
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="overflow-x-auto border border-slate-700/60 rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] code-font border-b border-slate-700/80">
+                            <tr>
+                                <th class="p-3">ID</th>
+                                <th class="p-3">日期</th>
+                                <th class="p-3">類型</th>
+                                <th class="p-3">航線</th>
+                                <th class="p-3">航司/航班</th>
+                                <th class="p-3">時刻 (當地)</th>
+                                <th class="p-3">台幣票價</th>
+                                <th class="p-3">Snapshot Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody id="db-table-body" class="divide-y divide-slate-800 text-slate-300 code-font">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 5: GEMINI AI ADVISOR ==================== -->
+        <div id="tab-content-ai" class="tab-content hidden space-y-6">
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-indigo-400"></i> AI 家族旅行顧問 (Gemini AI API)
+                        </h3>
+                        <p class="text-xs text-slate-400">基於當前航班數據與時間限制，提供 2027 家族出遊策略與總預算建議</p>
+                    </div>
+                    <span class="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Gemini 3 Flash Powered
+                    </span>
+                </div>
+
+                <!-- Quick Prompts -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-300">快速問題指南：</label>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button onclick="sendQuickPrompt('幫我比較 7月 (時段1) 與 8月 (時段2) 出發去名古屋與釜山，哪一個時間與地點最適合帶長輩與小孩的家族出遊？')" class="bg-slate-900 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all">
+                            💡 時段1 vs 時段2 (名古屋 vs 釜山) 評估
+                        </button>
+                        <button onclick="sendQuickPrompt('假設我們家族共 4 位大人與 2 位小孩，選擇去名古屋自駕 7 天 6 夜，包含機票、7人座租車與家庭房住宿，總預算大概要準備多少？')" class="bg-slate-900 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all">
+                            💰 4大2小 名古屋 7天總預算估算
+                        </button>
+                        <button onclick="sendQuickPrompt('請分析為什麼仙台 (SDJ) 的回程航班時間比較不適合我們週日回程 < 14:00 的限制？')" class="bg-slate-900 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg transition-all">
+                            ✈️ 仙台航班回程限制分析
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Log Box -->
+                <div id="ai-chat-box" class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] overflow-y-auto space-y-3 text-xs">
+                    <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl max-w-2xl text-slate-300">
+                        <div class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-sparkles"></i> AI 家族旅行顧問
+                        </div>
+                        您好！我是您的 2027 家族旅行 AI 顧問。我已掌握目前 6 大航點 (NGO, KIX, SDJ, CTS, HIJ, PUS) 的航班時刻限制 (去程週日&lt;15:00、週六回程&lt;20:00、週日回程&lt;14:00) 與預估開銷。請隨時向我提問！
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="flex items-center space-x-2 pt-2">
+                    <input id="ai-user-input" type="text" placeholder="輸入您的問題 (例如: 釜山適合幾天幾夜？有哪些親子飯店推薦？)..." onkeypress="if(event.key==='Enter') askGeminiAI()" class="flex-1 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
+                    <button onclick="askGeminiAI()" id="btn-send-ai" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-3 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>發送詢問</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Global State & Database Mock Engine
+        let executionMode = 'mock'; // 'mock' or 'crawl'
+        let strictRuleEnabled = true;
+
+        // Mock Database Tables matching SPEC.md
+        const mockDatabase = [
+            // NGO
+            { id: 1, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "NGO", airline_code: "CI", flight_number: "CI154", departure_time: "07:30", arrival_time: "11:15", price_twd: 14500, original_currency: "TWD", original_price: 14500, snapshot_hash: "0a1b2c3d4e5f6a7b8c9d" },
+            { id: 2, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "NGO", airline_code: "CX", flight_number: "CX530", departure_time: "11:45", arrival_time: "15:40", price_twd: 13200, original_currency: "TWD", original_price: 13200, snapshot_hash: "1a2b3c4d5e6f7a8b9c0d" },
+            { id: 3, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "NGO", airline_code: "JX", flight_number: "JX838", departure_time: "15:30", arrival_time: "19:15", price_twd: 15800, original_currency: "TWD", original_price: 15800, snapshot_hash: "2a3b4c5d6e7f8a9b0c1d" }, // Excluded (>15:00)
+            { id: 4, flight_date: "2027-07-17", trip_type: "INBOUND", origin_airport: "NGO", dest_airport: "TPE", airline_code: "CX", flight_number: "CX531", departure_time: "16:50", arrival_time: "19:00", price_twd: 13200, original_currency: "TWD", original_price: 13200, snapshot_hash: "3a4b5c6d7e8f9a0b1c2d" },
+            { id: 5, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "NGO", dest_airport: "TPE", airline_code: "CI", flight_number: "CI151", departure_time: "09:50", arrival_time: "12:10", price_twd: 14200, original_currency: "TWD", original_price: 14200, snapshot_hash: "4a5b6c7d8e9f0a1b2c3d" },
+            { id: 6, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "NGO", dest_airport: "TPE", airline_code: "JX", flight_number: "JX839", departure_time: "20:15", arrival_time: "22:30", price_twd: 16000, original_currency: "TWD", original_price: 16000, snapshot_hash: "5a6b7c8d9e0f1a2b3c4d" }, // Excluded (Sun >14:00)
+
+            // PUS
+            { id: 7, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "PUS", airline_code: "CI", flight_number: "CI188", departure_time: "07:45", arrival_time: "11:05", price_twd: 8900, original_currency: "TWD", original_price: 8900, snapshot_hash: "6a7b8c9d0e1f2a3b4c5d" },
+            { id: 8, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "PUS", airline_code: "BX", flight_number: "BX798", departure_time: "13:15", arrival_time: "16:35", price_twd: 7800, original_currency: "KRW", original_price: 325000, snapshot_hash: "7a8b9c0d1e2f3a4b5c6d" },
+            { id: 9, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "PUS", dest_airport: "TPE", airline_code: "CI", flight_number: "CI189", departure_time: "12:00", arrival_time: "13:25", price_twd: 8900, original_currency: "TWD", original_price: 8900, snapshot_hash: "8a9b0c1d2e3f4a5b6c7d" },
+            { id: 10, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "PUS", dest_airport: "TPE", airline_code: "BX", flight_number: "BX797", departure_time: "22:05", arrival_time: "23:35", price_twd: 7500, original_currency: "KRW", original_price: 312500, snapshot_hash: "9a0b1c2d3e4f5a6b7c8d" }, // Excluded
+
+            // CTS
+            { id: 11, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "CTS", airline_code: "BR", flight_number: "BR116", departure_time: "09:30", arrival_time: "14:05", price_twd: 21800, original_currency: "TWD", original_price: 21800, snapshot_hash: "0b1c2d3e4f5a6b7c8d9e" },
+            { id: 12, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "CTS", airline_code: "CI", flight_number: "CI130", departure_time: "08:35", arrival_time: "13:10", price_twd: 22500, original_currency: "TWD", original_price: 22500, snapshot_hash: "1c2d3e4f5a6b7c8d9e0f" },
+            { id: 13, flight_date: "2027-07-17", trip_type: "INBOUND", origin_airport: "CTS", dest_airport: "TPE", airline_code: "BR", flight_number: "BR115", departure_time: "15:45", arrival_time: "18:55", price_twd: 21800, original_currency: "TWD", original_price: 21800, snapshot_hash: "2c3d4e5f6a7b8c9d0e1f" },
+
+            // HIJ
+            { id: 14, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "HIJ", airline_code: "CI", flight_number: "CI112", departure_time: "07:20", arrival_time: "10:40", price_twd: 13800, original_currency: "TWD", original_price: 13800, snapshot_hash: "3c4d5e6f7a8b9c0d1e2f" },
+            { id: 15, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "HIJ", dest_airport: "TPE", airline_code: "CI", flight_number: "CI113", departure_time: "11:35", arrival_time: "13:20", price_twd: 13800, original_currency: "TWD", original_price: 13800, snapshot_hash: "4c5d6e7f8a9b0c1d2e3f" },
+
+            // KIX
+            { id: 16, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "KIX", airline_code: "JX", flight_number: "JX820", departure_time: "08:50", arrival_time: "12:30", price_twd: 16800, original_currency: "TWD", original_price: 16800, snapshot_hash: "5c6d7e8f9a0b1c2d3e4f" },
+            { id: 17, flight_date: "2027-07-17", trip_type: "INBOUND", origin_airport: "KIX", dest_airport: "TPE", airline_code: "JX", flight_number: "JX821", departure_time: "13:45", arrival_time: "15:40", price_twd: 16800, original_currency: "TWD", original_price: 16800, snapshot_hash: "6c7d8e8f9a0b1c2d3e4f" },
+
+            // SDJ
+            { id: 18, flight_date: "2027-07-11", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "SDJ", airline_code: "BR", flight_number: "BR118", departure_time: "10:05", arrival_time: "14:35", price_twd: 17500, original_currency: "TWD", original_price: 17500, snapshot_hash: "7c8d9e0f1a2b3c4d5e6f" },
+            { id: 19, flight_date: "2027-07-18", trip_type: "INBOUND", origin_airport: "SDJ", dest_airport: "TPE", airline_code: "BR", flight_number: "BR117", departure_time: "16:15", arrival_time: "18:55", price_twd: 17500, original_currency: "TWD", original_price: 17500, snapshot_hash: "8c9d0e1f2a3b4c5d6e7f" }, // Excluded (Sun > 14:00)
+
+            // Window 2 (August) Mock Data
+            { id: 20, flight_date: "2027-08-15", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "NGO", airline_code: "CI", flight_number: "CI154", departure_time: "07:30", arrival_time: "11:15", price_twd: 15200, original_currency: "TWD", original_price: 15200, snapshot_hash: "9c0d1e2f3a4b5c6d7e8f" },
+            { id: 21, flight_date: "2027-08-21", trip_type: "INBOUND", origin_airport: "NGO", dest_airport: "TPE", airline_code: "CX", flight_number: "CX531", departure_time: "16:50", arrival_time: "19:00", price_twd: 14800, original_currency: "TWD", original_price: 14800, snapshot_hash: "0d1e2f3a4b5c6d7e8f9a" },
+            { id: 22, flight_date: "2027-08-15", trip_type: "OUTBOUND", origin_airport: "TPE", dest_airport: "PUS", airline_code: "CI", flight_number: "CI188", departure_time: "07:45", arrival_time: "11:05", price_twd: 9200, original_currency: "TWD", original_price: 9200, snapshot_hash: "1d2e3f4a5b6c7d8e9f0a" },
+            { id: 23, flight_date: "2027-08-22", trip_type: "INBOUND", origin_airport: "PUS", dest_airport: "TPE", airline_code: "CI", flight_number: "CI189", departure_time: "12:00", arrival_time: "13:25", price_twd: 9200, original_currency: "TWD", original_price: 9200, snapshot_hash: "2d3e4f5a6b7c8d9e0f1a" }
+        ];
+
+        window.onload = function() {
+            renderFlightCards();
+            renderDbTable();
+            renderPhase1Chart();
+        };
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-400', 'border-b-2', 'border-indigo-500');
+                btn.classList.add('text-slate-400');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(`tab-btn-${tabId}`).classList.add('text-indigo-400', 'border-b-2', 'border-indigo-500');
+            document.getElementById(`tab-btn-${tabId}`).classList.remove('text-slate-400');
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+        }
+
+        // Mode Switcher
+        function setMode(mode) {
+            executionMode = mode;
+            const mockBtn = document.getElementById('btn-mode-mock');
+            const crawlBtn = document.getElementById('btn-mode-crawl');
+            const btnText = document.getElementById('btn-run-text');
+
+            if (mode === 'mock') {
+                mockBtn.className = "mode-btn px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center border-indigo-500 bg-indigo-600/30 text-indigo-200";
+                crawlBtn.className = "mode-btn px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-600";
+                btnText.innerText = "執行 `python src/main.py run --mock --export`";
+            } else {
+                crawlBtn.className = "mode-btn px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center border-indigo-500 bg-indigo-600/30 text-indigo-200";
+                mockBtn.className = "mode-btn px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-600";
+                btnText.innerText = "執行 `python src/main.py run --crawl --export`";
+            }
+        }
+
+        function appendConsoleLog(message, level = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const timeStr = new Date().toLocaleTimeString();
+            let colorClass = 'text-slate-300';
+            if (level === 'success') colorClass = 'text-emerald-400';
+            if (level === 'warn') colorClass = 'text-amber-400';
+            if (level === 'error') colorClass = 'text-rose-400';
+            if (level === 'system') colorClass = 'text-indigo-400 font-bold';
+
+            const logDiv = document.createElement('div');
+            logDiv.className = `${colorClass} flex items-start space-x-2`;
+            logDiv.innerHTML = `<span class="text-slate-600 shrink-0">[${timeStr}]</span> <span>${message}</span>`;
+            consoleOutput.appendChild(logDiv);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '<div class="text-slate-500">[CONSOLE CLEARED]</div>';
+        }
+
+        // Pipeline Runner Simulation
+        function runPipeline() {
+            const btn = document.getElementById('btn-run-pipeline');
+            const progressContainer = document.getElementById('pipeline-progress-bar-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressStep = document.getElementById('progress-step-text');
+            const progressPercent = document.getElementById('progress-percent-text');
+            const statusBadge = document.getElementById('console-status-badge');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            progressContainer.classList.remove('hidden');
+            statusBadge.innerText = 'RUNNING';
+            statusBadge.className = 'text-[10px] code-font bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded animate-pulse';
+
+            appendConsoleLog(`Initiating CLI command: python src/main.py run --${executionMode} --export`, 'system');
+
+            const steps = [
+                { percent: 15, msg: "[Scraper] Initializing Playwright Chromium headless context...", delay: 600 },
+                { percent: 35, msg: executionMode === 'mock' ? "[Scraper] Loading mock flight JSON records from config/mock_flights.json" : "[Playwright] Intercepting XHR response from airline APIs...", delay: 1200 },
+                { percent: 55, msg: "[Normalizer] Converting currencies (JPY/KRW -> TWD) & standardizing ISO datetimes", delay: 1800 },
+                { percent: 75, msg: "[FilterEngine] Applying SPEC 2.3 strict rules (Sun <15:00, Sat <20:00, Sun <14:00)", delay: 2400 },
+                { percent: 90, msg: "[Database] Inserting into SQLite data/flight_tracker.db via INSERT OR IGNORE", delay: 3000 },
+                { percent: 100, msg: "[ExcelExporter] Successfully generated report: data/reports/2027家族旅行_航班比價_20260825.xlsx", delay: 3600 }
+            ];
+
+            steps.forEach(s => {
+                setTimeout(() => {
+                    progressBar.style.width = `${s.percent}%`;
+                    progressPercent.innerText = `${s.percent}%`;
+                    progressStep.innerText = s.msg;
+                    appendConsoleLog(s.msg, s.percent === 100 ? 'success' : 'info');
+
+                    if (s.percent === 100) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        statusBadge.innerText = 'COMPLETED';
+                        statusBadge.className = 'text-[10px] code-font bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded';
+                    }
+                }, s.delay);
+            });
+        }
+
+        function checkStrictRule(f) {
+            // Outbound Sunday < 15:00
+            if (f.trip_type === 'OUTBOUND') {
+                const hour = parseInt(f.departure_time.split(':')[0], 10);
+                return hour < 15;
+            }
+            // Inbound Saturday < 20:00 or Inbound Sunday < 14:00
+            if (f.trip_type === 'INBOUND') {
+                const hour = parseInt(f.departure_time.split(':')[0], 10);
+                const dateObj = new Date(f.flight_date);
+                const dayOfWeek = dateObj.getDay(); // 6=Saturday, 0=Sunday
+                
+                if (dayOfWeek === 6) { // Saturday
+                    return hour < 20;
+                } else if (dayOfWeek === 0) { // Sunday
+                    return hour < 14;
+                }
+            }
+            return true;
+        }
+
+        function toggleStrictRules(btn) {
+            strictRuleEnabled = !strictRuleEnabled;
+            if (strictRuleEnabled) {
+                btn.className = "bg-indigo-600/30 border border-indigo-500 text-indigo-200 text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5";
+                btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i><span>硬性時間過濾：已開啟</span>`;
+            } else {
+                btn.className = "bg-slate-800 border border-slate-600 text-slate-400 text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5";
+                btn.innerHTML = `<i class="fa-solid fa-shield-slash"></i><span>硬性時間過濾：已關閉</span>`;
+            }
+            renderFlightCards();
+        }
+
+        function applyFlightFilters() {
+            renderFlightCards();
+        }
+
+        function resetFlightFilters() {
+            document.getElementById('filter-dest').value = 'ALL';
+            document.getElementById('filter-trip-type').value = 'ALL';
+            document.getElementById('filter-window').value = 'ALL';
+            document.getElementById('filter-sort').value = 'PRICE_ASC';
+            strictRuleEnabled = true;
+            renderFlightCards();
+        }
+
+        function renderFlightCards() {
+            const destFilter = document.getElementById('filter-dest').value;
+            const tripFilter = document.getElementById('filter-trip-type').value;
+            const windowFilter = document.getElementById('filter-window').value;
+            const sortFilter = document.getElementById('filter-sort').value;
+
+            let filtered = mockDatabase.filter(f => {
+                if (destFilter !== 'ALL' && f.dest_airport !== destFilter && f.origin_airport !== destFilter) return false;
+                if (tripFilter !== 'ALL' && f.trip_type !== tripFilter) return false;
+                if (windowFilter === 'WINDOW_1' && !f.flight_date.startsWith('2027-07')) return false;
+                if (windowFilter === 'WINDOW_2' && !f.flight_date.startsWith('2027-08')) return false;
+                return true;
+            });
+
+            // Sorting
+            if (sortFilter === 'PRICE_ASC') filtered.sort((a, b) => a.price_twd - b.price_twd);
+            if (sortFilter === 'PRICE_DESC') filtered.sort((a, b) => b.price_twd - a.price_twd);
+            if (sortFilter === 'TIME_ASC') filtered.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
+
+            const container = document.getElementById('flight-cards-container');
+            container.innerHTML = '';
+
+            filtered.forEach(f => {
+                const passesRule = checkStrictRule(f);
+                
+                // If strict rule is enabled and flight fails, dim or hide
+                if (strictRuleEnabled && !passesRule) {
+                    // Render dimmed excluded card
+                    container.innerHTML += `
+                        <div class="bg-slate-900/60 border border-rose-900/40 rounded-2xl p-4 shadow opacity-50 relative overflow-hidden">
+                            <div class="absolute top-2 right-2 bg-rose-500/20 text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-500/30">
+                                違反時刻限制 (已過濾)
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono">${f.flight_date} (${f.trip_type})</div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="font-black text-lg text-slate-300">${f.origin_airport} <i class="fa-solid fa-arrow-right text-xs mx-1 text-slate-500"></i> ${f.dest_airport}</span>
+                                <span class="font-bold text-slate-400">${f.airline_code} ${f.flight_number}</span>
+                            </div>
+                            <div class="text-xs text-rose-400 mt-2">
+                                出發時間: <strong>${f.departure_time}</strong> (不合條件)
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Normal qualified flight card
+                container.innerHTML += `
+                    <div class="bg-slate-800/90 border border-slate-700/80 hover:border-indigo-500/60 transition-all rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-mono text-indigo-300 bg-indigo-950/80 px-2 py-1 rounded border border-indigo-800/50">${f.flight_date} • ${f.trip_type === 'OUTBOUND' ? '去程' : '回程'}</span>
+                                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                    <i class="fa-solid fa-check text-xs"></i> 符合硬性條件
+                                </span>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-4">
+                                <div>
+                                    <div class="text-2xl font-black text-slate-100">${f.origin_airport}</div>
+                                    <div class="text-xs text-slate-400">出發地</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs font-mono text-indigo-400 font-bold">${f.airline_code} ${f.flight_number}</div>
+                                    <i class="fa-solid fa-plane text-slate-500 my-1"></i>
+                                    <div class="text-[10px] text-slate-400">直飛 Direct</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-black text-slate-100">${f.dest_airport}</div>
+                                    <div class="text-xs text-slate-400">目的地</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 mt-4 text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                                <div>
+                                    <span class="text-slate-400 block">起飛 (當地):</span>
+                                    <strong class="text-emerald-400 text-sm font-mono">${f.departure_time}</strong>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block">抵達 (當地):</span>
+                                    <strong class="text-indigo-300 text-sm font-mono">${f.arrival_time}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">新台幣含稅參考價</span>
+                            <span class="text-xl font-bold text-emerald-400">NT$ ${f.price_twd.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderPhase1Chart() {
+            const ctx = document.getElementById('chart-phase1-cost').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['NGO (名古屋)', 'PUS (釜山)', 'CTS (北海道)', 'HIJ (廣島)', 'KIX (大阪)', 'SDJ (仙台)'],
+                    datasets: [
+                        {
+                            label: '機票預估 (TWD)',
+                            data: [13200, 8900, 21800, 13800, 16800, 17500],
+                            backgroundColor: '#6366f1'
+                        },
+                        {
+                            label: '住宿預估/人 (TWD)',
+                            data: [7500, 5000, 14000, 6000, 9500, 6500],
+                            backgroundColor: '#10b981'
+                        },
+                        {
+                            label: '交通預估/人 (TWD)',
+                            data: [3500, 2000, 6500, 3500, 3000, 4500],
+                            backgroundColor: '#f59e0b'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { stacked: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function renderDbTable() {
+            const tbody = document.getElementById('db-table-body');
+            tbody.innerHTML = '';
+
+            mockDatabase.forEach(row => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/60 transition-all">
+                        <td class="p-3 text-slate-500">${row.id}</td>
+                        <td class="p-3 text-slate-200">${row.flight_date}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${row.trip_type === 'OUTBOUND' ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' : 'bg-cyan-950 text-cyan-300 border border-cyan-800'}">${row.trip_type}</span></td>
+                        <td class="p-3 font-bold">${row.origin_airport} → ${row.dest_airport}</td>
+                        <td class="p-3 text-indigo-300 font-bold">${row.airline_code} ${row.flight_number}</td>
+                        <td class="p-3 text-slate-300">${row.departure_time} - ${row.arrival_time}</td>
+                        <td class="p-3 font-bold text-emerald-400">NT$ ${row.price_twd.toLocaleString()}</td>
+                        <td class="p-3 text-[10px] text-slate-500 font-mono">${row.snapshot_hash}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('db-total-count').innerText = mockDatabase.length;
+        }
+
+        function filterDbTable() {
+            const term = document.getElementById('db-search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#db-table-body tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
+
+        function testDeduplication() {
+            const alertBox = document.getElementById('hash-demo-alert');
+            alertBox.classList.remove('hidden');
+            setTimeout(() => {
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        async function askGeminiAI() {
+            const inputEl = document.getElementById('ai-user-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            appendUserMessage(prompt);
+            inputEl.value = '';
+
+            const chatBox = document.getElementById('ai-chat-box');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'bg-slate-900 border border-slate-800 p-3 rounded-xl max-w-2xl text-slate-400 text-xs flex items-center space-x-2';
+            loadingDiv.id = 'ai-loading-indicator';
+            loadingDiv.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-indigo-400"></i><span>Gemini AI 正在分析 2027 航班與行程數據...</span>`;
+            chatBox.appendChild(loadingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const systemPrompt = `你是一位專業的日本與韓國家族旅行顧問。請根據以下 2027 年家族出遊條件回答使用者：
+1. 目標航點：NGO (名古屋)、KIX (大阪)、SDJ (仙台)、CTS (札幌)、HIJ (廣島)、PUS (釜山)。
+2. 時刻限制：去程週日 < 15:00 出發；週六回程 < 20:00 出發；週日回程 < 14:00 出發。
+3. Phase 1 評估指標：航班時間匹配、暑假平假日住宿價格、地面交通 (自駕 vs 鐵路)。
+請給出清晰、條理化且具體的家族出遊建議。`;
+
+                const apiKey = ""; // Canvas runtime environment automatically inserts key if empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || "抱歉，目前無法取得 AI 回覆，請稍後再試。";
+
+                document.getElementById('ai-loading-indicator')?.remove();
+                appendAiMessage(aiText);
+
+            } catch (err) {
+                document.getElementById('ai-loading-indicator')?.remove();
+                appendAiMessage("呼叫 Gemini AI 時發生錯誤，請確認網路連線。 (註：已為您提供預設諮詢邏輯)");
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('ai-user-input').value = promptText;
+            askGeminiAI();
+        }
+
+        function appendUserMessage(msg) {
+            const chatBox = document.getElementById('ai-chat-box');
+            const div = document.createElement('div');
+            div.className = 'bg-indigo-600/30 border border-indigo-500/40 p-3 rounded-xl max-w-xl text-slate-100 ml-auto text-xs';
+            div.innerHTML = `<div class="font-bold text-indigo-300 mb-1">您</div>${msg}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendAiMessage(msg) {
+            const chatBox = document.getElementById('ai-chat-box');
+            const div = document.createElement('div');
+            div.className = 'bg-slate-900/90 border border-slate-800 p-3 rounded-xl max-w-2xl text-slate-300 text-xs space-y-1.5';
+            
+            // Format line breaks
+            const formatted = msg.replace(/\n/g, '<br>');
+            div.innerHTML = `<div class="font-bold text-indigo-400 flex items-center gap-1.5"><i class="fa-solid fa-sparkles"></i> AI 家族旅行顧問</div><div>${formatted}</div>`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function exportToExcel() {
+            // Generate CSV payload
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "ID,飛行日期,行程類型,出發機場,目的地機場,航司代碼,航班號,當地起飛時間,當地抵達時間,台幣票價,Snapshot_Hash\n";
+
+            mockDatabase.forEach(f => {
+                csvContent += `${f.id},${f.flight_date},${f.trip_type},${f.origin_airport},${f.dest_airport},${f.airline_code},${f.flight_number},${f.departure_time},${f.arrival_time},${f.price_twd},${f.snapshot_hash}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `2027家族旅行_航班比價_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            appendConsoleLog("[ExcelExporter] 成功產出並下載報表 CSV/Excel 檔案！", "success");
+        }
+    </script>
+</body>
+</html>

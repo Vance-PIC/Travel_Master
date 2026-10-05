@@ -1,4 +1,6 @@
+.memory/
 __pycache__/
-*.pyc
+*.py[cod]
 *.tmp
 .env
+flight-tracker/data/

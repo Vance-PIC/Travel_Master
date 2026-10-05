@@ -1,0 +1,126 @@
+origins:
+- TPE
+destinations:
+- iata: KIX
+  name_zh: 大阪
+- iata: NGO
+  name_zh: 名古屋
+- iata: SDJ
+  name_zh: 仙台
+- iata: CTS
+  name_zh: 札幌/北海道
+- iata: HIJ
+  name_zh: 廣島
+- iata: PUS
+  name_zh: 釜山
+windows:
+  7月7天:
+    query_order: 1
+    label: 2027年7月
+    outbound_date: '2027-07-11'
+    inbound_dates:
+    - '2027-07-17'
+    - '2027-07-18'
+    outbound_before: 2027-07-11T15:00
+    inbound_before: 2027-07-17T20:00
+    group: 2027年7月
+  8月7天:
+    query_order: 3
+    label: 2027年8月
+    outbound_date: '2027-08-15'
+    inbound_dates:
+    - '2027-08-21'
+    - '2027-08-22'
+    outbound_before: 2027-08-15T15:00
+    inbound_before: 2027-08-21T20:00
+    group: 2027年8月
+  7月8天:
+    query_order: 2
+    group: 2027年7月
+    label: 2027年7月
+    outbound_before: 2027-07-11T15:00
+    inbound_before: 2027-07-18T14:00
+  8月8天:
+    query_order: 4
+    label: 2027年8月
+    outbound_date: '2027-08-15'
+    inbound_dates:
+    - '2027-08-21'
+    - '2027-08-22'
+    outbound_before: 2027-08-15T15:00
+    inbound_before: 2027-08-22T14:00
+    group: 2027年8月
+airlines:
+  CI:
+    name_zh: 中華航空
+    is_lcc: false
+  BR:
+    name_zh: 長榮航空
+    is_lcc: false
+  JX:
+    name_zh: 星宇航空
+    is_lcc: false
+  JL:
+    name_zh: 日本航空
+    is_lcc: false
+  IT:
+    name_zh: 台灣虎航
+    is_lcc: true
+  TW:
+    name_zh: 德威航空
+    is_lcc: true
+  BX:
+    name_zh: 釜山航空
+    is_lcc: true
+  CX:
+    name_zh: 國泰航空
+    is_lcc: false
+  KE:
+    name_zh: 大韓航空
+    is_lcc: false
+  D7:
+    name_zh: 亞洲航空 X
+    is_lcc: true
+  FD:
+    name_zh: 泰國亞洲航空
+    is_lcc: true
+  TR:
+    name_zh: 酷航
+    is_lcc: true
+strict_time_rules:
+  outbound_sunday_before: '15:00'
+  inbound_saturday_before: '20:00'
+  inbound_sunday_before: '14:00'
+exchange_rates:
+  JPY: 0.21
+  KRW: 0.023
+  TWD: 1.0
+database:
+  path: data/flight_tracker.db
+reports:
+  output_dir: data/reports
+scraper:
+  default_source: google_flights
+  headless: true
+  timeout_ms: 30000
+  google_flights_max_advance_days: 330
+  roundtrip_candidate_limit_per_airline: 2
+phase1_costs:
+  KIX:
+    accommodation: 14000
+    ground_transport: 3500
+  NGO:
+    accommodation: 12000
+    ground_transport: 3000
+  SDJ:
+    accommodation: 10000
+    ground_transport: 4000
+  CTS:
+    accommodation: 13000
+    ground_transport: 5000
+  HIJ:
+    accommodation: 9000
+    ground_transport: 2500
+  PUS:
+    accommodation: 8000
+    ground_transport: 2000

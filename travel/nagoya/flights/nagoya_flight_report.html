@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2027 名古屋親子遊機票監控儀表板 | 旅行大師 Travel-Master</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            },
+            ci: '#d97706',
+            cx: '#047857',
+            jx: '#854d0e',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
+    .flight-pill { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-16">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 bg-sky-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-inner">
+          ✈️
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            旅行大師 <span class="text-xs bg-sky-600/60 text-sky-200 px-2 py-0.5 rounded font-mono font-normal">Travel-Master v2.0</span>
+          </h1>
+          <p class="text-xs text-slate-400">2027 名古屋 8 日親子自由行・機票實時監控儀表板</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          即時監控中 (Normal Tier)
+        </span>
+        <span class="text-slate-400 hidden sm:inline">更新時間：2026-10-05 15:44 CST</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+    <!-- Trip Condition Hero Card -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+        <!-- Route & Dates -->
+        <div class="md:col-span-2 space-y-2 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-6">
+          <div class="flex items-center gap-2 text-xs font-semibold text-sky-700 uppercase tracking-wider">
+            <span>🎯 監控目標航線</span>
+            <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded">直飛傳統航空 (FSC) 優先</span>
+          </div>
+          <div class="flex items-center gap-3 text-2xl font-black text-slate-900">
+            <span>台北桃園 <span class="text-sm font-mono font-medium text-slate-400">TPE</span></span>
+            <span class="text-sky-500 text-lg">⇄</span>
+            <span>名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span></span>
+          </div>
+          <div class="flex flex-wrap items-center gap-y-1 gap-x-3 text-sm text-slate-600">
+            <span class="inline-flex items-center font-medium text-slate-700">📅 2027/07/11 (日) ～ 07/18 (日)</span>
+            <span class="text-slate-300">|</span>
+            <span>共 8 天 7 夜</span>
+            <span class="text-slate-300">|</span>
+            <span class="font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded">👨‍👩‍👧‍👦 2 位成人 + 2 位兒童</span>
+          </div>
+        </div>
+
+        <!-- Budget & Current Status -->
+        <div class="space-y-1">
+          <span class="text-xs text-slate-400 font-medium">家庭預算目標</span>
+          <div class="text-2xl font-bold text-slate-900">NT$ 50,000</div>
+          <p class="text-xs text-slate-500">預算容許範圍 (+10%)：NT$ 55,000</p>
+        </div>
+
+        <!-- Current Market Low -->
+        <div class="space-y-1 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-xs text-slate-500 font-medium">目前最佳直飛方案 (4人含稅)</span>
+          <div class="text-2xl font-black text-sky-600">NT$ 63,090</div>
+          <div class="flex items-center gap-1.5 text-xs text-amber-600 font-medium">
+            <span>偏高 +NT$13,090</span>
+            <span class="text-slate-400">(依華航官網即時價)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card 1 -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <div class="text-xs font-medium text-slate-400 mb-1">🌟 最推薦首選（時間均衡）</div>
+          <div class="text-lg font-bold text-slate-900">華航 CI154 + CI155</div>
+          <div class="text-sm font-semibold text-sky-600 mt-1">NT$ 68,466 <span class="text-xs font-normal text-slate-400">/ 4人</span></div>
+          <p class="text-xs text-emerald-600 mt-1 font-medium">早去午回・免清晨叫醒小孩</p>
+        </div>
+        <span class="p-2 bg-amber-50 text-amber-600 rounded-lg text-lg">👑</span>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <div class="text-xs font-medium text-slate-400 mb-1">💰 CP 值最高（玩滿首日）</div>
+          <div class="text-lg font-bold text-slate-900">華航 CI154 + CI151</div>
+          <div class="text-sm font-semibold text-emerald-600 mt-1">NT$ 63,090 <span class="text-xs font-normal text-slate-400">/ 4人</span></div>
+          <p class="text-xs text-slate-500 mt-1">早去早回・中午抵達日本</p>
+        </div>
+        <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-lg">🏷️</span>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <div class="text-xs font-medium text-slate-400 mb-1">👨‍👩‍👧 親子最舒適時段</div>
+          <div class="text-lg font-bold text-slate-900">國泰 CX530 + CX531</div>
+          <div class="text-sm font-semibold text-slate-900 mt-1">NT$ 80,580 <span class="text-xs font-normal text-slate-400">/ 4人</span></div>
+          <p class="text-xs text-slate-500 mt-1">午去晚回・回程逛滿下午</p>
+        </div>
+        <span class="p-2 bg-teal-50 text-teal-600 rounded-lg text-lg">☕</span>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-start justify-between">
+        <div>
+          <div class="text-xs font-medium text-slate-400 mb-1">🛡️ API 配額健康度</div>
+          <div class="text-lg font-bold text-slate-900">剩餘 228 / 250 次</div>
+          <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
+            <div class="bg-emerald-500 h-2 rounded-full" style="width: 91.2%"></div>
+          </div>
+          <p class="text-xs text-emerald-600 mt-1 font-medium">91.2% 充裕 (Normal Tier)</p>
+        </div>
+        <span class="p-2 bg-slate-50 text-slate-600 rounded-lg text-lg">⚡</span>
+      </div>
+    </div>
+
+    <!-- Main Comparison Section -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span>✈️</span> 完整來回航班組合分析 (Top Itineraries)
+          </h2>
+          <p class="text-xs text-slate-500">所有價格均為 2 大 2 小（共 4 位旅客）含稅總額</p>
+        </div>
+      </div>
+
+      <!-- Flight Card 1 (Recommended: CI154+CI155) -->
+      <div class="bg-white rounded-2xl border-2 border-sky-400 shadow-md p-6 relative overflow-hidden transition-all hover:shadow-lg">
+        <div class="absolute top-0 right-0 bg-gradient-to-l from-sky-500 to-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl shadow-sm">
+          ⭐️ 專家首選推薦（早去午回）
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Airline & Price Column -->
+          <div class="lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r border-slate-100 pb-4 lg:pb-0 lg:pr-6">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded">中華航空</span>
+              <span class="text-xs font-mono text-slate-400">CI 154 + CI 155</span>
+            </div>
+            <div class="text-3xl font-black text-slate-900">
+              NT$ 68,466 <span class="text-xs font-normal text-slate-500 font-sans">/ 4人含稅</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">每人平均約 NT$ 17,116</span>
+              <span class="text-slate-400">含託運行李</span>
+            </div>
+          </div>
+
+          <!-- Schedule Timeline Column -->
+          <div class="lg:col-span-8 space-y-4">
+            <!-- Outbound Leg -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div class="flex items-center gap-2 min-w-[70px]">
+                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-2 py-0.5 rounded">去程</span>
+                <span class="text-xs font-bold text-slate-700 font-mono">CI 154</span>
+              </div>
+              <div class="flex items-center gap-4 flex-1 justify-center text-center">
+                <div>
+                  <div class="text-base font-black text-slate-900">07:30</div>
+                  <div class="text-xs text-slate-500">台北桃園 (TPE)</div>
+                </div>
+                <div class="flex flex-col items-center px-3">
+                  <span class="text-[11px] text-slate-400 font-medium">2h 50m 直飛</span>
+                  <div class="w-24 h-0.5 bg-slate-300 relative my-1">
+                    <div class="w-1.5 h-1.5 bg-sky-500 rounded-full absolute -top-0.5 right-0"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-base font-black text-slate-900">11:20</div>
+                  <div class="text-xs text-slate-500">名古屋中部 (NGO)</div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-500 text-right sm:text-left min-w-[120px]">
+                <span class="text-emerald-600 font-medium">☀️ 中午抵達</span><br>
+                <span>第一天直接展開行程</span>
+              </div>
+            </div>
+
+            <!-- Inbound Leg -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div class="flex items-center gap-2 min-w-[70px]">
+                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded">回程</span>
+                <span class="text-xs font-bold text-slate-700 font-mono">CI 155</span>
+              </div>
+              <div class="flex items-center gap-4 flex-1 justify-center text-center">
+                <div>
+                  <div class="text-base font-black text-slate-900">12:20</div>
+                  <div class="text-xs text-slate-500">名古屋中部 (NGO)</div>
+                </div>
+                <div class="flex flex-col items-center px-3">
+                  <span class="text-[11px] text-slate-400 font-medium">3h 10m 直飛</span>
+                  <div class="w-24 h-0.5 bg-slate-300 relative my-1">
+                    <div class="w-1.5 h-1.5 bg-amber-500 rounded-full absolute -top-0.5 right-0"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-base font-black text-slate-900">14:30</div>
+                  <div class="text-xs text-slate-500">台北桃園 (TPE)</div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-500 text-right sm:text-left min-w-[120px]">
+                <span class="text-sky-600 font-medium">☕ 悠閒退房</span><br>
+                <span>下午抵台免慌亂</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Channels Comparison Accordion / Bar -->
+        <div class="mt-5 pt-4 border-t border-slate-100 bg-slate-50/50 -mx-6 -mb-6 p-6 rounded-b-xl">
+          <div class="text-xs font-bold text-slate-700 mb-3 flex items-center justify-between">
+            <span>🛒 售票管道價格實測對照表：</span>
+            <span class="text-emerald-600 font-normal">✅ 華航官網直營勝出</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-white p-3 rounded-lg border-2 border-emerald-400 shadow-xs flex justify-between items-center">
+              <div>
+                <span class="font-bold text-slate-900 block">🥇 中華航空官網</span>
+                <span class="text-slate-400 text-[11px]">每人含1件託運 + 兒童餐選位</span>
+              </div>
+              <div class="text-right">
+                <span class="font-bold text-emerald-600 text-sm">NT$ 68,466</span>
+                <span class="block text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1 rounded">最划算</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center opacity-80">
+              <div>
+                <span class="font-medium text-slate-800 block">🥈 Gotogate (國外 OTA)</span>
+                <span class="text-slate-400 text-[11px]">第三方平台中介</span>
+              </div>
+              <div class="text-right">
+                <span class="font-semibold text-slate-700 text-sm">NT$ 73,360</span>
+                <span class="block text-[10px] text-rose-500">+NT$ 4,894 (貴)</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center opacity-70">
+              <div>
+                <span class="font-medium text-slate-800 block">🥉 日本航空 JAL</span>
+                <span class="text-slate-400 text-[11px]">Code-share 聯營班號</span>
+              </div>
+              <div class="text-right">
+                <span class="font-semibold text-slate-700 text-sm">NT$ 181,658</span>
+                <span class="block text-[10px] text-rose-600 font-bold">不推薦</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flight Card 2 (CI154+CI151) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 transition-all hover:shadow-md">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r border-slate-100 pb-4 lg:pb-0 lg:pr-6">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded">中華航空</span>
+              <span class="text-xs font-mono text-slate-400">CI 154 + CI 151</span>
+              <span class="text-[11px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">CP值最高</span>
+            </div>
+            <div class="text-3xl font-black text-slate-900">
+              NT$ 63,090 <span class="text-xs font-normal text-slate-500 font-sans">/ 4人含稅</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">每人平均約 NT$ 15,773</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 space-y-3">
+            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 font-mono">去程 CI 154</span>
+              <span class="text-slate-900 font-semibold">07:30 (TPE) ➔ 11:20 (NGO)</span>
+              <span class="text-emerald-600">中午抵達日本</span>
+            </div>
+            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 font-mono">回程 CI 151</span>
+              <span class="text-slate-900 font-semibold">09:55 (NGO) ➔ 11:55 (TPE)</span>
+              <span class="text-amber-700">需早起前往機場</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Channels for Card 2 -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+          <div>售票管道最低價：<span class="font-bold text-emerald-600">華航官網 NT$ 63,090</span> <span class="text-slate-400">（Gotogate 賣 NT$ 67,760 貴 $4,670）</span></div>
+          <span class="text-emerald-700 font-medium">✅ 官網直購最划算</span>
+        </div>
+      </div>
+
+      <!-- Flight Card 3 (Cathay CX530+CX531) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 transition-all hover:shadow-md">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-4 space-y-2 border-b lg:border-b-0 lg:border-r border-slate-100 pb-4 lg:pb-0 lg:pr-6">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 bg-teal-100 text-teal-800 text-xs font-bold rounded">國泰航空</span>
+              <span class="text-xs font-mono text-slate-400">CX 530 + CX 531</span>
+              <span class="text-[11px] bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded font-medium">免早起</span>
+            </div>
+            <div class="text-3xl font-black text-slate-900">
+              NT$ 80,580 <span class="text-xs font-normal text-slate-500 font-sans">/ 4人含稅</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-600 bg-slate-100 px-2 py-0.5 rounded font-medium">每人平均約 NT$ 20,145</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 space-y-3">
+            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 font-mono">去程 CX 530</span>
+              <span class="text-slate-900 font-semibold">11:30 (TPE) ➔ 15:30 (NGO)</span>
+              <span class="text-teal-700">睡飽再出發</span>
+            </div>
+            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 font-mono">回程 CX 531</span>
+              <span class="text-slate-900 font-semibold">16:40 (NGO) ➔ 18:50 (TPE)</span>
+              <span class="text-teal-700">玩滿最後一天下午</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Family Travel Expert Tips Card -->
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50/40 rounded-2xl p-6 border border-amber-200/70 shadow-sm space-y-4">
+      <h3 class="text-base font-bold text-amber-900 flex items-center gap-2">
+        <span>💡</span> 旅行大師・親子出行決策建議
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-amber-950">
+        <div class="bg-white/80 backdrop-blur-xs p-4 rounded-xl border border-amber-200/50 space-y-1.5">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <span>🎯</span> 決策首選：華航 早去午回
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            `CI154 + CI155`（NT$ 68,466）僅比早回貴 5 千元，但回程 12:20 起飛可從容享用早餐後退房搭名鐵直達機場，極大減輕長輩與孩童負擔。
+          </p>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur-xs p-4 rounded-xl border border-amber-200/50 space-y-1.5">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <span>🎫</span> 管道建議：唯一推薦官網
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            經實測各大 OTA 均比華航官網貴 NT$ 4,600 以上。且官網購票能確保一家四口相鄰座位安排與幼兒/兒童餐預先鎖定。
+          </p>
+        </div>
+
+        <div class="bg-white/80 backdrop-blur-xs p-4 rounded-xl border border-amber-200/50 space-y-1.5">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <span>🧳</span> 託運行李與推車須知
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            傳統航空經濟艙每人均含 1 件免費託運行李（23kg），嬰兒推車／折疊推車可於登機門免費機邊託運，不佔用行李額度。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="pt-6 border-t border-slate-200 text-center text-xs text-slate-400 space-y-1">
+      <p>旅行大師 Travel-Master Engine • 零幻覺嚴謹旅遊工程化治理框架</p>
+      <p>數據來源：Google Flights & SerpApi 實時監控快照</p>
+    </footer>
+
+  </main>
+</body>
+</html>

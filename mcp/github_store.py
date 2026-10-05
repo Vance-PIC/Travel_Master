@@ -14,6 +14,7 @@ import urllib.request
 API_ROOT = "https://api.github.com/repos"
 DEFAULT_REPO = "Vance-PIC/Travel_Master"
 WORKFLOW = "nagoya-flight-monitor.yml"
+HOTEL_WORKFLOW = "hotel-monitor.yml"
 
 
 class GitHubStoreError(RuntimeError):
@@ -38,7 +39,7 @@ def _request(method: str, path: str, payload: dict | None = None) -> tuple[int, 
                                      headers={"Accept": "application/vnd.github+json",
                                               "Authorization": f"Bearer {token}",
                                               "X-GitHub-Api-Version": "2022-11-28",
-                                              "User-Agent": "Travel_Master Flight MCP"})
+                                              "User-Agent": "Travel_Master MCP"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             return response.status, response.read()
@@ -66,7 +67,7 @@ def get_file(path: str) -> bytes:
         raise GitHubStoreError("GitHub file content is invalid") from None
 
 
-def dispatch_monitor(mode: str, purchase_itinerary: str | None) -> dict[str, str]:
+def dispatch_flight_monitor(mode: str, purchase_itinerary: str | None) -> dict[str, str]:
     if mode not in ("monitor_query", "full_query"):
         raise GitHubStoreError("Monitoring mode is invalid")
     if purchase_itinerary is not None and not re.fullmatch(r"[A-Z0-9]+\+[A-Z0-9]+", purchase_itinerary):
@@ -78,3 +79,26 @@ def dispatch_monitor(mode: str, purchase_itinerary: str | None) -> dict[str, str
         raise GitHubStoreError(f"GitHub workflow dispatch failed (HTTP {status})")
     repo = os.environ.get("GITHUB_REPO", DEFAULT_REPO)
     return {"status": "queued", "workflow_url": f"https://github.com/{repo}/actions/workflows/{WORKFLOW}"}
+
+
+dispatch_monitor = dispatch_flight_monitor
+
+
+def dispatch_hotel_monitor(monitor: str, request_json: str | None = None) -> dict[str, str]:
+    if not monitor or not re.fullmatch(r"[A-Za-z0-9_-]+", monitor):
+        raise GitHubStoreError("Hotel monitor ID is invalid")
+    if request_json:
+        try:
+            parsed = json.loads(request_json)
+            if not isinstance(parsed, dict):
+                raise ValueError
+        except Exception:
+            raise GitHubStoreError("Hotel request JSON is invalid") from None
+    status, _ = _request("POST", f"actions/workflows/{HOTEL_WORKFLOW}/dispatches",
+                         {"ref": "master", "inputs": {"monitor": monitor,
+                                                      "request_json": request_json or ""}})
+    if status != 204:
+        raise GitHubStoreError(f"GitHub workflow dispatch failed (HTTP {status})")
+    repo = os.environ.get("GITHUB_REPO", DEFAULT_REPO)
+    return {"status": "queued", "workflow_url": f"https://github.com/{repo}/actions/workflows/{HOTEL_WORKFLOW}"}
+

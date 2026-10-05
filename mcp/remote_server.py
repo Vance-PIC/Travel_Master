@@ -11,6 +11,7 @@ from typing import Any
 from mcp.server.transport_security import TransportSecuritySettings
 
 import flight_server
+import travel_server
 
 ASGIApp = Callable[[dict[str, Any], Callable[..., Awaitable[Any]],
                     Callable[..., Awaitable[None]]], Awaitable[None]]
@@ -35,12 +36,12 @@ def make_authorized_app(inner: ASGIApp, token: str) -> ASGIApp:
 
 
 def config_from_env() -> tuple[str, str, int]:
-    token = os.environ.get("FLIGHT_MCP_BEARER_TOKEN", "")
-    host = os.environ.get("FLIGHT_MCP_ALLOWED_HOST", "")
+    token = os.environ.get("TRAVEL_MCP_BEARER_TOKEN") or os.environ.get("FLIGHT_MCP_BEARER_TOKEN", "")
+    host = os.environ.get("TRAVEL_MCP_ALLOWED_HOST") or os.environ.get("FLIGHT_MCP_ALLOWED_HOST", "")
     if not token:
-        raise ValueError("FLIGHT_MCP_BEARER_TOKEN is required for remote mode")
+        raise ValueError("TRAVEL_MCP_BEARER_TOKEN or FLIGHT_MCP_BEARER_TOKEN is required for remote mode")
     if not re.fullmatch(r"[A-Za-z0-9.-]+(?::[0-9]+)?", host) or ".." in host:
-        raise ValueError("FLIGHT_MCP_ALLOWED_HOST must be an exact hostname")
+        raise ValueError("FLIGHT_MCP_ALLOWED_HOST or TRAVEL_MCP_ALLOWED_HOST must be an exact hostname")
     try:
         port = int(os.environ.get("PORT", "8080"))
     except ValueError:
@@ -50,23 +51,26 @@ def config_from_env() -> tuple[str, str, int]:
     return token, host, port
 
 
-def create_app(token: str, allowed_host: str) -> ASGIApp:
-    flight_server.mcp.settings.stateless_http = True
-    flight_server.mcp.settings.json_response = True
-    flight_server.mcp.settings.transport_security = TransportSecuritySettings(
+def create_app(token: str, allowed_host: str, target_mcp: Any = None) -> ASGIApp:
+    server_mcp = target_mcp if target_mcp is not None else flight_server.mcp
+    server_mcp.settings.stateless_http = True
+    server_mcp.settings.json_response = True
+    server_mcp.settings.transport_security = TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
         allowed_hosts=[allowed_host],
         allowed_origins=["https://" + allowed_host],
     )
-    return make_authorized_app(flight_server.mcp.streamable_http_app(), token)
+    return make_authorized_app(server_mcp.streamable_http_app(), token)
 
 
 def main() -> None:
     token, host, port = config_from_env()
+    os.environ["TRAVEL_MCP_REMOTE"] = "1"
     os.environ["FLIGHT_MCP_REMOTE"] = "1"
+    os.environ["HOTEL_MCP_REMOTE"] = "1"
     import uvicorn
 
-    uvicorn.run(create_app(token, host), host="0.0.0.0", port=port, log_level="info")
+    uvicorn.run(create_app(token, host, target_mcp=travel_server.mcp), host="0.0.0.0", port=port, log_level="info")
 
 
 if __name__ == "__main__":

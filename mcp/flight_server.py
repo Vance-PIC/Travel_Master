@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Travel_Master Flight MCP MVP.
+"""Travel_Master Flight MCP Server.
 
-Three public tools:
-- flight_search: ad-hoc SerpApi Google Flights search; no persistence.
+Tools:
+- flight_search: ad-hoc flight search supporting dual engines (SerpApi & Ignav).
+- flight_booking_links: retrieve direct booking URLs from Ignav.
 - flight_monitor: operate the existing production monitor (run/status).
 - flight_report: read current report data/history without API usage.
 
@@ -26,6 +27,7 @@ from typing import Any, Literal
 from mcp.server.fastmcp import FastMCP
 
 import github_store
+import ignav_client
 
 ROOT = Path(__file__).resolve().parents[1]
 SERPAPI_SEARCH = "https://serpapi.com/search.json"
@@ -143,39 +145,184 @@ def flight_search(
     cabin_class: Literal["economy", "premium_economy", "business", "first"] = "economy",
     airlines: list[str] | None = None,
     max_results: int = 10,
+    engine: Literal["auto", "serpapi", "ignav", "both"] = "auto",
 ) -> dict[str, Any]:
-    """Ad-hoc round-trip search. Does not create monitoring/history.
+    """Ad-hoc round-trip search supporting auto (Ignav-first smart hybrid), SerpApi, and Ignav.
 
-    This tool consumes SerpApi quota. Prices are raw API displayed prices;
-    never infer per-person/family scope by multiplying them.
+    In 'auto' mode, Ignav is queried first to preserve SerpApi quota. If flag carriers
+    (such as China Airlines or EVA Air) are missing or specific requested airlines
+    are not found, SerpApi is automatically queried to enrich and complete the results.
     """
-    travel_class = {"economy": 1, "premium_economy": 2, "business": 3, "first": 4}[cabin_class]
-    params: dict[str, Any] = {
-        "engine": "google_flights",
-        "departure_id": origin.upper(),
-        "arrival_id": destination.upper(),
-        "outbound_date": outbound_date,
-        "return_date": inbound_date,
-        "type": 1,
-        "travel_class": travel_class,
-        "adults": adults,
-        "children": children,
-        "infants_in_seat": infants_in_seat,
-        "currency": currency.upper(),
-        "gl": market.lower(),
-        "hl": locale,
-    }
-    if nonstop_only:
-        params["stops"] = 1
-    data = _serpapi(params)
-    rows = _flight_rows(data, airlines)
-    return {
-        "query": {k: v for k, v in params.items() if k != "api_key"},
+    res: dict[str, Any] = {
+        "engine": engine,
+        "query": {
+            "origin": origin.upper(),
+            "destination": destination.upper(),
+            "outbound_date": outbound_date,
+            "inbound_date": inbound_date,
+            "adults": adults,
+            "children": children,
+            "currency": currency.upper(),
+            "cabin_class": cabin_class,
+        },
         "price_scope": "unknown",
         "persistence": "none",
-        "results": rows[:max(1, min(max_results, 25))],
-        "warning": "Raw API displayed prices only; do not multiply by passenger count.",
     }
+
+    if engine in ("serpapi", "both"):
+        travel_class = {"economy": 1, "premium_economy": 2, "business": 3, "first": 4}[cabin_class]
+        params: dict[str, Any] = {
+            "engine": "google_flights",
+            "departure_id": origin.upper(),
+            "arrival_id": destination.upper(),
+            "outbound_date": outbound_date,
+            "return_date": inbound_date,
+            "type": 1,
+            "travel_class": travel_class,
+            "adults": adults,
+            "children": children,
+            "infants_in_seat": infants_in_seat,
+            "currency": currency.upper(),
+            "gl": market.lower(),
+            "hl": locale,
+        }
+        if nonstop_only:
+            params["stops"] = 1
+        data = _serpapi(params)
+        rows = _flight_rows(data, airlines)
+        res["serpapi_results"] = rows[:max(1, min(max_results, 25))]
+        if engine == "serpapi":
+            res["results"] = res["serpapi_results"]
+            res["warning"] = "Raw API displayed prices only; do not multiply by passenger count."
+            return res
+
+    if engine in ("ignav", "both"):
+        client = ignav_client.IgnavClient()
+        ignav_data = client.search_round_trip(
+            origin=origin,
+            destination=destination,
+            departure_date=outbound_date,
+            return_date=inbound_date,
+            adults=adults,
+            children=children,
+            currency=currency,
+            cabin_class=cabin_class,
+        )
+        res["ignav_results"] = ignav_data
+        if engine == "ignav":
+            res["results"] = ignav_data
+            return res
+
+    if engine == "auto":
+        # Step 1: Probe with Ignav first (sentinel to save SerpApi quota)
+        client = ignav_client.IgnavClient()
+        ignav_data = client.search_round_trip(
+            origin=origin,
+            destination=destination,
+            departure_date=outbound_date,
+            return_date=inbound_date,
+            adults=adults,
+            children=children,
+            currency=currency,
+            cabin_class=cabin_class,
+        )
+        res["ignav_results"] = ignav_data
+        itins = ignav_data.get("itineraries", [])
+
+        carriers = set()
+        for it in itins:
+            c = (it.get("outbound") or {}).get("carrier")
+            if c:
+                carriers.add(c.lower())
+
+        # Check if SerpApi enrichment is needed (e.g. missing traditional flag carriers CI/BR or requested airlines)
+        needs_enrichment = False
+        if airlines:
+            needs_enrichment = any(a.lower() not in " ".join(carriers) for a in airlines)
+        elif not any("china airlines" in c or "eva" in c or "cathay" in c for c in carriers):
+            needs_enrichment = True
+
+        if needs_enrichment:
+            try:
+                travel_class = {"economy": 1, "premium_economy": 2, "business": 3, "first": 4}[cabin_class]
+                params = {
+                    "engine": "google_flights",
+                    "departure_id": origin.upper(),
+                    "arrival_id": destination.upper(),
+                    "outbound_date": outbound_date,
+                    "return_date": inbound_date,
+                    "type": 1,
+                    "travel_class": travel_class,
+                    "adults": adults,
+                    "children": children,
+                    "infants_in_seat": infants_in_seat,
+                    "currency": currency.upper(),
+                    "gl": market.lower(),
+                    "hl": locale,
+                }
+                if nonstop_only:
+                    params["stops"] = 1
+                data = _serpapi(params)
+                rows = _flight_rows(data, airlines)
+                res["serpapi_results"] = rows[:max(1, min(max_results, 25))]
+            except Exception as e:
+                res["serpapi_fallback_error"] = str(e)
+
+        # Merge and normalize results
+        merged: list[dict[str, Any]] = []
+        if "serpapi_results" in res:
+            for row in res["serpapi_results"]:
+                item = dict(row)
+                item["source"] = "serpapi"
+                merged.append(item)
+
+        for it in itins:
+            out_segs = (it.get("outbound") or {}).get("segments") or []
+            in_segs = (it.get("inbound") or {}).get("segments") or []
+            p = it.get("price") or {}
+            usd_amt = p.get("amount")
+            twd_est = int(usd_amt * 31.75) if (usd_amt and currency.upper() == "TWD") else None
+            ignav_row = {
+                "source": "ignav",
+                "airline": (it.get("outbound") or {}).get("carrier"),
+                "price": twd_est if twd_est is not None else usd_amt,
+                "currency": currency.upper() if twd_est is not None else p.get("currency"),
+                "raw_price": p,
+                "bags": it.get("bags"),
+                "requires_self_transfer": it.get("requires_self_transfer"),
+                "ignav_id": it.get("ignav_id"),
+                "stops": max(0, len(out_segs) - 1),
+                "flights": [{
+                    "airline": s.get("operating_carrier_name") or s.get("marketing_carrier_code"),
+                    "flight_number": f"{s.get('marketing_carrier_code', '')}{s.get('flight_number', '')}",
+                    "departure": s.get("departure_airport"),
+                    "arrival": s.get("arrival_airport"),
+                    "departure_time": s.get("departure_time_local"),
+                    "arrival_time": s.get("arrival_time_local"),
+                    "aircraft": s.get("aircraft"),
+                } for s in out_segs],
+            }
+            if nonstop_only and (len(out_segs) > 1 or len(in_segs) > 1):
+                continue
+            merged.append(ignav_row)
+
+        merged.sort(key=lambda r: (r.get("price") is None, r.get("price") or 0))
+        res["results"] = merged[:max(1, min(max_results, 25))]
+        return res
+
+    return res
+
+
+@mcp.tool()
+def flight_booking_links(
+    ignav_id: str,
+) -> dict[str, Any]:
+    """Retrieve direct booking links for an ignav flight offer.
+
+    Consumes Ignav quota. Returns direct links to airlines and OTAs (e.g. Trip.com).
+    """
+    client = ignav_client.IgnavClient()
+    return client.get_booking_links(ignav_id)
 
 
 @mcp.tool()
@@ -188,8 +335,7 @@ def flight_monitor(
     """Run or inspect a managed flight monitor.
 
     MVP managed execution currently supports trip_id='nagoya'. 'run' consumes
-    SerpApi quota; 'status' is read-only. New trip creation is intentionally
-    deferred until the production executor is generalized.
+    SerpApi quota; 'status' is read-only.
     """
     if trip_id != "nagoya":
         return {
@@ -253,7 +399,7 @@ def flight_report(
             )},
         }
     rows = _monitor_history()
-    return {"trip_id": trip_id, "history": rows[-max(1, min(limit, 500)):]} 
+    return {"trip_id": trip_id, "history": rows[-max(1, min(limit, 500)):]}
 
 
 if __name__ == "__main__":

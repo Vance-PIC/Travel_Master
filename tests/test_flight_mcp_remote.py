@@ -125,7 +125,7 @@ class RemoteTransportTests(unittest.TestCase):
                             listed = await session.list_tools()
                             return {tool.name for tool in listed.tools}
 
-        self.assertEqual(asyncio.run(check()), {"flight_search", "flight_monitor", "flight_report"})
+        self.assertEqual(asyncio.run(check()), {"flight_search", "flight_booking_links", "flight_monitor", "flight_report"})
 
     def test_auth_gate_rejects_invalid_headers_before_app(self):
         import remote_server
@@ -260,3 +260,53 @@ class RemoteRoutingTests(unittest.TestCase):
             with self.assertRaises(RuntimeError) as failure:
                 flight_server._serpapi({"engine": "google_flights"})
         self.assertNotIn(secret, str(failure.exception))
+
+    def test_flight_search_auto_engine_merges_hybrid_results(self):
+        import flight_server
+        import ignav_client
+
+        mock_ignav_res = {
+            "itineraries": [
+                {
+                    "price": {"amount": 500.0, "currency": "USD"},
+                    "outbound": {"carrier": "Tigerair Taiwan", "segments": [{"marketing_carrier_code": "IT", "flight_number": "206", "departure_airport": "TPE", "arrival_airport": "NGO", "departure_time_local": "2026-12-11T08:45:00", "arrival_time_local": "2026-12-11T12:25:00"}]},
+                    "inbound": {"carrier": "Tigerair Taiwan", "segments": [{"marketing_carrier_code": "IT", "flight_number": "209", "departure_airport": "NGO", "arrival_airport": "TPE", "departure_time_local": "2026-12-18T21:15:00", "arrival_time_local": "2026-12-18T23:50:00"}]},
+                    "bags": {"carry_on": 1},
+                    "requires_self_transfer": False,
+                    "ignav_id": "test-ignav-id-123",
+                }
+            ]
+        }
+        mock_serpapi_res = {
+            "best_flights": [
+                {
+                    "price": 59562,
+                    "flights": [
+                        {"airline": "中華航空", "flight_number": "CI 154", "departure_airport": {"id": "TPE"}, "arrival_airport": {"id": "NGO"}, "travel_class": "Economy"}
+                    ]
+                }
+            ]
+        }
+
+        with patch.object(ignav_client.IgnavClient, "search_round_trip", return_value=mock_ignav_res) as mock_ignav, \
+                patch.object(flight_server, "_serpapi", return_value=mock_serpapi_res) as mock_serp:
+            res = flight_server.flight_search(
+                origin="TPE",
+                destination="NGO",
+                outbound_date="2026-12-11",
+                inbound_date="2026-12-18",
+                engine="auto",
+            )
+            mock_ignav.assert_called_once()
+            mock_serp.assert_called_once()
+            self.assertEqual(res["engine"], "auto")
+            self.assertIn("results", res)
+            sources = [r["source"] for r in res["results"]]
+            self.assertIn("ignav", sources)
+            self.assertIn("serpapi", sources)
+            # Verify Ignav structural flags survived
+            ignav_item = [r for r in res["results"] if r["source"] == "ignav"][0]
+            self.assertEqual(ignav_item["bags"], {"carry_on": 1})
+            self.assertFalse(ignav_item["requires_self_transfer"])
+            self.assertEqual(ignav_item["ignav_id"], "test-ignav-id-123")
+

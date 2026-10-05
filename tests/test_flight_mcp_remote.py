@@ -145,3 +145,65 @@ class RemoteTransportTests(unittest.TestCase):
         with patch.dict(os.environ, {"FLIGHT_MCP_BEARER_TOKEN": "secret", "FLIGHT_MCP_ALLOWED_HOST": ""}):
             with self.assertRaises(ValueError):
                 remote_server.config_from_env()
+
+
+@unittest.skipUnless(SDK_AVAILABLE, "Install mcp/requirements.txt for routing tests")
+class RemoteRoutingTests(unittest.TestCase):
+    def test_remote_status_and_current_report_read_github_snapshot(self):
+        import flight_server
+        import github_store
+
+        files = {
+            "travel/nagoya/flight-monitor.json": b'{"family_target_twd":50000}',
+            "travel/nagoya/flights/last-run.json": b'{"status":"ok"}',
+            "travel/nagoya/flights/latest.json": json.dumps({
+                "checked_at": "2026-10-05T00:00:00Z", "status": "ok",
+                "itineraries": [{"itinerary_key": str(n), "displayed_price_twd": n}
+                                for n in range(8, 0, -1)],
+                "market_candidates": [{"flight_number": "CI150"}],
+            }).encode(),
+        }
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "get_file", side_effect=files.__getitem__) as read:
+            status = flight_server.flight_monitor("status")
+            report = flight_server.flight_report("current")
+        self.assertEqual(status["config"]["family_target_twd"], 50000)
+        self.assertEqual(status["latest_checked_at"], "2026-10-05T00:00:00Z")
+        self.assertEqual([x["displayed_price_twd"] for x in report["top_itineraries"]], [1, 2, 3, 4, 5])
+        self.assertEqual(report["market_candidates"], [{"flight_number": "CI150"}])
+        self.assertEqual(read.call_count, 4)
+
+    def test_remote_run_dispatches_once_without_local_execution(self):
+        import flight_server
+        import github_store
+
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "dispatch_monitor", return_value={"status": "queued", "workflow_url": "https://github.com/example"}) as dispatch, \
+                patch.object(flight_server.subprocess, "run") as local_run:
+            result = flight_server.flight_monitor("run", mode="full_query", purchase_itinerary="CI154+CI151")
+        dispatch.assert_called_once_with("full_query", "CI154+CI151")
+        local_run.assert_not_called()
+        self.assertEqual(result["status"], "queued")
+        self.assertNotIn("exit_code", result)
+
+    def test_remote_history_and_malformed_current_snapshot(self):
+        import flight_server
+        import github_store
+
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "get_file", return_value=b"itinerary_key,displayed_price_twd\nA,1\nB,2\n"):
+            self.assertEqual(flight_server.flight_report("history", limit=1)["history"],
+                             [{"itinerary_key": "B", "displayed_price_twd": "2"}])
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "get_file", return_value=b"{bad"):
+            with self.assertRaisesRegex(github_store.GitHubStoreError, "invalid"):
+                flight_server.flight_report("current")
+
+    def test_remote_missing_credentials_surface_clear_error(self):
+        import flight_server
+        import github_store
+
+        with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(github_store, "get_file", side_effect=github_store.GitHubStoreError("GitHub credential is missing")):
+            with self.assertRaisesRegex(github_store.GitHubStoreError, "credential is missing"):
+                flight_server.flight_report("current")

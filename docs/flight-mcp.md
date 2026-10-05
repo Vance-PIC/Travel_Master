@@ -62,10 +62,12 @@ account needs Secret Manager access; it does not need GitHub credentials in
 the image. Use a dedicated service account with minimal permissions.
 
 Build from the repository root so the Dockerfile can copy only `mcp/*.py` and
-`mcp/requirements.txt`:
+`mcp/requirements.txt`. The root `Dockerfile` supports Cloud Run's GitHub
+repository build flow; `mcp/Dockerfile` is kept for explicit local builds.
+Both use the repository root as the build context:
 
 ```sh
-docker build -f mcp/Dockerfile -t REGION-docker.pkg.dev/PROJECT/REPOSITORY/flight-mcp:VERSION .
+docker build -t REGION-docker.pkg.dev/PROJECT/REPOSITORY/flight-mcp:VERSION .
 docker push REGION-docker.pkg.dev/PROJECT/REPOSITORY/flight-mcp:VERSION
 ```
 

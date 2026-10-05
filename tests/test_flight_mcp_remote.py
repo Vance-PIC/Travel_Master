@@ -87,7 +87,11 @@ class GitHubStoreTests(unittest.TestCase):
 class CloudPackagingTests(unittest.TestCase):
     def test_container_is_minimal_nonroot_and_docs_cover_remote_setup(self):
         root = Path(__file__).resolve().parents[1]
-        dockerfile = (root / "mcp" / "Dockerfile").read_text(encoding="utf-8")
+        dockerfile = (root / "Dockerfile").read_text(encoding="utf-8")
+        self.assertEqual(
+            dockerfile,
+            (root / "mcp" / "Dockerfile").read_text(encoding="utf-8"),
+        )
         self.assertIn("FROM python:3.12-slim", dockerfile)
         self.assertIn("COPY mcp/requirements.txt", dockerfile)
         self.assertIn("COPY mcp/*.py", dockerfile)

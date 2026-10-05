@@ -30,5 +30,13 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertIn('airport-candidate', text)
         self.assertIn('marunouchi-booked', text)
 
+    def test_unified_manual_request_cannot_update_monitor_config(self):
+        text = WORKFLOW.read_text(encoding='utf-8')
+        self.assertIn('request_json:', text)
+        self.assertIn('run-request --request-file hotel-request.json', text)
+        self.assertNotIn('--allow-monitor-update', text)
+        self.assertIn('hotel-request-result.json', text)
+
 
 if __name__ == '__main__': unittest.main()
+

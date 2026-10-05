@@ -10,8 +10,10 @@ import os
 from pathlib import Path
 import re
 import uuid
+import tempfile
 from datetime import datetime, timezone
 from hotel_searchapi import Client, SearchAPIError, parameters, room_quotes, engine_parameters
+from hotel_request import resolve_request, config_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = 'schema_version run_id monitor_id stage comparison_key observed_at source hotel_key room_key rate_key status amount currency price_scope tax_fee_inclusion filter_status room_match comparison_status evidence_ref'.split()
@@ -298,11 +300,16 @@ def collect(config, m, client, rejected_token=None):
                   'resolution_mode': 'direct_token' if pinned else 'discovery'}, resolution
 
 
-def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
+def execute(config, monitor_id, root=ROOT, client=None, allow_query=False, *,
+            effective_request=None, persistence_directory=None, request_hash=None):
     m = next(m for m in config['monitors'] if m['monitor_id'] == monitor_id)
     if m['stage'] not in ('candidate_search', 'booked_room_compare'): raise ValueError('Invalid stage')
-    directory = location(config, monitor_id, root)
-    if not config['execution']['query_enabled'] and not allow_query: return {'status': 'skipped', 'reason': 'query_disabled'}
+    effective_request = copy.deepcopy(effective_request if effective_request is not None else m)
+    request_hash = request_hash or config_hash(effective_request)
+    directory = persistence_directory or location(config, monitor_id, root)
+    if not config['execution']['query_enabled'] and not allow_query:
+        return {'status': 'skipped', 'reason': 'query_disabled',
+                'effective_request': effective_request, 'config_hash': request_hash}
     directory.mkdir(parents=True, exist_ok=True)
     lock = directory/'.lock'
     with lock.open('x') as f: f.write(str(os.getpid()))
@@ -310,7 +317,9 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
         recover(directory)
         prior = json.loads((directory/'latest.json').read_text(encoding='utf-8')) if (directory/'latest.json').exists() else {}
         last = {'run_id': uuid.uuid4().hex, 'monitor_id': monitor_id, 'stage': m['stage'], 'started_at': now(),
-                'status': 'error', 'snapshot_run_id': prior.get('run_id'), 'coverage': {'requested': ['searchapi.io'], 'completed': [], 'deferred': [], 'failed': []}}
+                'status': 'error', 'snapshot_run_id': prior.get('run_id'), 'effective_request': effective_request,
+                'config_hash': request_hash,
+                'coverage': {'requested': ['searchapi.io'], 'completed': [], 'deferred': [], 'failed': []}}
         try:
             client = client or Client(os.environ.get(config['api']['key_env']), config['api'].get('max_requests_per_run', 5))
             cached = trusted_resolution(directory, m)
@@ -342,6 +351,7 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
             fingerprint = digest({'monitor': m, 'api': config['api'], 'execution': config['execution']})
             snapshot = {'schema_version': 1, 'monitor_id': monitor_id, 'stage': m['stage'], 'run_id': last['run_id'],
                         'checked_at': last['ended_at'], 'config_fingerprint': fingerprint, 'comparison_key': digest(m),
+                        'effective_request': effective_request, 'config_hash': request_hash,
                         'coverage': coverage, 'observations': [assess(m, q, config['execution'].get('max_quote_age_hours'), last['ended_at']) for q in rows]}
             if resolution is not None:
                 snapshot['property_resolution'] = resolution
@@ -357,6 +367,51 @@ def execute(config, monitor_id, root=ROOT, client=None, allow_query=False):
             atomic(directory/'last-run.json', json.dumps(last, ensure_ascii=False, indent=2))
         return last
     finally: lock.unlink()
+
+
+def run_request(config, envelope, root=ROOT, client=None, allow_query=False, *,
+                config_path=None, allow_monitor_update=False, confirm_config_hash=None):
+    """Execute one versioned request; only an explicit confirmation can update config."""
+    effective, policy, request_hash = resolve_request(config, envelope)
+    source_id = envelope.get('monitor_id')
+    if policy == 'monitor':
+        if not allow_monitor_update or confirm_config_hash != request_hash or config_path is None:
+            raise ValueError('monitor persistence needs explicit matching config hash confirmation')
+        config_path = Path(config_path).resolve()
+        if not config_path.is_relative_to(Path(root).resolve()):
+            raise ValueError('Monitor config must be inside repository')
+    execution_id = source_id or 'adhoc-' + uuid.uuid4().hex
+    executed = copy.deepcopy(effective)
+    executed['monitor_id'] = execution_id
+    scoped_config = copy.deepcopy(config)
+    scoped_config['monitors'] = [executed]
+
+    if policy == 'none':
+        with tempfile.TemporaryDirectory() as temporary:
+            result = execute(scoped_config, execution_id, Path(temporary), client, allow_query,
+                             effective_request=effective, request_hash=request_hash)
+    else:
+        isolated = not source_id or bool(envelope.get('input')) or policy == 'monitor'
+        directory = None
+        if isolated:
+            directory = (Path(root)/config['persistence_root']/'_runs'/uuid.uuid4().hex).resolve()
+            if not directory.is_relative_to(Path(root).resolve()):
+                raise ValueError('Persistence outside repository')
+        result = execute(scoped_config, execution_id, root, client, allow_query,
+                         effective_request=effective, persistence_directory=directory,
+                         request_hash=request_hash)
+        if policy == 'monitor' and result.get('status') == 'success':
+            current = json.loads(config_path.read_text(encoding='utf-8'))
+            if current != config:
+                raise ValueError('Monitor config changed during run; result saved but config not updated')
+            current['monitors'] = [effective if m['monitor_id'] == source_id else m
+                                   for m in current['monitors']]
+            atomic(config_path, json.dumps(current, ensure_ascii=False, indent=2) + '\n')
+    result['source_monitor_id'] = source_id
+    result['persist_policy'] = policy
+    result['effective_request'] = effective
+    result['config_hash'] = request_hash
+    return result
 
 
 def report(config, monitor_id, root=ROOT):
@@ -376,15 +431,33 @@ def report(config, monitor_id, root=ROOT):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=['run', 'report'])
+    parser.add_argument('mode', choices=['run', 'report', 'run-request', 'resolve-request'])
     parser.add_argument('--config', default='travel/nagoya/hotel-monitor.json')
-    parser.add_argument('--monitor', required=True)
+    parser.add_argument('--monitor')
+    parser.add_argument('--request-file', help='Versioned JSON request for run-request')
     parser.add_argument('--allow-query', action='store_true', help='Authorize this manual run only; does not change config or schedules')
+    parser.add_argument('--allow-monitor-update', action='store_true', help='Allow an explicitly confirmed saved-config update')
+    parser.add_argument('--confirm-config-hash', help='Full SHA256 of the effective request being approved')
     args = parser.parse_args()
-    config = json.loads((ROOT/args.config).read_text(encoding='utf-8'))
-    result = execute(config, args.monitor, allow_query=args.allow_query) if args.mode == 'run' else report(config, args.monitor)
+    config_path = ROOT/args.config
+    config = json.loads(config_path.read_text(encoding='utf-8'))
+    if args.mode in ('run-request', 'resolve-request'):
+        if args.monitor or not args.request_file: parser.error('request mode needs --request-file and no --monitor')
+        envelope = json.loads(Path(args.request_file).read_text(encoding='utf-8'))
+        if args.mode == 'resolve-request':
+            effective, policy, request_hash = resolve_request(config, envelope)
+            result = {'effective_request': effective, 'config_hash': request_hash,
+                      'persist_policy': policy, 'source_monitor_id': envelope.get('monitor_id')}
+        else:
+            result = run_request(config, envelope, allow_query=args.allow_query,
+                                 config_path=config_path, allow_monitor_update=args.allow_monitor_update,
+                                 confirm_config_hash=args.confirm_config_hash)
+    else:
+        if not args.monitor: parser.error('run/report needs --monitor')
+        result = execute(config, args.monitor, allow_query=args.allow_query) if args.mode == 'run' else report(config, args.monitor)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 1 if result.get('status') in ('error', 'partial') else 0
 
 
 if __name__ == '__main__': raise SystemExit(main())
+

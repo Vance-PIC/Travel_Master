@@ -1,10 +1,164 @@
 {
-  "run_id": "2011169ad8ce4e8287bfcfd57a88887a",
+  "run_id": "e8484d32568c43f8a7152d917d18b229",
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "started_at": "2026-10-02T03:24:15.327405+00:00",
+  "started_at": "2026-10-05T02:23:14.038587+00:00",
   "status": "success",
-  "snapshot_run_id": "2011169ad8ce4e8287bfcfd57a88887a",
+  "snapshot_run_id": "e8484d32568c43f8a7152d917d18b229",
+  "effective_request": {
+    "monitor_id": "marunouchi-booked",
+    "stage": "booked_room_compare",
+    "stay": {
+      "check_in": "2027-07-11",
+      "check_out": "2027-07-17"
+    },
+    "party": {
+      "adults": 2,
+      "children": 2,
+      "child_ages": [
+        9,
+        7
+      ],
+      "rooms": 1
+    },
+    "hotel_identity": {
+      "name": "Hotel LiVEMAX PREMIUM Nagoya Marunouchi",
+      "address": null,
+      "source_ids": {
+        "searchapi.io": "0x6003711bc3781f9b:0x8adc85566de9c8fe"
+      },
+      "evidence": [
+        {
+          "type": "user_statement",
+          "reference": "current_task"
+        },
+        {
+          "type": "source_page",
+          "reference": "https://www.google.com/travel/hotels/entity/ChoI_pGn7-aqoe6KARoNL2cvMTFyZnB2Zm1obRAB",
+          "fields": [
+            "discovery_aliases"
+          ],
+          "note": "Discovery names only; not room or occupancy evidence"
+        },
+        {
+          "type": "source_response",
+          "reference": "travel/nagoya/hotels/marunouchi-booked/snapshots/394d2ca253c0496e914aecb5ed710286.json#/observations/0",
+          "fields": [
+            "source_ids.searchapi.io"
+          ],
+          "note": "Confirmed by user after master Run 36849388436; this is data_id, not property_token"
+        }
+      ],
+      "discovery_aliases": [
+        "Hotel Live Max PREMIUM Nagoya Marunouchi",
+        "天然温泉ホテルリブマックスPREMIUM名古屋丸の内"
+      ]
+    },
+    "room_baseline": {
+      "name": "Luxury Twin Non-Smoking",
+      "size_m2": 39,
+      "beds": {
+        "count": null,
+        "type": null,
+        "reported_label": "Twin"
+      },
+      "smoking": "non-smoking",
+      "evidence": [
+        {
+          "type": "user_statement",
+          "reference": "current_task",
+          "fields": [
+            "name",
+            "size_m2",
+            "smoking"
+          ]
+        }
+      ]
+    },
+    "hard_filters": {
+      "occupancy": "must_accommodate_configured_party",
+      "room_requirement": "locked_room_baseline"
+    },
+    "preferences": {},
+    "booking_baseline": {
+      "amount": 77836,
+      "currency": null,
+      "source": null,
+      "price_scope": "unknown",
+      "tax_fee_inclusion": "unknown",
+      "cancellation": null,
+      "payment": null,
+      "benefits": null,
+      "evidence": [
+        {
+          "type": "user_statement",
+          "reference": "current_task",
+          "fields": [
+            "amount"
+          ]
+        }
+      ]
+    },
+    "alert": {
+      "operator": "lt",
+      "amount": 70000,
+      "currency": null,
+      "price_scope": "unknown",
+      "requires_lower_than_baseline": true,
+      "evidence": [
+        {
+          "type": "user_statement",
+          "reference": "current_task",
+          "fields": [
+            "operator",
+            "amount"
+          ]
+        }
+      ]
+    },
+    "sources": [
+      "searchapi.io/google_hotels",
+      "searchapi.io/google_hotels_property"
+    ],
+    "evidence": [
+      {
+        "type": "user_statement",
+        "reference": "current_task",
+        "fields": [
+          "stay",
+          "party.adults",
+          "party.children",
+          "party.rooms"
+        ]
+      },
+      {
+        "type": "user_statement",
+        "reference": "2026-10-01 confirmation",
+        "fields": [
+          "party.child_ages"
+        ]
+      }
+    ],
+    "needs_evidence": [
+      "room_baseline.beds",
+      "booking_baseline.currency",
+      "booking_baseline.source",
+      "booking_baseline.price_scope",
+      "booking_baseline.tax_fee_inclusion",
+      "booking_baseline.cancellation",
+      "booking_baseline.payment",
+      "booking_baseline.benefits",
+      "alert.currency",
+      "alert.price_scope",
+      "hotel_identity address"
+    ],
+    "search": {
+      "query": "Hotels in Marunouchi Nagoya Japan",
+      "property_token": null,
+      "property_token_evidence": null
+    }
+  },
+  "config_hash": "b7891df7d9bc2acdef05df58da5a73b068808e56a4cb2e3dcef33f0ac97e8837",
   "coverage": {
     "requested": [
       "0x6003711bc3781f9b:0x8adc85566de9c8fe"
@@ -18,5 +172,5 @@
     "resolution_mode": "direct_token"
   },
   "attempted_requests": 1,
-  "ended_at": "2026-10-02T03:24:18.057880+00:00"
+  "ended_at": "2026-10-05T02:23:17.593303+00:00"
 }

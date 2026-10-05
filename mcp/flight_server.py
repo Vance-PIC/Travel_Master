@@ -12,16 +12,20 @@ skills/flight-monitor and scripts/nagoya_flight_monitor.py.
 from __future__ import annotations
 
 import csv
+import io
 import json
 import os
 import subprocess
 import sys
 import urllib.parse
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any, Literal
 
 from mcp.server.fastmcp import FastMCP
+
+import github_store
 
 ROOT = Path(__file__).resolve().parents[1]
 SERPAPI_SEARCH = "https://serpapi.com/search.json"
@@ -39,15 +43,56 @@ def _json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _remote_mode() -> bool:
+    return os.environ.get("FLIGHT_MCP_REMOTE") == "1"
+
+
+def _monitor_json(path: Path) -> dict[str, Any]:
+    if not _remote_mode():
+        return _json(path)
+    relative = path.relative_to(ROOT).as_posix()
+    try:
+        value = json.loads(github_store.get_file(relative).decode("utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("Expected a JSON object")
+        return value
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+        raise github_store.GitHubStoreError("GitHub monitor JSON is invalid") from None
+
+
+def _monitor_history() -> list[dict[str, str]]:
+    path = NAGOYA_FLIGHTS / "itinerary_history.csv"
+    if not _remote_mode():
+        if not path.exists():
+            return []
+        with path.open(newline="", encoding="utf-8") as stream:
+            return list(csv.DictReader(stream))
+    try:
+        content = github_store.get_file(path.relative_to(ROOT).as_posix()).decode("utf-8")
+        reader = csv.DictReader(io.StringIO(content, newline=""))
+        if not reader.fieldnames or "itinerary_key" not in reader.fieldnames:
+            raise ValueError("Missing itinerary key column")
+        rows = list(reader)
+        if any(None in row for row in rows):
+            raise ValueError("Malformed CSV row")
+        return rows
+    except (UnicodeDecodeError, csv.Error, ValueError):
+        raise github_store.GitHubStoreError("GitHub monitor CSV is invalid") from None
+
+
 def _serpapi(params: dict[str, Any]) -> dict[str, Any]:
     key = os.environ.get("SERPAPI_KEY")
     if not key:
         raise RuntimeError("SERPAPI_KEY is not configured")
     params = {**params, "api_key": key}
     url = SERPAPI_SEARCH + "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"User-Agent": "Travel_Master Flight MCP"})
-    with urllib.request.urlopen(req, timeout=45) as response:
-        data = json.load(response)
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Travel_Master Flight MCP"})
+        with urllib.request.urlopen(req, timeout=45) as response:
+            data = json.load(response)
+    except Exception:
+        # urllib exceptions can include the full URL and its api_key.
+        raise RuntimeError("SerpApi search request failed") from None
     if not isinstance(data, dict) or data.get("error"):
         raise RuntimeError("SerpApi search failed")
     return data
@@ -155,10 +200,12 @@ def flight_monitor(
     if action == "status":
         return {
             "trip_id": trip_id,
-            "config": _json(NAGOYA_CONFIG),
-            "last_run": _json(NAGOYA_FLIGHTS / "last-run.json"),
-            "latest_checked_at": _json(NAGOYA_FLIGHTS / "latest.json").get("checked_at"),
+            "config": _monitor_json(NAGOYA_CONFIG),
+            "last_run": _monitor_json(NAGOYA_FLIGHTS / "last-run.json"),
+            "latest_checked_at": _monitor_json(NAGOYA_FLIGHTS / "latest.json").get("checked_at"),
         }
+    if _remote_mode():
+        return {"trip_id": trip_id, **github_store.dispatch_monitor(mode, purchase_itinerary)}
     cmd = [sys.executable, str(MONITOR_SCRIPT), "--mode", mode]
     if purchase_itinerary:
         cmd += ["--purchase-itinerary", purchase_itinerary]
@@ -182,9 +229,15 @@ def flight_report(
     if trip_id != "nagoya":
         return {"status": "unsupported_trip", "trip_id": trip_id}
     if action == "current":
-        latest = _json(NAGOYA_FLIGHTS / "latest.json")
+        latest = _monitor_json(NAGOYA_FLIGHTS / "latest.json")
+        candidates = latest.get("itineraries", [])
+        if _remote_mode() and (not isinstance(candidates, list) or any(
+            not isinstance(item, dict) or not isinstance(item.get("displayed_price_twd"), (int, float, type(None)))
+            for item in candidates
+        )):
+            raise github_store.GitHubStoreError("GitHub monitor itinerary data is invalid")
         itineraries = sorted(
-            [x for x in latest.get("itineraries", []) if isinstance(x.get("displayed_price_twd"), (int, float))],
+            [x for x in candidates if isinstance(x.get("displayed_price_twd"), (int, float))],
             key=lambda x: (x["displayed_price_twd"], x.get("itinerary_key", "")),
         )
         return {
@@ -199,11 +252,7 @@ def flight_report(
                 "refreshed_outbounds", "deferred_outbounds", "baseline_complete"
             )},
         }
-    path = NAGOYA_FLIGHTS / "itinerary_history.csv"
-    if not path.exists():
-        return {"trip_id": trip_id, "history": []}
-    with path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
+    rows = _monitor_history()
     return {"trip_id": trip_id, "history": rows[-max(1, min(limit, 500)):]} 
 
 

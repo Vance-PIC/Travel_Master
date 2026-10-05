@@ -13,6 +13,11 @@ on:
         options:
           - marunouchi-booked
           - airport-candidate
+      request_json:
+        description: Optional unified hotel request JSON; overrides the selected monitor input
+        required: false
+        type: string
+        default: ''
 permissions:
   contents: write
 concurrency:
@@ -50,10 +55,14 @@ jobs:
           SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
           EVENT_NAME: ${{ github.event_name }}
           MONITOR_ID: ${{ inputs.monitor }}
+          REQUEST_JSON: ${{ inputs.request_json }}
         run: |
           if [ "$EVENT_NAME" = "schedule" ]; then
             python scripts/hotel_executor.py run --monitor airport-candidate
             python scripts/hotel_executor.py run --monitor marunouchi-booked
+          elif [ -n "$REQUEST_JSON" ]; then
+            printf '%s' "$REQUEST_JSON" > hotel-request.json
+            python scripts/hotel_executor.py run-request --request-file hotel-request.json > hotel-request-result.json
           else
             python scripts/hotel_executor.py run --monitor "$MONITOR_ID"
           fi
@@ -75,5 +84,14 @@ jobs:
         with:
           name: hotel-monitor-${{ github.run_id }}
           path: travel/nagoya/hotels/
+          # Ad-hoc persist_policy=none has no repository records.
           include-hidden-files: true
           if-no-files-found: warn
+      - name: Retain unified request result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotel-request-${{ github.run_id }}
+          path: hotel-request-result.json
+          if-no-files-found: ignore
+

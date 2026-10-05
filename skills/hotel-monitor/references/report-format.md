@@ -4,9 +4,9 @@
 
 以 repo-relative `persistence_root/<monitor_id>/` 區分案例。首次真實執行後才產生資料；路徑必須留在 persistence_root 内，monitor_id 不接受路徑跳脫。報告模式不建立或改寫監控檔案。
 
-- `latest.json`：最後成功且完整驗證的該案例 snapshot。包含 schema_version、monitor_id、stage、comparison_key、config 指紋、run_id、checked_at、coverage、observations。每筆 room/rate 有自己的 observed_at、source、identity、stay／party、條件證據、價格語意、Stage 判定與 fresh/retained 標記。跨來源資料不可拼接成不存在的 rate。
+- `latest.json`：最後成功且完整驗證的該案例 snapshot。包含 schema_version、monitor_id、stage、comparison_key、config 指紋、effective_request、config_hash、run_id、checked_at、coverage、observations。每筆 room/rate 有自己的 observed_at、source、identity、stay／party、條件證據、價格語意、Stage 判定與 fresh/retained 標記。跨來源資料不可拼接成不存在的 rate。
 - `history.csv`：只追加實際新觀察。欄位至少 schema_version、run_id、monitor_id、stage、comparison_key、observed_at、source、hotel_key、room_key、rate_key、status、amount、currency、price_scope、tax_fee_inclusion、filter_status、room_match、comparison_status、evidence_ref。證據完整物件保存在成功 snapshot 的不可變版本 `snapshots/<run_id>.json`，history 的 evidence_ref 指向該版本，不能指向會覆寫的 latest。unknown 數值為空，不是零。
-- `last-run.json`：最新一次真實執行嘗試的 run_id、stage、開始／結束時間、success/error/partial/skipped、requested/completed/deferred/failed sources、安全錯誤與 snapshot_run_id。沒有執行就不建立。設定檢查不是一次查價。
+- `last-run.json`：最新一次真實執行嘗試的 run_id、stage、開始／結束時間、success/error/partial/skipped、effective_request、config_hash、requested/completed/deferred/failed sources、安全錯誤與 snapshot_run_id。沒有執行就不建立。設定檢查不是一次查價。
 
 全部必要查詢與解析成功後，才發布不可變 snapshot、history 與 latest 的同一 run_id。未來 executor 必須實作可恢復的寫入交易／暫存機制，不能因寫檔中斷留下 history/latest 不一致。任何必要來源/API/解析失敗或部分完成時，保留原 latest/history；只寫 last-run 診斷，partial 不發布為有效新 snapshot。明確成功的空結果可存空觀察，不能偽造零價。
 
@@ -41,3 +41,4 @@
 ## 執行與資料狀態
 
 結尾列 last-run 狀態、來源 coverage 與缺失／失敗原因。失敗後使用舊 snapshot 時，顯示「最後有效資料，非本次更新」與原時間；逾設定新鮮度標 stale，未設新鮮度標待確認。保留報價不觸發新通知。未執行、空觀察、來源失敗、待確認與真正無合格候選必須區別；不得宣稱全市場涵蓋、可訂保證或未有證據的取消權利。
+

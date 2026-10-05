@@ -1,5 +1,9 @@
 # Formal executor
 
+The unified saved/ad-hoc request envelope, persistence policies, config hash,
+and CLI boundary are documented in
+[hotel-unified-request.md](../../../docs/hotel-unified-request.md).
+
 `scripts/hotel_executor.py` separates single-run search, Stage evaluation,
 operational persistence, and read-only reports. It reuses the existing SearchAPI
 client and room-price parser; it never invokes capability verification or an
@@ -87,3 +91,4 @@ insufficient budget do not trigger discovery. A failed fallback retains the
 previous resolution, latest snapshot, and history; only last-run diagnostics
 change. The first run that creates a token still needs discovery and property
 requests.
+

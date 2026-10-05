@@ -1,10 +1,82 @@
 {
-  "run_id": "efeafe9987f046119fdb9091dcdc6edc",
+  "run_id": "b3e502ae0f9e4e1ca461fc5caedd0a85",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-10-04T07:27:39.619234+00:00",
+  "started_at": "2026-10-05T02:24:00.869019+00:00",
   "status": "partial",
   "snapshot_run_id": null,
+  "effective_request": {
+    "monitor_id": "airport-candidate",
+    "stage": "candidate_search",
+    "stay": {
+      "check_in": "2027-07-17",
+      "check_out": "2027-07-18"
+    },
+    "party": {
+      "adults": 2,
+      "children": 2,
+      "child_ages": [
+        9,
+        7
+      ],
+      "rooms": null
+    },
+    "hard_filters": {
+      "location": {
+        "anchor": "中部國際機場",
+        "requirement": "機場附近，或大眾運輸鄰近一站範圍",
+        "operator": "any_of",
+        "alternatives": [
+          {
+            "type": "near_airport",
+            "max_distance_m": null
+          },
+          {
+            "type": "public_transport",
+            "max_stops_from_airport": 1,
+            "line": null
+          }
+        ]
+      },
+      "min_room_size_m2": 30,
+      "beds": {
+        "count": 2,
+        "type": null
+      },
+      "smoking": "non-smoking",
+      "occupancy": "must_accommodate_configured_party",
+      "price_ceiling": null
+    },
+    "preferences": {},
+    "sources": [
+      "searchapi.io/google_hotels",
+      "searchapi.io/google_hotels_property"
+    ],
+    "evidence": [
+      {
+        "type": "user_statement",
+        "reference": "current_task",
+        "fields": [
+          "stay",
+          "party.adults",
+          "party.children",
+          "hard_filters"
+        ]
+      },
+      {
+        "type": "user_statement",
+        "reference": "2026-10-01 confirmation",
+        "fields": [
+          "party.child_ages"
+        ]
+      }
+    ],
+    "needs_evidence": [
+      "party.rooms",
+      "location distance or transport evidence"
+    ]
+  },
+  "config_hash": "c684c6e41218f74e87a755c434af401b178ff12d2a1f3554b9835a44fd0789b1",
   "coverage": {
     "requested": [
       "0x60047dec385d0ad9:0xc8fe87d05bd1b088",
@@ -21,12 +93,12 @@
       "0x60048100ad7dc371:0xec28c64828a71ab9",
       "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x6004874ce9d95feb:0x89694bab0b51bb4",
-      "0x60048700688a6f17:0x304c4cf7aed2aea5",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
-      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
+      "0x600489a9db25b9b5:0xa083578c676656dc",
+      "0x60048773140611ad:0x1d734d496cd25fd0",
       "ぽんぽこハウス",
-      "Villa Mariso “貸別荘マリソ“"
+      "A barbecue area and accommodation for up to 15 people (families, clubs, corporate training, etc.)"
     ],
     "completed": [
       "0x60047dec385d0ad9:0xc8fe87d05bd1b088",
@@ -45,10 +117,10 @@
       "0x60048100ad7dc371:0xec28c64828a71ab9",
       "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x6004874ce9d95feb:0x89694bab0b51bb4",
-      "0x60048700688a6f17:0x304c4cf7aed2aea5",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
-      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
+      "0x600489a9db25b9b5:0xa083578c676656dc",
+      "0x60048773140611ad:0x1d734d496cd25fd0",
       "additional_results_page"
     ],
     "failed": [],
@@ -56,5 +128,5 @@
     "resolution_mode": "discovery"
   },
   "attempted_requests": 5,
-  "ended_at": "2026-10-04T07:27:49.751114+00:00"
+  "ended_at": "2026-10-05T02:24:08.541525+00:00"
 }

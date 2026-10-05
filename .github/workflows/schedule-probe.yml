@@ -1,0 +1,23 @@
+name: Schedule probe
+
+on:
+  schedule:
+    # Temporary scheduler diagnostic. No API calls, secrets, or travel data writes.
+    - cron: "12 10 * * *"
+      timezone: "Asia/Taipei"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Record scheduler event
+        run: |
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "run_id=$GITHUB_RUN_ID"
+          echo "utc=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "expected_schedule=10:12 Asia/Taipei"

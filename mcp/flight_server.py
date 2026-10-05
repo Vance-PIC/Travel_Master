@@ -121,7 +121,7 @@ def flight_search(
         "hl": locale,
     }
     if nonstop_only:
-        params["stops"] = 0
+        params["stops"] = 1
     data = _serpapi(params)
     rows = _flight_rows(data, airlines)
     return {

@@ -14,6 +14,8 @@
 
 `Publish public price dashboard` workflow 接受：
 
+監控使用 `GITHUB_TOKEN` 推送快照時，不會觸發新的 push workflow，因此以 `workflow_run` 監聽監控完成來更新公開頁。
+
 - master 上 `Nagoya SerpApi flight monitor` 或 `Hotel monitor executor` 完成事件，包括失敗完成。這讓頁面能呈現最後保留快照與原始觀測時間；非 master 的完成事件會略過。
 - master 上產生器、公開頁模板或發布 workflow 的變更。
 - Actions 頁面的手動 `Run workflow`。

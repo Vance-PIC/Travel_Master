@@ -14,6 +14,9 @@ CHECKED = '2026-10-05T15:00:00+08:00'
 
 def quote(price=68466):
     return {'displayed_price_twd': price, 'price_scope': 'family_total',
+            'outbound_flight': 'CI150', 'inbound_flight': 'CI151',
+            'outbound_departure': '08:00', 'outbound_arrival': '12:00',
+            'inbound_departure': '13:00', 'inbound_arrival': '15:00',
             'family_total_twd': price, 'checked_at': CHECKED,
             'price_verification': {'price': price, 'verified_at': CHECKED,
                                    'quote_checked_at': CHECKED},
@@ -21,6 +24,28 @@ def quote(price=68466):
 
 
 class PublicProjectionTests(unittest.TestCase):
+    def test_incomplete_round_trips_are_rejected(self):
+        for field in ('outbound_flight', 'inbound_flight', 'outbound_departure',
+                      'outbound_arrival', 'inbound_departure', 'inbound_arrival'):
+            for value in (None, '', '   ', 123):
+                with self.subTest(field=field, value=value):
+                    item = quote(1)
+                    item[field] = value
+                    self.assertEqual(project_flights({'itineraries': [item]}, NOW), [])
+            with self.subTest(missing=field):
+                item = quote(1)
+                del item[field]
+                self.assertEqual(project_flights({'itineraries': [item]}, NOW), [])
+
+    def test_invalid_round_trips_do_not_displace_valid_top_five(self):
+        missing_return = quote(0)
+        del missing_return['inbound_flight']
+        missing_time = quote(0)
+        del missing_time['outbound_arrival']
+        rows = project_flights({'itineraries': [missing_return, missing_time]
+                                + [quote(p) for p in range(7, 0, -1)]}, NOW)
+        self.assertEqual([row['displayed_price_twd'] for row in rows], [1, 2, 3, 4, 5])
+
     def test_flights_order_scope_and_whitelist(self):
         unverified = quote(63090)
         unverified['price_scope'] = 'unknown'
@@ -117,6 +142,12 @@ class PublicProjectionTests(unittest.TestCase):
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_flight_status_describes_only_listed_observations(self):
+        from scripts.build_public_dashboard import render_page
+        html = render_page(project_flights({'itineraries': [quote()]}, NOW), [], {})
+        self.assertIn('所列機票最新觀測：' + CHECKED, html)
+        self.assertNotIn('機票最新有效觀測', html)
+
     def test_render_escapes_and_ignores_unknown_fields(self):
         from scripts.build_public_dashboard import render_page
         html = render_page([{'airline': '<script>alert(1)</script>', 'checked_at': CHECKED,

@@ -52,6 +52,12 @@ def project_flights(snapshot: dict, now: datetime) -> list[dict]:
         checked = _timestamp(itinerary.get('checked_at'))
         if not _valid_price(price) or checked is None:
             continue
+        required_flight_fields = ('outbound_flight', 'inbound_flight',
+                                 'outbound_departure', 'outbound_arrival',
+                                 'inbound_departure', 'inbound_arrival')
+        if not all(isinstance(itinerary.get(field), str) and itinerary[field].strip()
+                   for field in required_flight_fields):
+            continue
         verification = itinerary.get('price_verification')
         verification = verification if isinstance(verification, dict) else {}
         verified = (itinerary.get('price_scope') == 'family_total'
@@ -134,7 +140,8 @@ def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
         times = [item.get(time_field) for item in items if _timestamp(item.get(time_field))]
         if times:
             latest = max(times, key=_timestamp)
-            messages.append(label + '最新有效觀測：' + cell(latest))
+            observation_label = '所列機票最新觀測' if label == '機票' else '飯店最新有效觀測'
+            messages.append(observation_label + '：' + cell(latest))
         if any(item.get('stale') is True for item in items):
             messages.append(label + '：資料過期')
     if any(item.get('price_scope') != 'family_total' for item in flights):

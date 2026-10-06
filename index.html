@@ -163,7 +163,7 @@
             <!-- Origin -->
             <div class="sm:col-span-5 relative" id="origin-container">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛫</div>
-              <input type="text" id="input-origin" value="TPE" oninput="handleAirportInput('origin')" onfocus="handleAirportFocus('origin')" autocomplete="off" placeholder="出發地 (例: TPE、台北、高雄)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <input type="text" id="input-origin" value="台北 (TPE)" oninput="handleAirportInput('origin')" onfocus="handleAirportFocus('origin')" onblur="handleAirportBlur('origin')" autocomplete="off" placeholder="出發地 (例: 台北、TPE、高雄)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-semibold tracking-wide">
               <!-- Google Flights Style Dropdown -->
               <div id="origin-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
             </div>
@@ -178,7 +178,7 @@
             <!-- Destination -->
             <div class="sm:col-span-5 relative" id="dest-container">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛬</div>
-              <input type="text" id="input-dest" value="NGO" oninput="handleAirportInput('dest')" onfocus="handleAirportFocus('dest')" autocomplete="off" placeholder="目的地 (例: NGO、名古屋、熊本、東京)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <input type="text" id="input-dest" value="名古屋 (NGO)" oninput="handleAirportInput('dest')" onfocus="handleAirportFocus('dest')" onblur="handleAirportBlur('dest')" autocomplete="off" placeholder="目的地 (例: 名古屋、NGO、熊本、大阪)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-semibold tracking-wide">
               <!-- Google Flights Style Dropdown -->
               <div id="dest-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
             </div>
@@ -1306,8 +1306,9 @@
     }
 
     function selectAirport(type, code) {
+      const info = getAirportInfo(code);
       const input = document.getElementById(`input-${type}`);
-      input.value = code;
+      if (input) input.value = info.inputVal;
       const dropdown = document.getElementById(`${type}-dropdown`);
       if (dropdown) dropdown.classList.add('hidden');
 
@@ -1317,7 +1318,7 @@
           chip.classList.remove('bg-sky-600', 'text-white', 'shadow-xs');
           chip.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
         });
-        const activeChip = document.getElementById(`chip-${code}`);
+        const activeChip = document.getElementById(`chip-${info.code}`);
         if (activeChip) {
           activeChip.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
           activeChip.classList.add('bg-sky-600', 'text-white', 'shadow-xs');
@@ -1325,7 +1326,17 @@
       }
 
       onFilterChange();
-      showToast(`🎯 已選擇：${code} 機場`, '🛫');
+      showToast(`🎯 已選擇：${info.inputVal}`, '🛫');
+    }
+
+    function handleAirportBlur(type) {
+      setTimeout(() => {
+        const input = document.getElementById(`input-${type}`);
+        if (!input || !input.value.trim()) return;
+        const info = getAirportInfo(input.value);
+        input.value = info.inputVal;
+        onFilterChange();
+      }, 250);
     }
 
     // Close autocomplete when clicking outside
@@ -1342,41 +1353,53 @@
       }
     });
 
-    // Airport IATA Lookup & Name Dictionary
-    const AIRPORT_MAP = {
-      '台北': 'TPE', '桃園': 'TPE', 'TPE': 'TPE', '松山': 'TSA', 'TSA': 'TSA', '高雄': 'KHH', 'KHH': 'KHH',
-      '名古屋': 'NGO', 'NGO': 'NGO', '中部': 'NGO',
-      '大阪': 'KIX', 'KIX': 'KIX', '關西': 'KIX',
-      '東京': 'HND', 'TYO': 'HND', '羽田': 'HND', 'HND': 'HND', '成田': 'NRT', 'NRT': 'NRT',
-      '福岡': 'FUK', 'FUK': 'FUK',
-      '沖繩': 'OKA', '那霸': 'OKA', 'OKA': 'OKA',
-      '熊本': 'KMJ', 'KMJ': 'KMJ',
-      '札幌': 'CTS', '新千歲': 'CTS', 'CTS': 'CTS', '北海道': 'CTS'
-    };
-
-    const AIRPORT_NAMES = {
-      'TPE': '台北桃園 TPE',
-      'TSA': '台北松山 TSA',
-      'KHH': '高雄小港 KHH',
-      'NGO': '名古屋中部 NGO',
-      'KIX': '大阪關西 KIX',
-      'HND': '東京羽田 HND',
-      'NRT': '東京成田 NRT',
-      'FUK': '福岡機場 FUK',
-      'OKA': '沖繩那霸 OKA',
-      'KMJ': '熊本阿蘇 KMJ',
-      'CTS': '札幌新千歲 CTS'
-    };
-
     function resolveIata(val, fallback = 'TPE') {
       if (!val) return fallback;
       const clean = val.trim();
-      const upper = clean.toUpperCase();
-      if (AIRPORT_MAP[upper]) return AIRPORT_MAP[upper];
-      for (const [key, code] of Object.entries(AIRPORT_MAP)) {
-        if (clean.includes(key)) return code;
+      // 1. If contains (TPE) or 3 letters in parentheses / boundaries
+      const parenMatch = clean.match(/\(([A-Za-z]{3})\)/);
+      if (parenMatch) return parenMatch[1].toUpperCase();
+
+      const wordMatch = clean.match(/\b([A-Za-z]{3})\b/);
+      if (wordMatch) {
+        const upper = wordMatch[1].toUpperCase();
+        if (AIRPORTS_DB.some(a => a.code === upper)) return upper;
       }
-      return upper.length === 3 ? upper : fallback;
+
+      // 2. Fuzzy match against AIRPORTS_DB
+      const lower = clean.toLowerCase();
+      const match = AIRPORTS_DB.find(a => 
+        a.code.toLowerCase() === lower ||
+        a.city.toLowerCase() === lower ||
+        lower.includes(a.city.toLowerCase()) ||
+        a.name.toLowerCase().includes(lower) ||
+        a.keywords.toLowerCase().includes(lower)
+      );
+      if (match) return match.code;
+
+      return clean.length === 3 ? clean.toUpperCase() : fallback;
+    }
+
+    function getAirportInfo(codeOrText) {
+      const iata = resolveIata(codeOrText);
+      const found = AIRPORTS_DB.find(a => a.code === iata);
+      if (found) {
+        const shortName = found.name.split(' ')[0].replace('國際機場', '').replace('機場', '');
+        return {
+          code: found.code,
+          city: found.city,
+          name: found.name,
+          inputVal: `${found.city} (${found.code})`,
+          heroVal: `${found.city}${shortName} <span class="text-sm font-mono font-medium text-slate-400">${found.code}</span>`
+        };
+      }
+      return {
+        code: iata,
+        city: iata,
+        name: iata,
+        inputVal: `${iata}`,
+        heroVal: `${iata} <span class="text-sm font-mono font-medium text-slate-400">${iata}</span>`
+      };
     }
 
     // Swap Origin and Destination
@@ -1392,29 +1415,17 @@
 
     // Set Destination via Quick Chips
     function setDestination(code) {
-      document.getElementById('input-dest').value = code;
-      
-      // Update chip styling
-      const chips = document.querySelectorAll('.route-chip');
-      chips.forEach(chip => {
-        chip.classList.remove('bg-sky-600', 'text-white', 'shadow-xs');
-        chip.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
-      });
-      const activeChip = document.getElementById(`chip-${code}`);
-      if (activeChip) {
-        activeChip.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-        activeChip.classList.add('bg-sky-600', 'text-white', 'shadow-xs');
-      }
-
-      onFilterChange();
+      selectAirport('dest', code);
     }
 
     // Interactive Filter & Calculation Controller
     function onFilterChange() {
       const rawOrigin = document.getElementById('input-origin') ? document.getElementById('input-origin').value : 'TPE';
       const rawDest = document.getElementById('input-dest') ? document.getElementById('input-dest').value : 'NGO';
-      const origin = resolveIata(rawOrigin, 'TPE');
-      const dest = resolveIata(rawDest, 'NGO');
+      const originInfo = getAirportInfo(rawOrigin);
+      const destInfo = getAirportInfo(rawDest);
+      const origin = originInfo.code;
+      const dest = destInfo.code;
 
       const depDate = document.getElementById('input-dep-date').value;
       const retDate = document.getElementById('input-ret-date').value;
@@ -1446,12 +1457,10 @@
 
       // 3. Update Hero Card
       if (document.getElementById('hero-origin-display')) {
-        const originName = AIRPORT_NAMES[origin] ? AIRPORT_NAMES[origin].split(' ')[0] : origin;
-        document.getElementById('hero-origin-display').innerHTML = `${originName} <span class="text-sm font-mono font-medium text-slate-400">${origin}</span>`;
+        document.getElementById('hero-origin-display').innerHTML = originInfo.heroVal;
       }
       if (document.getElementById('hero-dest-display')) {
-        const destName = AIRPORT_NAMES[dest] ? AIRPORT_NAMES[dest].split(' ')[0] : dest;
-        document.getElementById('hero-dest-display').innerHTML = `${destName} <span class="text-sm font-mono font-medium text-slate-400">${dest}</span>`;
+        document.getElementById('hero-dest-display').innerHTML = destInfo.heroVal;
       }
       if (document.getElementById('hero-dates-label')) {
         document.getElementById('hero-dates-label').innerText = `📅 ${depDate} ～ ${retDate}`;

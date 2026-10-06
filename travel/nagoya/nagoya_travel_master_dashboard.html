@@ -161,9 +161,11 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-11 gap-2 items-center">
             <!-- Origin -->
-            <div class="sm:col-span-5 relative">
+            <div class="sm:col-span-5 relative" id="origin-container">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛫</div>
-              <input type="text" id="input-origin" value="TPE" oninput="onFilterChange()" placeholder="出發地 (例: TPE 或 台北桃園)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <input type="text" id="input-origin" value="TPE" oninput="handleAirportInput('origin')" onfocus="handleAirportFocus('origin')" autocomplete="off" placeholder="出發地 (例: TPE、台北、高雄)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <!-- Google Flights Style Dropdown -->
+              <div id="origin-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
             </div>
 
             <!-- Swap Button -->
@@ -174,9 +176,11 @@
             </div>
 
             <!-- Destination -->
-            <div class="sm:col-span-5 relative">
+            <div class="sm:col-span-5 relative" id="dest-container">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛬</div>
-              <input type="text" id="input-dest" value="NGO" oninput="onFilterChange()" placeholder="目的地 (例: NGO 或 名古屋)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <input type="text" id="input-dest" value="NGO" oninput="handleAirportInput('dest')" onfocus="handleAirportFocus('dest')" autocomplete="off" placeholder="目的地 (例: NGO、名古屋、熊本、東京)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+              <!-- Google Flights Style Dropdown -->
+              <div id="dest-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-64 overflow-y-auto divide-y divide-slate-100"></div>
             </div>
           </div>
         </div>
@@ -1203,6 +1207,140 @@
       }
     }
 
+
+    // Google Flights Style Airport Database
+    const AIRPORTS_DB = [
+      // 台灣
+      { code: 'TPE', city: '台北', name: '桃園國際機場 (Taiwan Taoyuan)', country: '台灣', keywords: '台北 桃園 台灣 tpe taipei taoyuan' },
+      { code: 'TSA', city: '台北', name: '台北松山機場 (Taipei Songshan)', country: '台灣', keywords: '台北 松山 台灣 tsa songshan' },
+      { code: 'KHH', city: '高雄', name: '小港國際機場 (Kaohsiung)', country: '台灣', keywords: '高雄 小港 台灣 khh kaohsiung' },
+      { code: 'RMQ', city: '台中', name: '清泉崗機場 (Taichung)', country: '台灣', keywords: '台中 清泉崗 台灣 rmq taichung' },
+
+      // 日本 (本州/九州/北海道/沖繩/四國)
+      { code: 'NGO', city: '名古屋', name: '中部國際機場 (Chubu Centrair)', country: '日本', keywords: '名古屋 中部 ngo chubu centrair nagoya' },
+      { code: 'KIX', city: '大阪', name: '關西國際機場 (Kansai)', country: '日本', keywords: '大阪 關西 kix kansai osaka' },
+      { code: 'ITM', city: '大阪', name: '伊丹機場 (Osaka Itami)', country: '日本', keywords: '大阪 伊丹 itm itami osaka' },
+      { code: 'HND', city: '東京', name: '東京羽田國際機場 (Haneda)', country: '日本', keywords: '東京 羽田 hnd tokyo haneda' },
+      { code: 'NRT', city: '東京', name: '東京成田國際機場 (Narita)', country: '日本', keywords: '東京 成田 nrt tokyo narita' },
+      { code: 'FUK', city: '福岡', name: '福岡機場 (Fukuoka)', country: '日本', keywords: '福岡 九州 fuk fukuoka' },
+      { code: 'OKA', city: '沖繩', name: '那霸機場 (Okinawa Naha)', country: '日本', keywords: '沖繩 那霸 oka okinawa naha' },
+      { code: 'KMJ', city: '熊本', name: '阿蘇熊本機場 (Aso Kumamoto)', country: '日本', keywords: '熊本 阿蘇 九州 kmj kumamoto aso' },
+      { code: 'CTS', city: '札幌', name: '新千歲機場 (New Chitose)', country: '日本', keywords: '札幌 新千歲 北海道 cts sapporo chitose hokkaido' },
+      { code: 'KOJ', city: '鹿兒島', name: '鹿兒島機場 (Kagoshima)', country: '日本', keywords: '鹿兒島 九州 koj kagoshima' },
+      { code: 'MYJ', city: '松山', name: '四國松山機場 (Matsuyama)', country: '日本', keywords: '松山 四國 myj matsuyama' },
+      { code: 'TAK', city: '高松', name: '高松機場 (Takamatsu)', country: '日本', keywords: '高松 四國 tak takamatsu' },
+      { code: 'SDJ', city: '仙台', name: '仙台機場 (Sendai)', country: '日本', keywords: '仙台 東北 sdj sendai' },
+      { code: 'AOJ', city: '青森', name: '青森機場 (Aomori)', country: '日本', keywords: '青森 東北 aoj aomori' },
+      { code: 'HKD', city: '函館', name: '函館機場 (Hakodate)', country: '日本', keywords: '函館 北海道 hkd hakodate' },
+      { code: 'OKJ', city: '岡山', name: '岡山桃太郎機場 (Okayama)', country: '日本', keywords: '岡山 桃太郎 okj okayama' },
+      { code: 'HIJ', city: '廣島', name: '廣島機場 (Hiroshima)', country: '日本', keywords: '廣島 hij hiroshima' },
+
+      // 韓國與其他熱門
+      { code: 'ICN', city: '首爾', name: '仁川國際機場 (Incheon)', country: '韓國', keywords: '首爾 仁川 韓國 icn incheon seoul' },
+      { code: 'GMP', city: '首爾', name: '金浦國際機場 (Gimpo)', country: '韓國', keywords: '首爾 金浦 韓國 gmp gimpo seoul' },
+      { code: 'PUS', city: '釜山', name: '金海國際機場 (Gimhae)', country: '韓國', keywords: '釜山 金海 韓國 pus busan' },
+      { code: 'BKK', city: '曼谷', name: '蘇凡納布機場 (Suvarnabhumi)', country: '泰國', keywords: '曼谷 泰國 bkk bangkok' },
+      { code: 'DMK', city: '曼谷', name: '廊曼國際機場 (Don Mueang)', country: '泰國', keywords: '曼谷 廊曼 泰國 dmk' },
+      { code: 'SIN', city: '新加坡', name: '樟宜國際機場 (Changi)', country: '新加坡', keywords: '新加坡 樟宜 sin singapore changi' },
+      { code: 'HKG', city: '香港', name: '香港國際機場 (Hong Kong)', country: '香港', keywords: '香港 赤鱲角 hkg hong kong' },
+      { code: 'DAD', city: '峴港', name: '峴港國際機場 (Da Nang)', country: '越南', keywords: '峴港 越南 dad da nang' }
+    ];
+
+    function searchAirports(query) {
+      if (!query || query.trim() === '') {
+        return AIRPORTS_DB.slice(0, 8);
+      }
+      const q = query.trim().toLowerCase();
+      return AIRPORTS_DB.filter(item => {
+        return item.code.toLowerCase().includes(q) ||
+               item.city.toLowerCase().includes(q) ||
+               item.name.toLowerCase().includes(q) ||
+               item.country.toLowerCase().includes(q) ||
+               item.keywords.toLowerCase().includes(q);
+      }).slice(0, 8);
+    }
+
+    function renderDropdown(type, list) {
+      const dropdown = document.getElementById(`${type}-dropdown`);
+      if (!dropdown) return;
+      if (list.length === 0) {
+        dropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">無吻合機場，您可直接輸入 3 碼代碼</div>`;
+        dropdown.classList.remove('hidden');
+        return;
+      }
+      dropdown.innerHTML = list.map(item => `
+        <div onclick="selectAirport('${type}', '${item.code}')" class="p-2.5 hover:bg-sky-50 cursor-pointer flex items-center justify-between transition group text-xs">
+          <div class="flex items-center gap-2.5 text-left">
+            <div class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-sky-100 text-slate-500 group-hover:text-sky-700 flex items-center justify-center text-xs flex-shrink-0">
+              🛫
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span>${item.city}</span>
+                <span class="text-[10px] text-slate-400 font-normal">(${item.country})</span>
+              </div>
+              <div class="text-[11px] text-slate-500 truncate">${item.name}</div>
+            </div>
+          </div>
+          <span class="font-mono font-bold text-xs bg-slate-100 group-hover:bg-sky-200 text-slate-700 group-hover:text-sky-900 px-2 py-0.5 rounded flex-shrink-0 ml-2">
+            ${item.code}
+          </span>
+        </div>
+      `).join('');
+      dropdown.classList.remove('hidden');
+    }
+
+    function handleAirportInput(type) {
+      const input = document.getElementById(`input-${type}`);
+      const val = input.value;
+      const results = searchAirports(val);
+      renderDropdown(type, results);
+      onFilterChange();
+    }
+
+    function handleAirportFocus(type) {
+      const input = document.getElementById(`input-${type}`);
+      const val = input.value;
+      const results = searchAirports(val);
+      renderDropdown(type, results);
+    }
+
+    function selectAirport(type, code) {
+      const input = document.getElementById(`input-${type}`);
+      input.value = code;
+      const dropdown = document.getElementById(`${type}-dropdown`);
+      if (dropdown) dropdown.classList.add('hidden');
+
+      if (type === 'dest') {
+        const chips = document.querySelectorAll('.route-chip');
+        chips.forEach(chip => {
+          chip.classList.remove('bg-sky-600', 'text-white', 'shadow-xs');
+          chip.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+        });
+        const activeChip = document.getElementById(`chip-${code}`);
+        if (activeChip) {
+          activeChip.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+          activeChip.classList.add('bg-sky-600', 'text-white', 'shadow-xs');
+        }
+      }
+
+      onFilterChange();
+      showToast(`🎯 已選擇：${code} 機場`, '🛫');
+    }
+
+    // Close autocomplete when clicking outside
+    document.addEventListener('click', (e) => {
+      const originBox = document.getElementById('origin-container');
+      const destBox = document.getElementById('dest-container');
+      if (originBox && !originBox.contains(e.target)) {
+        const d = document.getElementById('origin-dropdown');
+        if (d) d.classList.add('hidden');
+      }
+      if (destBox && !destBox.contains(e.target)) {
+        const d = document.getElementById('dest-dropdown');
+        if (d) d.classList.add('hidden');
+      }
+    });
 
     // Airport IATA Lookup & Name Dictionary
     const AIRPORT_MAP = {

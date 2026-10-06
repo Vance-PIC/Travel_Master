@@ -75,7 +75,7 @@
             <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded font-medium">親子零失誤・禁菸房・大空間優先</span>
           </div>
           <div class="flex items-center gap-3 text-2xl font-black text-slate-900">
-            <span>台北桃園 <span class="text-sm font-mono font-medium text-slate-400">TPE</span></span>
+            <span id="hero-origin-display">台北桃園 <span class="text-sm font-mono font-medium text-slate-400">TPE</span></span>
             <span class="text-sky-500 text-lg">⇄</span>
             <span id="hero-dest-display">名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span></span>
           </div>
@@ -137,70 +137,102 @@
         </div>
       </div>
 
-      <!-- Controls Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 text-xs">
-        <!-- 1. Route / Destination -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-700 flex items-center gap-1">
-            <span>🛫</span> 航線目的地
-          </label>
-          <select id="input-route" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
-            <option value="NGO" selected>TPE ⇄ NGO (台北 ⇄ 名古屋中部)</option>
-            <option value="KIX">TPE ⇄ KIX (台北 ⇄ 大阪關西)</option>
-            <option value="NRT">TPE ⇄ NRT/HND (台北 ⇄ 東京成田/羽田)</option>
-            <option value="FUK">TPE ⇄ FUK (台北 ⇄ 福岡)</option>
-          </select>
-        </div>
+      <!-- Controls Layout -->
+      <div class="space-y-3.5 text-xs">
+        <!-- Row 1: Origin ⇄ Destination + Quick Chips -->
+        <div class="bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="font-bold text-slate-700 flex items-center gap-1.5 text-xs">
+              <span>🛫</span> 航線自由設定 (出發地 ⇄ 目的地)
+              <span class="text-[10px] text-slate-400 font-normal">支援輸入 3 碼機場代碼 (如 NGO, KIX, KMJ) 或城市中文名</span>
+            </label>
+            <!-- Quick Route Chips -->
+            <div class="flex flex-wrap items-center gap-1.5 text-[11px]" id="route-chips-container">
+              <span class="text-slate-400 font-medium">常用快捷：</span>
+              <button type="button" onclick="setDestination('NGO')" id="chip-NGO" class="route-chip px-2.5 py-0.5 rounded-md bg-sky-600 text-white font-medium transition cursor-pointer shadow-xs">👑 名古屋 (NGO)</button>
+              <button type="button" onclick="setDestination('KIX')" id="chip-KIX" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">大阪 (KIX)</button>
+              <button type="button" onclick="setDestination('HND')" id="chip-HND" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">東京 (HND/NRT)</button>
+              <button type="button" onclick="setDestination('FUK')" id="chip-FUK" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">福岡 (FUK)</button>
+              <button type="button" onclick="setDestination('OKA')" id="chip-OKA" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">沖繩 (OKA)</button>
+              <button type="button" onclick="setDestination('KMJ')" id="chip-KMJ" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">熊本 (KMJ)</button>
+              <button type="button" onclick="setDestination('CTS')" id="chip-CTS" class="route-chip px-2.5 py-0.5 rounded-md bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium transition cursor-pointer">北海道 (CTS)</button>
+            </div>
+          </div>
 
-        <!-- 2. Departure Date -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-700 flex items-center gap-1">
-            <span>📅</span> 去程日期
-          </label>
-          <input type="date" id="input-dep-date" value="2027-07-11" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
-        </div>
+          <div class="grid grid-cols-1 sm:grid-cols-11 gap-2 items-center">
+            <!-- Origin -->
+            <div class="sm:col-span-5 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛫</div>
+              <input type="text" id="input-origin" value="TPE" oninput="onFilterChange()" placeholder="出發地 (例: TPE 或 台北桃園)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+            </div>
 
-        <!-- 3. Return Date -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-700 flex items-center gap-1">
-            <span>📅</span> 回程日期
-          </label>
-          <input type="date" id="input-ret-date" value="2027-07-18" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
-        </div>
+            <!-- Swap Button -->
+            <div class="sm:col-span-1 flex justify-center">
+              <button type="button" onclick="swapRoute()" title="對調出發地與目的地" class="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-300 flex items-center justify-center font-bold text-slate-600 transition shadow-2xs cursor-pointer">
+                ⇄
+              </button>
+            </div>
 
-        <!-- 4. Passengers -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-700 flex items-center gap-1">
-            <span>👨‍👩‍👧‍👦</span> 乘客人數配置
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <select id="input-adults" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
-              <option value="1">1 大人</option>
-              <option value="2" selected>2 大人</option>
-              <option value="3">3 大人</option>
-              <option value="4">4 大人</option>
-            </select>
-            <select id="input-children" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
-              <option value="0">0 小孩</option>
-              <option value="1">1 小孩</option>
-              <option value="2" selected>2 小孩</option>
-              <option value="3">3 小孩</option>
-            </select>
+            <!-- Destination -->
+            <div class="sm:col-span-5 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">🛬</div>
+              <input type="text" id="input-dest" value="NGO" oninput="onFilterChange()" placeholder="目的地 (例: NGO 或 名古屋)" class="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-bold uppercase font-mono tracking-wider">
+            </div>
           </div>
         </div>
 
-        <!-- 5. Airline Preference -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-700 flex items-center gap-1">
-            <span>✈️</span> 偏好航空公司
-          </label>
-          <select id="input-airline" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
-            <option value="all" selected>全部航空公司</option>
-            <option value="CI">中華航空 (CI 首選)</option>
-            <option value="JX">星宇航空 (JX)</option>
-            <option value="CX">國泰航空 (CX)</option>
-            <option value="LCC">廉價航空 (虎航/樂桃)</option>
-          </select>
+        <!-- Row 2: Dates, Passengers & Airline -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <!-- 1. Departure Date -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 flex items-center gap-1">
+              <span>📅</span> 去程日期
+            </label>
+            <input type="date" id="input-dep-date" value="2027-07-11" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
+          </div>
+
+          <!-- 2. Return Date -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 flex items-center gap-1">
+              <span>📅</span> 回程日期
+            </label>
+            <input type="date" id="input-ret-date" value="2027-07-18" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
+          </div>
+
+          <!-- 3. Passengers -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 flex items-center gap-1">
+              <span>👨‍👩‍👧‍👦</span> 乘客人數配置
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="input-adults" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                <option value="1">1 大人</option>
+                <option value="2" selected>2 大人</option>
+                <option value="3">3 大人</option>
+                <option value="4">4 大人</option>
+              </select>
+              <select id="input-children" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+                <option value="0">0 小孩</option>
+                <option value="1">1 小孩</option>
+                <option value="2" selected>2 小孩</option>
+                <option value="3">3 小孩</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4. Airline Preference -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 flex items-center gap-1">
+              <span>✈️</span> 偏好航空公司
+            </label>
+            <select id="input-airline" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+              <option value="all" selected>全部航空公司</option>
+              <option value="CI">中華航空 (CI 首選)</option>
+              <option value="JX">星宇航空 (JX)</option>
+              <option value="CX">國泰航空 (CX)</option>
+              <option value="LCC">廉價航空 (虎航/樂桃)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -1171,9 +1203,81 @@
       }
     }
 
+
+    // Airport IATA Lookup & Name Dictionary
+    const AIRPORT_MAP = {
+      '台北': 'TPE', '桃園': 'TPE', 'TPE': 'TPE', '松山': 'TSA', 'TSA': 'TSA', '高雄': 'KHH', 'KHH': 'KHH',
+      '名古屋': 'NGO', 'NGO': 'NGO', '中部': 'NGO',
+      '大阪': 'KIX', 'KIX': 'KIX', '關西': 'KIX',
+      '東京': 'HND', 'TYO': 'HND', '羽田': 'HND', 'HND': 'HND', '成田': 'NRT', 'NRT': 'NRT',
+      '福岡': 'FUK', 'FUK': 'FUK',
+      '沖繩': 'OKA', '那霸': 'OKA', 'OKA': 'OKA',
+      '熊本': 'KMJ', 'KMJ': 'KMJ',
+      '札幌': 'CTS', '新千歲': 'CTS', 'CTS': 'CTS', '北海道': 'CTS'
+    };
+
+    const AIRPORT_NAMES = {
+      'TPE': '台北桃園 TPE',
+      'TSA': '台北松山 TSA',
+      'KHH': '高雄小港 KHH',
+      'NGO': '名古屋中部 NGO',
+      'KIX': '大阪關西 KIX',
+      'HND': '東京羽田 HND',
+      'NRT': '東京成田 NRT',
+      'FUK': '福岡機場 FUK',
+      'OKA': '沖繩那霸 OKA',
+      'KMJ': '熊本阿蘇 KMJ',
+      'CTS': '札幌新千歲 CTS'
+    };
+
+    function resolveIata(val, fallback = 'TPE') {
+      if (!val) return fallback;
+      const clean = val.trim();
+      const upper = clean.toUpperCase();
+      if (AIRPORT_MAP[upper]) return AIRPORT_MAP[upper];
+      for (const [key, code] of Object.entries(AIRPORT_MAP)) {
+        if (clean.includes(key)) return code;
+      }
+      return upper.length === 3 ? upper : fallback;
+    }
+
+    // Swap Origin and Destination
+    function swapRoute() {
+      const originEl = document.getElementById('input-origin');
+      const destEl = document.getElementById('input-dest');
+      const temp = originEl.value;
+      originEl.value = destEl.value;
+      destEl.value = temp;
+      onFilterChange();
+      showToast('⇄ 航線出發地與目的地已對調！', '⇄');
+    }
+
+    // Set Destination via Quick Chips
+    function setDestination(code) {
+      document.getElementById('input-dest').value = code;
+      
+      // Update chip styling
+      const chips = document.querySelectorAll('.route-chip');
+      chips.forEach(chip => {
+        chip.classList.remove('bg-sky-600', 'text-white', 'shadow-xs');
+        chip.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+      });
+      const activeChip = document.getElementById(`chip-${code}`);
+      if (activeChip) {
+        activeChip.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+        activeChip.classList.add('bg-sky-600', 'text-white', 'shadow-xs');
+      }
+
+      onFilterChange();
+    }
+
     // Interactive Filter & Calculation Controller
     function onFilterChange() {
-      const route = document.getElementById('input-route').value;
+      const rawOrigin = document.getElementById('input-origin') ? document.getElementById('input-origin').value : 'TPE';
+      const rawDest = document.getElementById('input-dest') ? document.getElementById('input-dest').value : 'NGO';
+      const origin = resolveIata(rawOrigin, 'TPE');
+      const dest = resolveIata(rawDest, 'NGO');
+
       const depDate = document.getElementById('input-dep-date').value;
       const retDate = document.getElementById('input-ret-date').value;
       const adults = parseInt(document.getElementById('input-adults').value) || 2;
@@ -1195,18 +1299,21 @@
       }
 
       // 2. Update Console Labels
-      document.getElementById('label-trip-days').innerText = `${diffDays}天${nights}夜`;
-      document.getElementById('label-passengers-calc').innerText = `${adults}大${children}小 (共${totalPax}人)`;
+      if (document.getElementById('label-trip-days')) {
+        document.getElementById('label-trip-days').innerText = `${diffDays}天${nights}夜`;
+      }
+      if (document.getElementById('label-passengers-calc')) {
+        document.getElementById('label-passengers-calc').innerText = `${adults}大${children}小 (共${totalPax}人)`;
+      }
 
       // 3. Update Hero Card
-      const destNames = {
-        'NGO': '名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span>',
-        'KIX': '大阪關西 <span class="text-sm font-mono font-medium text-slate-400">KIX</span>',
-        'NRT': '東京成田/羽田 <span class="text-sm font-mono font-medium text-slate-400">NRT/HND</span>',
-        'FUK': '福岡機場 <span class="text-sm font-mono font-medium text-slate-400">FUK</span>'
-      };
+      if (document.getElementById('hero-origin-display')) {
+        const originName = AIRPORT_NAMES[origin] ? AIRPORT_NAMES[origin].split(' ')[0] : origin;
+        document.getElementById('hero-origin-display').innerHTML = `${originName} <span class="text-sm font-mono font-medium text-slate-400">${origin}</span>`;
+      }
       if (document.getElementById('hero-dest-display')) {
-        document.getElementById('hero-dest-display').innerHTML = destNames[route] || route;
+        const destName = AIRPORT_NAMES[dest] ? AIRPORT_NAMES[dest].split(' ')[0] : dest;
+        document.getElementById('hero-dest-display').innerHTML = `${destName} <span class="text-sm font-mono font-medium text-slate-400">${dest}</span>`;
       }
       if (document.getElementById('hero-dates-label')) {
         document.getElementById('hero-dates-label').innerText = `📅 ${depDate} ～ ${retDate}`;
@@ -1231,11 +1338,18 @@
       }
 
       // 5. Update Deep Links
-      const flightsUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${route}%20from%20TPE%20on%20${depDate}%20through%20${retDate}`;
-      const hotelCity = route === 'NGO' ? 'Nagoya' : (route === 'KIX' ? 'Osaka' : (route === 'FUK' ? 'Fukuoka' : 'Tokyo'));
+      const flightsUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${dest}%20from%20${origin}%20on%20${depDate}%20through%20${retDate}`;
+      const hotelCities = {
+        'NGO': 'Nagoya', 'KIX': 'Osaka', 'FUK': 'Fukuoka', 'OKA': 'Okinawa', 'KMJ': 'Kumamoto', 'CTS': 'Sapporo', 'HND': 'Tokyo', 'NRT': 'Tokyo'
+      };
+      const hotelCity = hotelCities[dest] || dest;
       const hotelsUrl = `https://www.google.com/travel/hotels/${hotelCity}?dates=${depDate}%2C${retDate}`;
-      document.getElementById('link-google-flights').setAttribute('href', flightsUrl);
-      document.getElementById('link-google-hotels').setAttribute('href', hotelsUrl);
+      if (document.getElementById('link-google-flights')) {
+        document.getElementById('link-google-flights').setAttribute('href', flightsUrl);
+      }
+      if (document.getElementById('link-google-hotels')) {
+        document.getElementById('link-google-hotels').setAttribute('href', hotelsUrl);
+      }
 
       // 6. Airline Row Filtering
       const rows = document.querySelectorAll('.flight-row');
@@ -1250,7 +1364,7 @@
 
       // 7. Update Modal Target Values
       if (document.getElementById('modal-target-route')) {
-        document.getElementById('modal-target-route').innerText = `TPE ⇄ ${route}`;
+        document.getElementById('modal-target-route').innerText = `${origin} ⇄ ${dest}`;
       }
       if (document.getElementById('modal-target-dates')) {
         document.getElementById('modal-target-dates').innerText = `${depDate} ～ ${retDate}`;
@@ -1274,7 +1388,7 @@
         spinner.classList.add('hidden');
         icon.classList.remove('hidden');
         text.innerText = '即時套用與查詢';
-        showToast('⚡ 查詢條件已成功套用！機加酒預算與即時比價深連結已同步更新。', '✅');
+        showToast('⚡ 航線與查詢條件已套用！Google Flights / Hotels 官方深連結已同步更新。', '✅');
       }, 400);
     }
 
@@ -1290,12 +1404,15 @@
 
     // Copy MCP Query
     function copyMcpQueryCommand() {
-      const route = document.getElementById('input-route').value;
+      const rawOrigin = document.getElementById('input-origin').value;
+      const rawDest = document.getElementById('input-dest').value;
+      const origin = resolveIata(rawOrigin, 'TPE');
+      const dest = resolveIata(rawDest, 'NGO');
       const depDate = document.getElementById('input-dep-date').value;
       const retDate = document.getElementById('input-ret-date').value;
       const adults = document.getElementById('input-adults').value;
       const children = document.getElementById('input-children').value;
-      const cmd = `flight_search(origin="TPE", destination="${route}", departure_date="${depDate}", return_date="${retDate}", adults=${adults}, children=${children})`;
+      const cmd = `flight_search(origin="${origin}", destination="${dest}", departure_date="${depDate}", return_date="${retDate}", adults=${adults}, children=${children})`;
       navigator.clipboard.writeText(cmd).then(() => {
         showToast('📋 已複製 MCP 查詢指令至剪貼簿！可直接貼於終端或 AI 執行。', '📋');
       }).catch(() => {

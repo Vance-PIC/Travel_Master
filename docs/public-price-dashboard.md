@@ -26,4 +26,4 @@
 
 首次正式發布需先取得該次發布核准，再建立公開 `Vance-PIC/Travel_Master_Prices`，以 `main` 為預設分支，至少有一個初始提交。公開儲存庫只放公開頁所需檔案，不複製私人 repo。於公開儲存庫 Settings → Pages 將 Source 設為「Deploy from a branch」、Branch 設為 `main` / root。由使用者建立僅可存取此公開儲存庫、具 Contents read/write 的 fine-grained GitHub PAT，並在私人 `Travel_Master` 的 Actions secrets 建立 `PUBLIC_PAGES_TOKEN`；不要在對話或文件貼出權杖值。若公開儲存庫名稱在發布前變更，須同步修改 workflow 的 `repository` 設定。
 
-完成遠端設定並合併程式後，在私人儲存庫的 Actions 手動執行 `Publish public price dashboard`。檢查執行成功、公開儲存庫只新增／更新 `index.html`，以及 Pages 網址上的價格、每筆資料時間、過期狀態與私人區塊未公開。若缺少權杖，流程會明確失敗且不修改公開頁；若發布失敗，前次已發布頁面維持可用。此份程式變更不包含建立公開儲存庫、存放權杖或實際發布。
+取得當次發布核准，且公開儲存庫與 `PUBLIC_PAGES_TOKEN` 均已就緒後，合併程式至私人儲存庫 master 即可能因 `push` 事件自動首次發布。先檢查這次自動 Actions Run 是否成功、公開儲存庫是否只新增／更新 `index.html`，再核對 Pages 網址上的價格、每筆資料時間、過期狀態與私人區塊未公開。手動執行 `Publish public price dashboard` 僅供補跑或再次核對，不是首次發布的必要觸發。若缺少權杖，流程會明確失敗且不修改公開頁；若發布失敗，前次已發布頁面維持可用。此份程式變更不包含建立公開儲存庫、存放權杖或實際發布。

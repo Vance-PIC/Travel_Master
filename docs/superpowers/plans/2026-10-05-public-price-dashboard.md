@@ -191,5 +191,5 @@ jobs:
 
 - [ ] **Step 1: 將已驗證分支建立 PR，檢視差異；保持現有監控排程與資料不變。**
 - [ ] **Step 2: 取得該次發布核准後，建立只有公開資料的 `Vance-PIC/Travel_Master_Prices`，以 `main` 為預設分支並設 Pages Source 為 Deploy from a branch、`main` / root。由使用者建立限定此 repo Contents read/write 的 fine-grained PAT，存入私人 `Travel_Master` Actions secret `PUBLIC_PAGES_TOKEN`，不讀取權杖值。**
-- [ ] **Step 3: 合併私人 repo PR，手動執行 `publish-price-dashboard`，確認 Actions 成功、公開 repo 只更新 `index.html`，並取得 Pages 網址。**
+- [ ] **Step 3: 確認已取得當次發布核准，且公開 repo、Pages 與權杖均已就緒，再合併私人 repo PR。合併至 master 可能因 `push` 自動首次發布；檢查該次自動 Actions Run 成功、公開 repo 只更新 `index.html`，並取得 Pages 網址。手動執行只作補跑或再次核對。**
 - [ ] **Step 4: 檢查公開頁的價格、幣別、各筆觀測時間、過期／未驗證標示，以及家庭私人資訊未出現；記錄 Run ID、公開網址及未解決問題。此步不執行查價。**

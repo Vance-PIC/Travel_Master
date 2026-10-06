@@ -1,8 +1,8 @@
 {
-  "run_id": "e09fb65cbbc6432cb1db1e6b221dad1e",
+  "run_id": "31a196dadf1f4b20be4f3c7c1de8fba1",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-10-05T07:44:12.930272+00:00",
+  "started_at": "2026-10-06T08:10:56.123286+00:00",
   "status": "partial",
   "snapshot_run_id": null,
   "effective_request": {
@@ -94,9 +94,9 @@
       "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x6004874ce9d95feb:0x89694bab0b51bb4",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
       "0x600489a9db25b9b5:0xa083578c676656dc",
-      "0x60048773140611ad:0x1d734d496cd25fd0",
       "ぽんぽこハウス",
       "A barbecue area and accommodation for up to 15 people (families, clubs, corporate training, etc.)"
     ],
@@ -118,9 +118,9 @@
       "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x6004874ce9d95feb:0x89694bab0b51bb4",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
       "0x600489a9db25b9b5:0xa083578c676656dc",
-      "0x60048773140611ad:0x1d734d496cd25fd0",
       "additional_results_page"
     ],
     "failed": [],
@@ -128,5 +128,5 @@
     "resolution_mode": "discovery"
   },
   "attempted_requests": 5,
-  "ended_at": "2026-10-05T07:44:21.707853+00:00"
+  "ended_at": "2026-10-06T08:11:05.487981+00:00"
 }

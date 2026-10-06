@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import tempfile
 import unittest
 from datetime import datetime, timezone, timedelta
@@ -167,6 +168,44 @@ class PublicPageTests(unittest.TestCase):
             self.assertNotIn('SECRET_ERROR', html)
             path.write_text('{"itineraries": []}', encoding='utf-8')
             self.assertIn('無有效觀測', build_page(root, NOW))
+
+class PublicPagesWorkflowTests(unittest.TestCase):
+    def setUp(self):
+        self.workflow = (Path(__file__).resolve().parents[1] /
+                         '.github/workflows/publish-price-dashboard.yml').read_text(encoding='utf-8')
+
+    def test_trigger_and_trusted_checkout(self):
+        workflow = self.workflow
+        for required in ('workflow_dispatch:', 'workflow_run:', 'types: [completed]',
+                         "workflows: ['Nagoya SerpApi flight monitor', 'Hotel monitor executor']",
+                         'branches: [master]',
+                         "github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'master'",
+                         'ref: master'):
+            self.assertIn(required, workflow)
+        paths = workflow.split('    paths:\n', 1)[1].split('  workflow_run:', 1)[0]
+        self.assertEqual(re.findall(r"- '([^']+)'", paths), [
+            'scripts/build_public_dashboard.py', 'site/public_price_template.html',
+            '.github/workflows/publish-price-dashboard.yml'])
+
+    def test_no_fare_api_calls_or_private_artifacts(self):
+        workflow = self.workflow
+        for forbidden in ('schedule:', 'SERPAPI_KEY', 'SEARCHAPI_KEY', 'Ignav_KEY',
+                          'secrets.', 'nagoya_flight_monitor.py', 'hotel_executor.py',
+                          'download-artifact', 'contents: write'):
+            self.assertNotIn(forbidden, workflow)
+        self.assertEqual(re.findall(r'^      - run: (.+)$', workflow, re.MULTILINE),
+                         ['python scripts/build_public_dashboard.py --output _site'])
+        self.assertEqual(re.findall(r'^          path: (.+)$', workflow, re.MULTILINE), ['_site'])
+        self.assertEqual(workflow.count('upload-pages-artifact@'), 1)
+
+    def test_pages_actions_permissions_environment_and_concurrency(self):
+        for required in ('actions/checkout@v4', 'persist-credentials: false',
+                         'actions/configure-pages@v5', 'actions/upload-pages-artifact@v4',
+                         'actions/deploy-pages@v4', 'contents: read', 'pages: write',
+                         'id-token: write', 'name: github-pages',
+                         'group: public-price-dashboard-pages', 'cancel-in-progress: false'):
+            self.assertIn(required, self.workflow)
+
 
 if __name__ == '__main__':
     unittest.main()

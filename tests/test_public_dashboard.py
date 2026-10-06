@@ -83,6 +83,25 @@ class PublicProjectionTests(unittest.TestCase):
             self.assertNotIn('booking_baseline', str(rows))
             self.assertNotIn('twd', str(rows).lower())
 
+    def test_large_integer_flight_price_does_not_abort_projection(self):
+        amount = 10 ** 400
+        rows = project_flights({'itineraries': [quote(amount), quote(1)]}, NOW)
+        self.assertEqual([row['displayed_price_twd'] for row in rows], [1, amount])
+        self.assertEqual(rows[1]['price_label'], '已驗證家庭總價')
+
+    def test_large_integer_hotel_price_does_not_abort_projection(self):
+        amount = 10 ** 400
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'one').mkdir()
+            observations = [{'hotel_name': 'Hotel', 'total_amount': price,
+                             'nightly_amount': price, 'query_currency': 'JPY',
+                             'observed_at': CHECKED} for price in [amount, 1]]
+            (root / 'one' / 'latest.json').write_text(
+                json.dumps({'observations': observations}), encoding='utf-8')
+            rows = project_hotels(root, NOW)
+            self.assertEqual([row['total_amount'] for row in rows], [amount, 1])
+            self.assertEqual(rows[0]['nightly_amount'], amount)
     def test_missing_invalid_and_malformed_snapshots(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'latest.json'

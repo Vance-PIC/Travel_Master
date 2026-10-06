@@ -19,7 +19,9 @@ def read_snapshot(path: Path) -> tuple[dict, str]:
 
 
 def _valid_price(value):
-    return type(value) in (int, float) and math.isfinite(value) and value >= 0
+    if type(value) is int:
+        return value >= 0
+    return type(value) is float and math.isfinite(value) and value >= 0
 
 
 def _timestamp(value):

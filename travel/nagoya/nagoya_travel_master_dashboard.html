@@ -77,14 +77,14 @@
           <div class="flex items-center gap-3 text-2xl font-black text-slate-900">
             <span>台北桃園 <span class="text-sm font-mono font-medium text-slate-400">TPE</span></span>
             <span class="text-sky-500 text-lg">⇄</span>
-            <span>名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span></span>
+            <span id="hero-dest-display">名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span></span>
           </div>
           <div class="flex flex-wrap items-center gap-y-1 gap-x-3 text-sm text-slate-600">
-            <span class="inline-flex items-center font-semibold text-slate-800">📅 2027/07/11 (日) ～ 07/18 (日)</span>
+            <span id="hero-dates-label" class="inline-flex items-center font-semibold text-slate-800">📅 2027/07/11 (日) ～ 07/18 (日)</span>
             <span class="text-slate-300">|</span>
-            <span>共 8 天 7 夜</span>
+            <span id="hero-days-label">共 8 天 7 夜</span>
             <span class="text-slate-300">|</span>
-            <span class="font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">👨‍👩‍👧‍👦 2 大 2 小（9歲、7歲）</span>
+            <span id="hero-pax-label" class="font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">👨‍👩‍👧‍👦 2 大 2 小（9歲、7歲）</span>
           </div>
         </div>
 
@@ -94,8 +94,8 @@
             <span class="text-xs text-slate-400 font-medium">最新機加酒預估總額</span>
             <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded">降價 NT$5,376!</span>
           </div>
-          <div class="text-2xl font-black text-emerald-600">約 NT$ 85,825</div>
-          <p class="text-xs text-slate-500">華航首選 NT$63,090 + 飯店 7 晚約 NT$22,735</p>
+          <div class="text-2xl font-black text-emerald-600" id="hero-total-price">約 NT$ 85,825</div>
+          <p class="text-xs text-slate-500" id="hero-price-subtext">華航首選 NT$63,090 + 飯店 7 晚約 NT$22,735</p>
         </div>
 
         <!-- System Engine Status -->
@@ -109,6 +109,119 @@
             <div class="flex justify-between"><span>飯店引擎：</span><span class="font-medium text-slate-700">Google Hotels (SerpApi)</span></div>
             <div class="flex justify-between"><span>購票管道：</span><span class="font-medium text-emerald-700 font-bold">官網直營 / Trip / 易遊網</span></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE SEARCH & MONITORING CONSOLE    -->
+    <!-- ========================================== -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+        <div>
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span>🎛️</span> 智慧搜尋條件與雲端監控控制台
+            <span class="text-[11px] bg-sky-50 text-sky-700 border border-sky-200 px-2 py-0.5 rounded-full font-medium">即時動態過濾・深連結比價・雲端排程連動</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">自訂航線、日期、人數與偏好，即時計算家庭花費並連動最新比價</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-open-monitor-modal" onclick="openMonitorModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition shadow-xs cursor-pointer">
+            <span>⏱️</span> 設定定時監控
+          </button>
+          <button id="btn-run-search" onclick="runSearch()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 text-white hover:bg-sky-700 transition shadow-sm shadow-sky-500/20 cursor-pointer">
+            <span id="search-spinner" class="hidden animate-spin">🔄</span>
+            <span id="search-icon">⚡</span>
+            <span id="search-text">即時套用與查詢</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 text-xs">
+        <!-- 1. Route / Destination -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 flex items-center gap-1">
+            <span>🛫</span> 航線目的地
+          </label>
+          <select id="input-route" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+            <option value="NGO" selected>TPE ⇄ NGO (台北 ⇄ 名古屋中部)</option>
+            <option value="KIX">TPE ⇄ KIX (台北 ⇄ 大阪關西)</option>
+            <option value="NRT">TPE ⇄ NRT/HND (台北 ⇄ 東京成田/羽田)</option>
+            <option value="FUK">TPE ⇄ FUK (台北 ⇄ 福岡)</option>
+          </select>
+        </div>
+
+        <!-- 2. Departure Date -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 flex items-center gap-1">
+            <span>📅</span> 去程日期
+          </label>
+          <input type="date" id="input-dep-date" value="2027-07-11" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
+        </div>
+
+        <!-- 3. Return Date -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 flex items-center gap-1">
+            <span>📅</span> 回程日期
+          </label>
+          <input type="date" id="input-ret-date" value="2027-07-18" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium font-mono">
+        </div>
+
+        <!-- 4. Passengers -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 flex items-center gap-1">
+            <span>👨‍👩‍👧‍👦</span> 乘客人數配置
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="input-adults" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+              <option value="1">1 大人</option>
+              <option value="2" selected>2 大人</option>
+              <option value="3">3 大人</option>
+              <option value="4">4 大人</option>
+            </select>
+            <select id="input-children" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+              <option value="0">0 小孩</option>
+              <option value="1">1 小孩</option>
+              <option value="2" selected>2 小孩</option>
+              <option value="3">3 小孩</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5. Airline Preference -->
+        <div class="space-y-1.5">
+          <label class="font-bold text-slate-700 flex items-center gap-1">
+            <span>✈️</span> 偏好航空公司
+          </label>
+          <select id="input-airline" onchange="onFilterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium">
+            <option value="all" selected>全部航空公司</option>
+            <option value="CI">中華航空 (CI 首選)</option>
+            <option value="JX">星宇航空 (JX)</option>
+            <option value="CX">國泰航空 (CX)</option>
+            <option value="LCC">廉價航空 (虎航/樂桃)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Action Deep Links Bar -->
+      <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 text-slate-600">
+          <span class="text-sm">🔗</span>
+          <span><b>即時市場比價直達：</b></span>
+          <span id="label-trip-days" class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-bold">8天7夜</span>
+          <span id="label-passengers-calc" class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium">2大2小 (共4人)</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <a id="link-google-flights" href="https://www.google.com/travel/flights?q=Flights%20to%20NGO%20from%20TPE%20on%202027-07-11%20through%202027-07-18" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-sky-700 hover:border-sky-300 font-semibold shadow-2xs transition">
+            <span>✈️</span> Google Flights 即時查價 ↗
+          </a>
+          <a id="link-google-hotels" href="https://www.google.com/travel/hotels/Nagoya?dates=2027-07-11%2C2027-07-17" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-indigo-700 hover:border-indigo-300 font-semibold shadow-2xs transition">
+            <span>🏨</span> Google Hotels 即時查價 ↗
+          </a>
+          <button onclick="copyMcpQueryCommand()" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 font-medium transition cursor-pointer">
+            <span>📋</span> 複製 MCP 查詢指令
+          </button>
         </div>
       </div>
     </div>
@@ -325,7 +438,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 font-sans">
               <!-- CI Best FSC -->
-              <tr class="bg-amber-50/60 font-medium">
+              <tr class="flight-row bg-amber-50/60 font-medium transition-all" data-airline="CI">
                 <td class="py-2.5 px-3 font-bold text-slate-900">
                   <span class="text-amber-500">🏆</span> 中華航空
                 </td>
@@ -344,7 +457,7 @@
                 <td class="py-2.5 px-3"><span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold">最佳首選 (早去午回)</span></td>
               </tr>
               <!-- CI Late Flight -->
-              <tr>
+              <tr class="flight-row transition-all" data-airline="CI">
                 <td class="py-2.5 px-3 font-bold text-slate-800">中華航空</td>
                 <td class="py-2.5 px-3">
                   <b class="text-slate-700 font-mono">CI 150</b> 17:15 - 21:05
@@ -359,7 +472,7 @@
                 <td class="py-2.5 px-3 text-slate-500">晚去早回，實質少玩 2 天</td>
               </tr>
               <!-- Tigerair -->
-              <tr>
+              <tr class="flight-row transition-all" data-airline="LCC">
                 <td class="py-2.5 px-3 font-bold text-slate-800">台灣虎航</td>
                 <td class="py-2.5 px-3">
                   <b class="text-slate-700 font-mono">IT 706</b> 16:35 - 20:30
@@ -374,7 +487,7 @@
                 <td class="py-2.5 px-3 text-slate-500">加上行李餐點後約 6 萬</td>
               </tr>
               <!-- Cathay Pacific -->
-              <tr>
+              <tr class="flight-row transition-all" data-airline="CX">
                 <td class="py-2.5 px-3 font-bold text-slate-800">國泰航空</td>
                 <td class="py-2.5 px-3">
                   <b class="text-slate-700 font-mono">CX 530</b> 11:30 - 15:30
@@ -389,7 +502,7 @@
                 <td class="py-2.5 px-3 text-slate-500">時間平順，但旺季票價偏高</td>
               </tr>
               <!-- STARLUX -->
-              <tr>
+              <tr class="flight-row transition-all" data-airline="JX">
                 <td class="py-2.5 px-3 font-bold text-slate-800">星宇航空</td>
                 <td class="py-2.5 px-3">
                   <b class="text-slate-700 font-mono">JX 838</b> 14:55 - 18:45
@@ -954,7 +1067,85 @@
 
   </main>
 
+  <!-- ========================================== -->
+  <!-- MODAL: CLOUD SCHEDULER & MONITORING        -->
+  <!-- ========================================== -->
+  <div id="monitor-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs hidden p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all animate-in fade-in zoom-in duration-150">
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-lg">
+            ⏱️
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">定時監控排程設定</h3>
+            <p class="text-[11px] text-slate-300">GitHub Actions ＆ GCP 雲端自動巡檢</p>
+          </div>
+        </div>
+        <button onclick="closeMonitorModal()" class="text-slate-400 hover:text-white text-lg font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs text-slate-700">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-start gap-2.5 text-emerald-800">
+          <span class="text-base mt-0.5">✅</span>
+          <div>
+            <div class="font-bold">GitHub Actions 自動巡邏已就緒</div>
+            <div class="text-[11px] text-emerald-700 mt-0.5">工作流程：每天台灣時間 09:50 自動巡檢機票與飯店價格，降價自動發布！</div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="font-bold text-slate-800 block">1. 巡檢頻率偏好</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="border-2 border-indigo-500 bg-indigo-50/40 rounded-lg p-2.5 flex items-center gap-2 cursor-pointer font-medium text-indigo-900">
+              <input type="radio" name="cron-opt" value="daily_morning" checked class="text-indigo-600">
+              <span>每天 09:50 (預設)</span>
+            </label>
+            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center gap-2 cursor-pointer font-medium hover:bg-slate-50">
+              <input type="radio" name="cron-opt" value="twice_daily" class="text-indigo-600">
+              <span>每天兩次 (早/晚)</span>
+            </label>
+            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center gap-2 cursor-pointer font-medium hover:bg-slate-50">
+              <input type="radio" name="cron-opt" value="weekly" class="text-indigo-600">
+              <span>每週日巡檢一次</span>
+            </label>
+            <label class="border border-slate-200 rounded-lg p-2.5 flex items-center gap-2 cursor-pointer font-medium hover:bg-slate-50">
+              <input type="radio" name="cron-opt" value="custom" class="text-indigo-600">
+              <span>GCP Cloud Scheduler</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 pt-1">
+          <label class="font-bold text-slate-800 block">2. 當前監控參數目標</label>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1 text-slate-600 font-mono text-[11px]">
+            <div>• 航線目標：<span id="modal-target-route" class="font-bold text-slate-900">TPE ⇄ NGO</span></div>
+            <div>• 出發回程：<span id="modal-target-dates" class="font-bold text-slate-900">2027/07/11 ～ 2027/07/18</span></div>
+            <div>• 人數配置：<span id="modal-target-pax" class="font-bold text-slate-900">2大 2小 (共4人)</span></div>
+            <div>• 降價提醒門檻：<span class="font-bold text-emerald-700">&lt; NT$ 60,000 / 4人</span></div>
+          </div>
+        </div>
+
+        <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+          <a href="https://github.com/Vance-PIC/Travel_Master/actions/workflows/nagoya-flight-monitor.yml" target="_blank" class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
+            <span>🚀</span> 前往 GitHub Actions 手動立即跑一次 ↗
+          </a>
+          <button onclick="closeMonitorModal()" class="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer">
+            完成
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <span id="toast-icon">✅</span>
+    <span id="toast-msg">條件已更新！</span>
+  </div>
+
   <script>
+    // Tab switching
     function switchTab(tabId) {
       document.getElementById('flight-tab').classList.add('hidden');
       document.getElementById('hotel-tab').classList.add('hidden');
@@ -979,6 +1170,156 @@
         document.getElementById('btn-itinerary').classList.remove('text-slate-500');
       }
     }
+
+    // Interactive Filter & Calculation Controller
+    function onFilterChange() {
+      const route = document.getElementById('input-route').value;
+      const depDate = document.getElementById('input-dep-date').value;
+      const retDate = document.getElementById('input-ret-date').value;
+      const adults = parseInt(document.getElementById('input-adults').value) || 2;
+      const children = parseInt(document.getElementById('input-children').value) || 0;
+      const airline = document.getElementById('input-airline').value;
+      const totalPax = adults + children;
+
+      // 1. Calculate dates and nights
+      let diffDays = 8;
+      let nights = 7;
+      if (depDate && retDate) {
+        const d1 = new Date(depDate);
+        const d2 = new Date(retDate);
+        const timeDiff = d2.getTime() - d1.getTime();
+        if (timeDiff > 0) {
+          diffDays = Math.round(timeDiff / (1000 * 3600 * 24)) + 1;
+          nights = diffDays - 1;
+        }
+      }
+
+      // 2. Update Console Labels
+      document.getElementById('label-trip-days').innerText = `${diffDays}天${nights}夜`;
+      document.getElementById('label-passengers-calc').innerText = `${adults}大${children}小 (共${totalPax}人)`;
+
+      // 3. Update Hero Card
+      const destNames = {
+        'NGO': '名古屋中部 <span class="text-sm font-mono font-medium text-slate-400">NGO</span>',
+        'KIX': '大阪關西 <span class="text-sm font-mono font-medium text-slate-400">KIX</span>',
+        'NRT': '東京成田/羽田 <span class="text-sm font-mono font-medium text-slate-400">NRT/HND</span>',
+        'FUK': '福岡機場 <span class="text-sm font-mono font-medium text-slate-400">FUK</span>'
+      };
+      if (document.getElementById('hero-dest-display')) {
+        document.getElementById('hero-dest-display').innerHTML = destNames[route] || route;
+      }
+      if (document.getElementById('hero-dates-label')) {
+        document.getElementById('hero-dates-label').innerText = `📅 ${depDate} ～ ${retDate}`;
+      }
+      if (document.getElementById('hero-days-label')) {
+        document.getElementById('hero-days-label').innerText = `共 ${diffDays} 天 ${nights} 夜`;
+      }
+      if (document.getElementById('hero-pax-label')) {
+        document.getElementById('hero-pax-label').innerText = `👨‍👩‍👧‍👦 ${adults} 大 ${children} 小（共 ${totalPax} 人）`;
+      }
+
+      // 4. Dynamically estimate budget
+      const flightPerPax = 15773; // CI baseline FSC rate
+      const totalFlight = flightPerPax * totalPax;
+      const hotelTotal = Math.round(22735 * (nights / 7));
+      const grandTotal = totalFlight + hotelTotal;
+      if (document.getElementById('hero-total-price')) {
+        document.getElementById('hero-total-price').innerText = `約 NT$ ${grandTotal.toLocaleString()}`;
+      }
+      if (document.getElementById('hero-price-subtext')) {
+        document.getElementById('hero-price-subtext').innerText = `機票 (${totalPax}人) NT$${totalFlight.toLocaleString()} + 飯店 ${nights}晚約 NT$${hotelTotal.toLocaleString()}`;
+      }
+
+      // 5. Update Deep Links
+      const flightsUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${route}%20from%20TPE%20on%20${depDate}%20through%20${retDate}`;
+      const hotelCity = route === 'NGO' ? 'Nagoya' : (route === 'KIX' ? 'Osaka' : (route === 'FUK' ? 'Fukuoka' : 'Tokyo'));
+      const hotelsUrl = `https://www.google.com/travel/hotels/${hotelCity}?dates=${depDate}%2C${retDate}`;
+      document.getElementById('link-google-flights').setAttribute('href', flightsUrl);
+      document.getElementById('link-google-hotels').setAttribute('href', hotelsUrl);
+
+      // 6. Airline Row Filtering
+      const rows = document.querySelectorAll('.flight-row');
+      rows.forEach(row => {
+        const rowAirline = row.getAttribute('data-airline');
+        if (airline === 'all' || rowAirline === airline) {
+          row.classList.remove('opacity-25', 'bg-slate-100');
+        } else {
+          row.classList.add('opacity-25');
+        }
+      });
+
+      // 7. Update Modal Target Values
+      if (document.getElementById('modal-target-route')) {
+        document.getElementById('modal-target-route').innerText = `TPE ⇄ ${route}`;
+      }
+      if (document.getElementById('modal-target-dates')) {
+        document.getElementById('modal-target-dates').innerText = `${depDate} ～ ${retDate}`;
+      }
+      if (document.getElementById('modal-target-pax')) {
+        document.getElementById('modal-target-pax').innerText = `${adults}大 ${children}小 (共${totalPax}人)`;
+      }
+    }
+
+    // Trigger Instant Search Animation
+    function runSearch() {
+      const spinner = document.getElementById('search-spinner');
+      const icon = document.getElementById('search-icon');
+      const text = document.getElementById('search-text');
+      spinner.classList.remove('hidden');
+      icon.classList.add('hidden');
+      text.innerText = '查詢運算中...';
+
+      setTimeout(() => {
+        onFilterChange();
+        spinner.classList.add('hidden');
+        icon.classList.remove('hidden');
+        text.innerText = '即時套用與查詢';
+        showToast('⚡ 查詢條件已成功套用！機加酒預算與即時比價深連結已同步更新。', '✅');
+      }, 400);
+    }
+
+    // Modal Handlers
+    function openMonitorModal() {
+      onFilterChange();
+      document.getElementById('monitor-modal').classList.remove('hidden');
+    }
+
+    function closeMonitorModal() {
+      document.getElementById('monitor-modal').classList.add('hidden');
+    }
+
+    // Copy MCP Query
+    function copyMcpQueryCommand() {
+      const route = document.getElementById('input-route').value;
+      const depDate = document.getElementById('input-dep-date').value;
+      const retDate = document.getElementById('input-ret-date').value;
+      const adults = document.getElementById('input-adults').value;
+      const children = document.getElementById('input-children').value;
+      const cmd = `flight_search(origin="TPE", destination="${route}", departure_date="${depDate}", return_date="${retDate}", adults=${adults}, children=${children})`;
+      navigator.clipboard.writeText(cmd).then(() => {
+        showToast('📋 已複製 MCP 查詢指令至剪貼簿！可直接貼於終端或 AI 執行。', '📋');
+      }).catch(() => {
+        showToast(cmd, '📋');
+      });
+    }
+
+    // Toast Notification helper
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      onFilterChange();
+    });
   </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 
 **Goal:** 把現有名古屋監控的有效價格發布為公開、唯讀、無家庭私人資訊的 GitHub Pages 儀表板。
 
-**Architecture:** Python 產生器只從現有 `latest.json` 擷取白名單欄位，套入獨立的公開頁樣板，輸出 `_site/index.html`。Pages workflow 在現有監控完成、頁面來源變更或手動執行時發布 `_site`，不呼叫查價 API，也不改監控排程。
+**Architecture:** Python 產生器只從私人 `Travel_Master` 的 `latest.json` 擷取白名單欄位，套入獨立的公開頁樣板，輸出 `_site/index.html`。發布 workflow 在現有監控完成、頁面來源變更或手動執行時，只把該 HTML 推至獨立公開儲存庫 `Vance-PIC/Travel_Master_Prices`（暫定名稱）的 `main` 根目錄，由其 GitHub Pages 發布；不呼叫查價 API，也不改監控排程。
 
 **Tech Stack:** Python 3.12 標準函式庫、HTML/CSS、GitHub Actions、GitHub Pages。
 
@@ -13,7 +13,8 @@
 ## Global Constraints
 
 - 只公開航線、旅行日期、航空公司、航班號、飯店名稱、已觀測價格與資料時間；不公開逐日行程、旅客資訊、已訂房基準、家庭預算、原始 API 資料或密鑰。
-- 只發布 `_site`；不得發布現有完整儀表板或原始 `travel/nagoya` 目錄。
+- 只同步 `_site/index.html`；不得公開私人 `Travel_Master`、現有完整儀表板、原始 `travel/nagoya` 目錄或其他 `_site` 檔案。
+- 使用私人 repo 的 `PUBLIC_PAGES_TOKEN` Actions secret 跨儲存庫寫入；權杖只授予公開目標 repo Contents read/write，不進入 URL、程式碼或日誌。未設定時發布失敗。
 - 不新增查價呼叫、監控排程或修改 flight/hotel monitor policy。
 - 未經當次 Booking Options 驗證，不得把 API 顯示價格稱為家庭總價；飯店保留原幣別，不自行換匯。
 - 報價超過 48 小時標示過期，且每筆資料時間取該筆觀測值，不冒用頁面產生時間。
@@ -102,7 +103,7 @@ def cell(value: object) -> str:
 - [ ] **Step 4: 執行測試及實際樣本產生：`python scripts/build_public_dashboard.py --output _site`。檢視產物與 `git diff --check`；`_site/` 應被 `.gitignore` 忽略。**
 - [ ] **Step 5: 提交 `feat: render privacy-safe public price page`。**
 
-### Task 3: GitHub Pages 發布流程
+### Task 3: 推送脫敏 HTML 至獨立公開 Pages 儲存庫
 
 **Files:**
 - Create: `.github/workflows/publish-price-dashboard.yml`
@@ -111,22 +112,24 @@ def cell(value: object) -> str:
 
 **Interfaces:**
 - Consumes: Task 2 的 CLI 與預設分支監控快照。
-- Produces: GitHub Pages 發布 artifact `_site`；不寫入 `latest.json` 或 history。
+- Produces: 公開儲存庫 `main` 根目錄的 `index.html`；不寫入 `latest.json` 或 history。
 
-- [ ] **Step 1: 寫靜態 workflow 測試。** 確認 workflow 含 `workflow_run`（監聽 `Nagoya SerpApi flight monitor`、`Hotel monitor executor` 的 `completed`）、`workflow_dispatch` 與僅針對頁面檔案的 `push`；確認沒有 `schedule`、`SERPAPI_KEY`、`SEARCHAPI_KEY`、`Ignav_KEY` 或查價腳本。確認使用 Pages 官方 actions 並只上傳 `_site`。
+- [ ] **Step 1: 寫 workflow 測試。** 確認 workflow 含 `workflow_run`（監聽 `Nagoya SerpApi flight monitor`、`Hotel monitor executor` 的 `completed`）、`workflow_dispatch` 與僅針對頁面檔案的 `push`；確認沒有 `schedule`、`SERPAPI_KEY`、`SEARCHAPI_KEY`、`Ignav_KEY` 或查價腳本。確認缺少 `PUBLIC_PAGES_TOKEN` 時明確失敗，檢出限定的公開 repo，且只複製及暫存 `index.html`，不使用同 repo Pages artifact/deploy actions。
 
 ```python
 def test_pages_workflow_has_no_fare_api_calls():
     workflow = Path(".github/workflows/publish-price-dashboard.yml").read_text(encoding="utf-8")
     assert "workflow_run:" in workflow and "workflow_dispatch:" in workflow
     assert "schedule:" not in workflow
-    assert "path: _site" in workflow
-    assert "actions/deploy-pages@" in workflow
+    assert "repository: Vance-PIC/Travel_Master_Prices" in workflow
+    assert "cp _site/index.html public-site/index.html" in workflow
+    assert "git -C public-site add -- index.html" in workflow
+    assert "actions/deploy-pages@" not in workflow
     for forbidden in ("SERPAPI_KEY", "SEARCHAPI_KEY", "Ignav_KEY", "nagoya_flight_monitor.py", "hotel_executor.py"):
         assert forbidden not in workflow
 ```
 - [ ] **Step 2: 執行 `python -m unittest tests.test_public_dashboard -v`，確認新 workflow 測試先失敗。**
-- [ ] **Step 3: 加入 workflow。** 只在預設分支的監控完成事件發布；`actions/checkout` 檢出 `master`，Python 產生 `_site`，使用 `actions/configure-pages`、`actions/upload-pages-artifact`、`actions/deploy-pages`。設定 `contents: read`、`pages: write`、`id-token: write`、`github-pages` environment 與 concurrency；不得讀取查價 secrets。文件說明公開欄位、手動重建、資料時間與隱私邊界。
+- [ ] **Step 3: 加入 workflow。** 只在預設分支的監控完成事件發布；`actions/checkout` 檢出私人 `master` 並停用持久憑證，Python 產生 `_site/index.html`，檢查 `PUBLIC_PAGES_TOKEN`，再以限定公開 repo 的 PAT 檢出其 `main`。只複製 `_site/index.html` 並 `git add -- index.html`，內容未變時略過 commit；變更時推送 `main`。設定私人 workflow `contents: read` 與 concurrency；不得讀取查價 secrets。文件說明公開欄位、手動重建、資料時間與隱私邊界。
 
 ```yaml
 name: Publish public price dashboard
@@ -143,28 +146,41 @@ on:
     types: [completed]
 permissions:
   contents: read
-  pages: write
-  id-token: write
 jobs:
   publish:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'master'
     runs-on: ubuntu-latest
-    environment: github-pages
     steps:
       - uses: actions/checkout@v4
         with:
           ref: master
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python scripts/build_public_dashboard.py --output _site
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - name: Check public repository credential
+        env:
+          PUBLIC_PAGES_TOKEN: ${{ secrets.PUBLIC_PAGES_TOKEN }}
+        run: |
+          if [ -z "$PUBLIC_PAGES_TOKEN" ]; then
+            echo 'PUBLIC_PAGES_TOKEN is missing; no public page was changed.' >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v4
         with:
-          path: _site
-      - uses: actions/deploy-pages@v4
+          repository: Vance-PIC/Travel_Master_Prices
+          ref: main
+          path: public-site
+          token: ${{ secrets.PUBLIC_PAGES_TOKEN }}
+      - run: |
+          cp _site/index.html public-site/index.html
+          git -C public-site add -- index.html
+          if git -C public-site diff --cached --quiet; then exit 0; fi
+          git -C public-site -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update public price dashboard'
+          git -C public-site push origin HEAD:main
 ```
-- [ ] **Step 4: 執行全部相關測試、`git diff --check`，並核對 workflow 的觸發事件與權限。**
+- [ ] **Step 4: 執行全部相關測試、`git diff --check`，並核對 workflow 的觸發事件、權限、單檔發布與憑證處理。**
 - [ ] **Step 5: 提交 `ci: publish public price dashboard from monitor snapshots`。**
 
 ### Task 4: 發布驗證
@@ -173,7 +189,7 @@ jobs:
 
 **Interfaces:** GitHub Pages 網址與 Actions 執行結果。
 
-- [ ] **Step 1: 將已驗證分支建立 PR，檢視差異；在取得該次發布核准後合併到 `master`，保持現有監控排程與資料不變。**
-- [ ] **Step 2: 在 GitHub Pages 設定中選擇 GitHub Actions 發布來源；在真正公開網站前，依瀏覽器確認規則核對公開範圍。**
-- [ ] **Step 3: 手動執行 `publish-price-dashboard`，確認 Actions 成功並取得 Pages 網址。**
+- [ ] **Step 1: 將已驗證分支建立 PR，檢視差異；保持現有監控排程與資料不變。**
+- [ ] **Step 2: 取得該次發布核准後，建立只有公開資料的 `Vance-PIC/Travel_Master_Prices`，以 `main` 為預設分支並設 Pages Source 為 Deploy from a branch、`main` / root。由使用者建立限定此 repo Contents read/write 的 fine-grained PAT，存入私人 `Travel_Master` Actions secret `PUBLIC_PAGES_TOKEN`，不讀取權杖值。**
+- [ ] **Step 3: 合併私人 repo PR，手動執行 `publish-price-dashboard`，確認 Actions 成功、公開 repo 只更新 `index.html`，並取得 Pages 網址。**
 - [ ] **Step 4: 檢查公開頁的價格、幣別、各筆觀測時間、過期／未驗證標示，以及家庭私人資訊未出現；記錄 Run ID、公開網址及未解決問題。此步不執行查價。**

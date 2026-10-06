@@ -12,8 +12,6 @@ on:
     types: [completed]
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: public-price-dashboard-pages
   cancel-in-progress: false
@@ -21,9 +19,6 @@ jobs:
   publish:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'master'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,9 +28,28 @@ jobs:
         with:
           python-version: '3.12'
       - run: python scripts/build_public_dashboard.py --output _site
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - name: Check public repository credential
+        env:
+          PUBLIC_PAGES_TOKEN: ${{ secrets.PUBLIC_PAGES_TOKEN }}
+        run: |
+          if [ -z "$PUBLIC_PAGES_TOKEN" ]; then
+            echo 'PUBLIC_PAGES_TOKEN is missing; no public page was changed.' >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v4
         with:
-          path: _site
-      - uses: actions/deploy-pages@v4
-        id: deployment
+          repository: Vance-PIC/Travel_Master_Prices
+          ref: main
+          path: public-site
+          token: ${{ secrets.PUBLIC_PAGES_TOKEN }}
+          persist-credentials: true
+      - name: Publish sanitized HTML only
+        run: |
+          cp _site/index.html public-site/index.html
+          git -C public-site add -- index.html
+          if git -C public-site diff --cached --quiet; then
+            echo 'Public page is unchanged.'
+            exit 0
+          fi
+          git -C public-site -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update public price dashboard'
+          git -C public-site push origin HEAD:main

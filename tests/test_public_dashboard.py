@@ -221,21 +221,27 @@ class PublicPagesWorkflowTests(unittest.TestCase):
     def test_no_fare_api_calls_or_private_artifacts(self):
         workflow = self.workflow
         for forbidden in ('schedule:', 'SERPAPI_KEY', 'SEARCHAPI_KEY', 'Ignav_KEY',
-                          'secrets.', 'nagoya_flight_monitor.py', 'hotel_executor.py',
-                          'download-artifact', 'contents: write'):
+                          'nagoya_flight_monitor.py', 'hotel_executor.py',
+                          'download-artifact', 'contents: write', 'git add .',
+                          'actions/upload-pages-artifact', 'actions/deploy-pages',
+                          'travel/nagoya/*', 'cp -r', 'rsync'):
             self.assertNotIn(forbidden, workflow)
-        self.assertEqual(re.findall(r'^      - run: (.+)$', workflow, re.MULTILINE),
-                         ['python scripts/build_public_dashboard.py --output _site'])
-        self.assertEqual(re.findall(r'^          path: (.+)$', workflow, re.MULTILINE), ['_site'])
-        self.assertEqual(workflow.count('upload-pages-artifact@'), 1)
+        self.assertIn('python scripts/build_public_dashboard.py --output _site', workflow)
+        self.assertIn('cp _site/index.html public-site/index.html', workflow)
+        self.assertIn('git -C public-site add -- index.html', workflow)
+        self.assertIn('git -C public-site push origin HEAD:main', workflow)
 
-    def test_pages_actions_permissions_environment_and_concurrency(self):
+    def test_cross_repository_publish_scope_and_token_guard(self):
         for required in ('actions/checkout@v4', 'persist-credentials: false',
-                         'actions/configure-pages@v5', 'actions/upload-pages-artifact@v4',
-                         'actions/deploy-pages@v4', 'contents: read', 'pages: write',
-                         'id-token: write', 'name: github-pages',
-                         'group: public-price-dashboard-pages', 'cancel-in-progress: false'):
+                         'repository: Vance-PIC/Travel_Master_Prices', 'ref: main',
+                         'path: public-site', 'token: ${{ secrets.PUBLIC_PAGES_TOKEN }}',
+                         'PUBLIC_PAGES_TOKEN: ${{ secrets.PUBLIC_PAGES_TOKEN }}',
+                         'if [ -z "$PUBLIC_PAGES_TOKEN" ]; then',
+                         'contents: read', 'group: public-price-dashboard-pages',
+                         'cancel-in-progress: false'):
             self.assertIn(required, self.workflow)
+        self.assertNotIn('https://${{ secrets.PUBLIC_PAGES_TOKEN }}', self.workflow)
+        self.assertNotIn('echo "$PUBLIC_PAGES_TOKEN"', self.workflow)
 
 
 if __name__ == '__main__':

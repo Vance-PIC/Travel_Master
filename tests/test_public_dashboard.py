@@ -115,5 +115,58 @@ class PublicProjectionTests(unittest.TestCase):
             self.assertEqual(project_flights(data, NOW), [])
 
 
+class PublicPageTests(unittest.TestCase):
+    def test_render_escapes_and_ignores_unknown_fields(self):
+        from scripts.build_public_dashboard import render_page
+        html = render_page([{'airline': '<script>alert(1)</script>', 'checked_at': CHECKED,
+                             'stale': True, 'child_ages': 'PRIVATE_CHILD',
+                             'raw_response': 'PRIVATE_RAW'}], [], {'private': 'PRIVATE_STATUS'})
+        self.assertIn('&lt;script&gt;', html)
+        self.assertNotIn('<script>alert(1)</script>', html)
+        self.assertIn(CHECKED, html)
+        self.assertIn('資料過期', html)
+        for value in ('PRIVATE_CHILD', 'PRIVATE_RAW', 'PRIVATE_STATUS', 'child_ages'):
+            self.assertNotIn(value, html)
+
+    def test_build_page_omits_private_snapshot_data(self):
+        from scripts.build_public_dashboard import build_page
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            flights = root / 'travel/nagoya/flights'
+            hotels = root / 'travel/nagoya/hotels/one'
+            flights.mkdir(parents=True)
+            hotels.mkdir(parents=True)
+            item = quote()
+            item['airline'] = 'Safe airline'
+            item['child_ages'] = 'PRIVATE_AGES'
+            flights.joinpath('latest.json').write_text(json.dumps({'itineraries': [item],
+                'budget': 'PRIVATE_BUDGET', 'daily_itinerary': 'PRIVATE_DAY',
+                'SERPAPI_KEY': 'PRIVATE_KEY'}), encoding='utf-8')
+            hotels.joinpath('latest.json').write_text(json.dumps({'booking_baseline': 'PRIVATE_BASELINE',
+                'observations': [{'hotel_name': 'Safe hotel', 'total_amount': 100,
+                'query_currency': 'JPY', 'observed_at': CHECKED}]}), encoding='utf-8')
+            html = build_page(root, NOW + timedelta(days=3))
+            self.assertIn('Safe airline', html)
+            self.assertIn('Safe hotel', html)
+            self.assertIn(CHECKED, html)
+            self.assertIn('資料過期', html)
+            for value in ('PRIVATE_', 'SERPAPI_KEY', 'raw_response', 'booking_baseline',
+                          'daily_itinerary', 'child_ages', '2030-01-01'):
+                self.assertNotIn(value, html)
+
+    def test_source_status_distinguishes_missing_corrupt_and_empty(self):
+        from scripts.build_public_dashboard import build_page
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.assertIn('無可用報價', build_page(root, NOW))
+            path = root / 'travel/nagoya/flights/latest.json'
+            path.parent.mkdir(parents=True)
+            path.write_text('{SECRET_ERROR', encoding='utf-8')
+            html = build_page(root, NOW)
+            self.assertIn('資料無法讀取', html)
+            self.assertNotIn('SECRET_ERROR', html)
+            path.write_text('{"itineraries": []}', encoding='utf-8')
+            self.assertIn('無有效觀測', build_page(root, NOW))
+
 if __name__ == '__main__':
     unittest.main()

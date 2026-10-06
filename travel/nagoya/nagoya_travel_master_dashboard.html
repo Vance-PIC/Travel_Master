@@ -1384,13 +1384,19 @@
       const iata = resolveIata(codeOrText);
       const found = AIRPORTS_DB.find(a => a.code === iata);
       if (found) {
-        const shortName = found.name.split(' ')[0].replace('國際機場', '').replace('機場', '');
+        // Strip out '國際機場', '機場', and any English/parentheses
+        let cleanName = found.name.split(' ')[0].replace('國際機場', '').replace('機場', '').trim();
+        // Remove city name from cleanName to prevent duplicate concatenation (e.g. 台北 + 台北松山 -> 台北松山)
+        cleanName = cleanName.replace(found.city, '').trim();
+        const heroTitle = cleanName ? `${found.city}${cleanName}` : found.city;
+        const inputCity = (['台北', '東京'].includes(found.city) && cleanName) ? `${found.city}${cleanName}` : found.city;
+
         return {
           code: found.code,
           city: found.city,
           name: found.name,
-          inputVal: `${found.city} (${found.code})`,
-          heroVal: `${found.city}${shortName} <span class="text-sm font-mono font-medium text-slate-400">${found.code}</span>`
+          inputVal: `${inputCity} (${found.code})`,
+          heroVal: `${heroTitle} <span class="text-sm font-mono font-medium text-slate-400">${found.code}</span>`
         };
       }
       return {

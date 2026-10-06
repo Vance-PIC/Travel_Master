@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-06T06:26:57+00:00",
+  "checked_at": "2026-10-06T08:10:56+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 3,
@@ -7,52 +7,65 @@
   "api_searches_used": 3,
   "account_calls": 4,
   "quota_before": {
-    "usage": 32,
-    "remaining": 218,
-    "tier": "normal",
-    "plan_searches_left": 218,
-    "renewal_date": "2026-10-30"
-  },
-  "quota_after": {
     "usage": 35,
     "remaining": 215,
     "tier": "normal",
     "plan_searches_left": 215,
     "renewal_date": "2026-10-30"
   },
+  "quota_after": {
+    "usage": 38,
+    "remaining": 212,
+    "tier": "normal",
+    "plan_searches_left": 212,
+    "renewal_date": "2026-10-30"
+  },
   "actual_usage_delta": 3,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
-    "JX838"
+    "CI154"
   ],
   "deferred_outbounds": [
-    "CI154",
     "CX530"
   ],
   "missing_required_outbounds": [],
   "baseline_complete": true,
   "booking_verification_checks": [
     {
-      "itinerary_key": "JX838+JX839",
+      "itinerary_key": "CI154+CI151",
       "reasons": [
-        "drop_5_percent",
         "new_low"
       ],
       "status": "verified",
       "quota_before": {
-        "usage": 33,
-        "remaining": 217,
+        "usage": 36,
+        "remaining": 214,
         "tier": "normal",
-        "plan_searches_left": 217,
+        "plan_searches_left": 214,
         "renewal_date": "2026-10-30"
       },
       "quota_after": {
-        "usage": 35,
-        "remaining": 215,
+        "usage": 38,
+        "remaining": 212,
         "tier": "normal",
-        "plan_searches_left": 215,
+        "plan_searches_left": 212,
         "renewal_date": "2026-10-30"
       }
+    },
+    {
+      "itinerary_key": "CI154+CI155",
+      "reasons": [
+        "new_low"
+      ],
+      "status": "deferred",
+      "quota_before": {
+        "usage": 38,
+        "remaining": 212,
+        "tier": "normal",
+        "plan_searches_left": 212,
+        "renewal_date": "2026-10-30"
+      },
+      "deferred_reason": "run_limit"
     }
   ],
   "refresh_complete": false

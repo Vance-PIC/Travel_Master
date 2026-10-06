@@ -1,59 +1,61 @@
 {
-  "checked_at": "2026-10-05T07:44:14+00:00",
+  "checked_at": "2026-10-06T06:26:57+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 5,
-  "searches_used": 5,
-  "api_searches_used": 5,
-  "account_calls": 6,
+  "planned_searches": 3,
+  "searches_used": 3,
+  "api_searches_used": 3,
+  "account_calls": 4,
   "quota_before": {
-    "usage": 17,
-    "remaining": 233,
+    "usage": 32,
+    "remaining": 218,
     "tier": "normal",
-    "plan_searches_left": 233,
+    "plan_searches_left": 218,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 22,
-    "remaining": 228,
+    "usage": 35,
+    "remaining": 215,
     "tier": "normal",
-    "plan_searches_left": 228,
+    "plan_searches_left": 215,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 5,
+  "actual_usage_delta": 3,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
-    "CI154",
-    "CX530",
     "JX838"
   ],
-  "deferred_outbounds": [],
+  "deferred_outbounds": [
+    "CI154",
+    "CX530"
+  ],
   "missing_required_outbounds": [],
   "baseline_complete": true,
   "booking_verification_checks": [
     {
-      "itinerary_key": "CI154+CX531",
+      "itinerary_key": "JX838+JX839",
       "reasons": [
+        "drop_5_percent",
         "new_low"
       ],
       "status": "verified",
       "quota_before": {
-        "usage": 19,
-        "remaining": 231,
+        "usage": 33,
+        "remaining": 217,
         "tier": "normal",
-        "plan_searches_left": 231,
+        "plan_searches_left": 217,
         "renewal_date": "2026-10-30"
       },
       "quota_after": {
-        "usage": 22,
-        "remaining": 228,
+        "usage": 35,
+        "remaining": 215,
         "tier": "normal",
-        "plan_searches_left": 228,
+        "plan_searches_left": 215,
         "renewal_date": "2026-10-30"
       }
     }
   ],
-  "refresh_complete": true,
+  "refresh_complete": false,
   "schema_version": 7,
   "skill_version": 2,
   "route": {
@@ -106,7 +108,7 @@
       "outbound_flight": "CI 150",
       "outbound_departure": "2027-07-11 17:15",
       "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 51666,
+      "displayed_price_twd": 54134,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -123,7 +125,7 @@
       "outbound_flight": "CI 154",
       "outbound_departure": "2027-07-11 07:30",
       "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 63090,
+      "displayed_price_twd": 63038,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -132,24 +134,9 @@
       "outbound_preference_match": true,
       "time_preference_match": null,
       "departure_token_available": true,
-      "deep_search_triggers": []
-    },
-    {
-      "airline": "國泰航空",
-      "airline_iata": "CX",
-      "outbound_flight": "CX 530",
-      "outbound_departure": "2027-07-11 11:30",
-      "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 80580,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": null,
-      "outbound_preference_match": true,
-      "time_preference_match": null,
-      "departure_token_available": true,
-      "deep_search_triggers": []
+      "deep_search_triggers": [
+        "new_low"
+      ]
     },
     {
       "airline": "星宇航空",
@@ -157,7 +144,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 97990,
+      "displayed_price_twd": 78020,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -166,7 +153,29 @@
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": []
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ]
+    },
+    {
+      "airline": "國泰航空",
+      "airline_iata": "CX",
+      "outbound_flight": "CX 530",
+      "outbound_departure": "2027-07-11 11:30",
+      "outbound_arrival": "2027-07-11 15:30",
+      "displayed_price_twd": 79660,
+      "price_scope": "unknown",
+      "family_total_twd": null,
+      "currency": "TWD",
+      "baggage_status": "unknown",
+      "inbound_preference_match": null,
+      "outbound_preference_match": true,
+      "time_preference_match": null,
+      "departure_token_available": true,
+      "deep_search_triggers": [
+        "new_low"
+      ]
     }
   ],
   "itineraries": [
@@ -191,8 +200,8 @@
       "inbound_arrival": "2027-07-18 11:55",
       "inbound_airline_iata": "CI",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CI154+CI151",
       "previous_displayed_price_twd": 63064.0,
@@ -225,8 +234,8 @@
       "inbound_arrival": "2027-07-18 14:30",
       "inbound_airline_iata": "CI",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CI154+CI155",
       "previous_displayed_price_twd": 68440.0,
@@ -259,8 +268,8 @@
       "inbound_arrival": "2027-07-18 18:50",
       "inbound_airline_iata": "CX",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CI154+CX531",
       "previous_displayed_price_twd": 211436.0,
@@ -342,8 +351,8 @@
       "inbound_arrival": "2027-07-18 18:50",
       "inbound_airline_iata": "CX",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CX530+CX531",
       "previous_displayed_price_twd": 80554.0,
@@ -376,8 +385,8 @@
       "inbound_arrival": "2027-07-18 11:55",
       "inbound_airline_iata": "CI",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CX530+CI151",
       "previous_displayed_price_twd": 204336.0,
@@ -410,8 +419,8 @@
       "inbound_arrival": "2027-07-18 14:30",
       "inbound_airline_iata": "CI",
       "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "CX530+CI155",
       "previous_displayed_price_twd": 204336.0,
@@ -429,336 +438,194 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 97990,
-      "price_scope": "unknown",
-      "family_total_twd": null,
+      "displayed_price_twd": 70214,
+      "price_scope": "family_total",
+      "family_total_twd": 70214,
       "currency": "TWD",
-      "baggage_status": "unknown",
+      "baggage_status": "booking_option_verified",
       "inbound_preference_match": false,
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [],
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-05T07:44:14+00:00",
+      "checked_at": "2026-10-06T06:26:57+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 97960.0,
+      "previous_displayed_price_twd": 97990.0,
       "price_changes": [
-        "price_increase"
+        "price_drop",
+        "drop_5_percent",
+        "new_low"
       ],
-      "historical_low_twd": 97960.0,
+      "historical_low_twd": 70214,
       "refresh_reasons": [
-        "itinerary_refresh"
-      ]
+        "new_low",
+        "drop_5_percent"
+      ],
+      "price_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-06T06:26:57+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-06T06:26:57+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 70214,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      },
+      "baggage_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-06T06:26:57+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-06T06:26:57+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 70214,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      }
     }
   ],
   "options": [
     {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 154",
-      "outbound_departure": "2027-07-11 07:30",
-      "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 63090,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CI 151",
-      "inbound_departure": "2027-07-18 09:55",
-      "inbound_arrival": "2027-07-18 11:55",
-      "inbound_airline_iata": "CI",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CI154+CI151",
-      "previous_displayed_price_twd": 63064.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 63064.0,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ]
-    },
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 154",
-      "outbound_departure": "2027-07-11 07:30",
-      "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 68466,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CI 155",
-      "inbound_departure": "2027-07-18 12:20",
-      "inbound_arrival": "2027-07-18 14:30",
-      "inbound_airline_iata": "CI",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CI154+CI155",
-      "previous_displayed_price_twd": 68440.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 68440.0,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ]
-    },
-    {
-      "airline": "中華航空",
-      "airline_iata": "CI",
-      "outbound_flight": "CI 154",
-      "outbound_departure": "2027-07-11 07:30",
-      "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 208578,
-      "price_scope": "family_total",
-      "family_total_twd": 208578,
-      "currency": "TWD",
-      "baggage_status": "booking_option_verified",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CX 531",
-      "inbound_departure": "2027-07-18 16:40",
-      "inbound_arrival": "2027-07-18 18:50",
-      "inbound_airline_iata": "CX",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CI154+CX531",
-      "previous_displayed_price_twd": 211436.0,
-      "price_changes": [
-        "price_drop",
-        "new_low"
-      ],
-      "historical_low_twd": 208578,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ],
-      "price_verification": {
-        "source": "SerpApi Booking Options",
-        "verified_at": "2026-10-05T07:44:14+00:00",
-        "itinerary_key": "CI154+CX531",
-        "quote_checked_at": "2026-10-05T07:44:14+00:00",
-        "passengers": {
-          "adults": 2,
-          "children": 2
-        },
-        "currency": "TWD",
-        "book_with": "China Airlines",
-        "price": 208578,
-        "local_prices": null,
-        "option_title": null,
-        "extensions": null,
-        "baggage_prices": [
-          "1 free carry-on",
-          "1st checked bag free"
-        ],
-        "marketed_as": [
-          "CI 154",
-          "CX 531"
-        ]
-      },
-      "baggage_verification": {
-        "source": "SerpApi Booking Options",
-        "verified_at": "2026-10-05T07:44:14+00:00",
-        "itinerary_key": "CI154+CX531",
-        "quote_checked_at": "2026-10-05T07:44:14+00:00",
-        "passengers": {
-          "adults": 2,
-          "children": 2
-        },
-        "currency": "TWD",
-        "book_with": "China Airlines",
-        "price": 208578,
-        "local_prices": null,
-        "option_title": null,
-        "extensions": null,
-        "baggage_prices": [
-          "1 free carry-on",
-          "1st checked bag free"
-        ],
-        "marketed_as": [
-          "CI 154",
-          "CX 531"
-        ]
-      }
-    },
-    {
-      "airline": "國泰航空",
-      "airline_iata": "CX",
-      "outbound_flight": "CX 530",
-      "outbound_departure": "2027-07-11 11:30",
-      "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 80580,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CX 531",
-      "inbound_departure": "2027-07-18 16:40",
-      "inbound_arrival": "2027-07-18 18:50",
-      "inbound_airline_iata": "CX",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CX530+CX531",
-      "previous_displayed_price_twd": 80554.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 80554.0,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ]
-    },
-    {
-      "airline": "國泰航空",
-      "airline_iata": "CX",
-      "outbound_flight": "CX 530",
-      "outbound_departure": "2027-07-11 11:30",
-      "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 204358,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CI 151",
-      "inbound_departure": "2027-07-18 09:55",
-      "inbound_arrival": "2027-07-18 11:55",
-      "inbound_airline_iata": "CI",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CX530+CI151",
-      "previous_displayed_price_twd": 204336.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 204336.0,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ]
-    },
-    {
-      "airline": "國泰航空",
-      "airline_iata": "CX",
-      "outbound_flight": "CX 530",
-      "outbound_departure": "2027-07-11 11:30",
-      "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 204358,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": true,
-      "outbound_preference_match": true,
-      "time_preference_match": true,
-      "departure_token_available": true,
-      "deep_search_triggers": [],
-      "inbound_flight": "CI 155",
-      "inbound_departure": "2027-07-18 12:20",
-      "inbound_arrival": "2027-07-18 14:30",
-      "inbound_airline_iata": "CI",
-      "checked_at": "2026-10-05T07:44:14+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "CX530+CI155",
-      "previous_displayed_price_twd": 204336.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 204336.0,
-      "refresh_reasons": [
-        "itinerary_refresh"
-      ]
-    },
-    {
       "airline": "星宇航空",
       "airline_iata": "JX",
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 97990,
-      "price_scope": "unknown",
-      "family_total_twd": null,
+      "displayed_price_twd": 70214,
+      "price_scope": "family_total",
+      "family_total_twd": 70214,
       "currency": "TWD",
-      "baggage_status": "unknown",
+      "baggage_status": "booking_option_verified",
       "inbound_preference_match": false,
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [],
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-05T07:44:14+00:00",
+      "checked_at": "2026-10-06T06:26:57+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 97960.0,
+      "previous_displayed_price_twd": 97990.0,
       "price_changes": [
-        "price_increase"
+        "price_drop",
+        "drop_5_percent",
+        "new_low"
       ],
-      "historical_low_twd": 97960.0,
+      "historical_low_twd": 70214,
       "refresh_reasons": [
-        "itinerary_refresh"
-      ]
+        "new_low",
+        "drop_5_percent"
+      ],
+      "price_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-06T06:26:57+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-06T06:26:57+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 70214,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      },
+      "baggage_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-06T06:26:57+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-06T06:26:57+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 70214,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      }
     }
   ],
   "market_price_lows": {
-    "CI154": 63064,
-    "CX530": 80554,
+    "CI154": 63038,
+    "CX530": 79660,
     "CI150": 51640,
-    "JX838": 97960
+    "JX838": 78020
   },
   "outbound_refresh": {
     "CI154": "2026-10-05T07:44:14+00:00",
     "CX530": "2026-10-05T07:44:14+00:00",
-    "JX838": "2026-10-05T07:44:14+00:00"
+    "JX838": "2026-10-06T06:26:57+00:00"
   },
-  "pending_deep_search": {},
+  "pending_deep_search": {
+    "CI154": [
+      "new_low"
+    ],
+    "CX530": [
+      "new_low"
+    ]
+  },
   "itinerary_refresh_days": 4,
   "notes": "Raw market/itinerary prices remain unchanged. Only exact 2A2C Booking Options matches verify that specific quote. Baggage evidence is seller-specific literal text. Historical rows are not backfilled."
 }

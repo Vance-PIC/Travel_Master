@@ -1152,23 +1152,83 @@
           </div>
         </div>
 
-        <div class="space-y-1.5 pt-1">
-          <label class="font-bold text-slate-800 block">2. 當前監控參數目標</label>
-          <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1 text-slate-600 font-mono text-[11px]">
-            <div>• 航線目標：<span id="modal-target-route" class="font-bold text-slate-900">TPE ⇄ NGO</span></div>
-            <div>• 出發回程：<span id="modal-target-dates" class="font-bold text-slate-900">2027/07/11 ～ 2027/07/18</span></div>
-            <div>• 人數配置：<span id="modal-target-pax" class="font-bold text-slate-900">2大 2小 (共4人)</span></div>
-            <div>• 降價提醒門檻：<span class="font-bold text-emerald-700">&lt; NT$ 60,000 / 4人</span></div>
+        <div class="space-y-2.5 pt-1 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+              <span>🎯</span> 2. 監控目標參數 (可直接在此修改)
+            </label>
+            <button type="button" onclick="syncModalWithMainInputs()" class="text-[11px] text-sky-600 hover:text-sky-800 font-medium cursor-pointer flex items-center gap-1">
+              <span>🔄</span> 同步主畫面條件
+            </button>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
+            <!-- 航線 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">出發地 (Origin)</label>
+                <input type="text" id="modal-input-origin" value="台北 (TPE)" placeholder="例如: 台北 (TPE)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">目的地 (Destination)</label>
+                <input type="text" id="modal-input-dest" value="名古屋 (NGO)" placeholder="例如: 名古屋 (NGO)" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- 日期 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">出發日期</label>
+                <input type="date" id="modal-input-dep-date" value="2027-07-11" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">回程日期</label>
+                <input type="date" id="modal-input-ret-date" value="2027-07-18" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- 人數與降價門檻 -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] font-bold text-slate-600 block mb-1">乘客人數</label>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <select id="modal-input-adults" class="bg-white border border-slate-200 rounded-lg px-1.5 py-1.5 text-xs text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+                    <option value="1">1大</option>
+                    <option value="2" selected>2大</option>
+                    <option value="3">3大</option>
+                    <option value="4">4大</option>
+                  </select>
+                  <select id="modal-input-children" class="bg-white border border-slate-200 rounded-lg px-1.5 py-1.5 text-xs text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+                    <option value="0">0小</option>
+                    <option value="1">1小</option>
+                    <option value="2" selected>2小</option>
+                    <option value="3">3小</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-emerald-800 block mb-1">降價提醒門檻 (NT$)</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-bold text-xs">$</span>
+                  <input type="number" id="modal-input-threshold" value="60000" step="1000" class="w-full bg-white border border-emerald-300 rounded-lg pl-6 pr-2.5 py-1.5 text-xs text-emerald-700 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
-          <a href="https://github.com/Vance-PIC/Travel_Master/actions/workflows/nagoya-flight-monitor.yml" target="_blank" class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
-            <span>🚀</span> 前往 GitHub Actions 手動立即跑一次 ↗
+        <div class="pt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-slate-100">
+          <a href="https://github.com/Vance-PIC/Travel_Master/actions/workflows/nagoya-flight-monitor.yml" target="_blank" class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg font-bold transition shadow-sm text-xs">
+            <span>🚀</span> 前往 GitHub Actions 立即跑一次 ↗
           </a>
-          <button onclick="closeMonitorModal()" class="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer">
-            完成
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="closeMonitorModal()" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer text-xs">
+              取消
+            </button>
+            <button onclick="saveMonitorSettings()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer shadow-sm shadow-indigo-500/20 text-xs transition">
+              💾 儲存並套用設定
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1545,10 +1605,91 @@
       }, 400);
     }
 
-    // Modal Handlers
+    // Modal Handlers & Two-Way Sync
     function openMonitorModal() {
-      onFilterChange();
+      // 1. Load current values from main inputs
+      if (document.getElementById('input-origin')) {
+        document.getElementById('modal-input-origin').value = document.getElementById('input-origin').value;
+      }
+      if (document.getElementById('input-dest')) {
+        document.getElementById('modal-input-dest').value = document.getElementById('input-dest').value;
+      }
+      if (document.getElementById('input-dep-date')) {
+        document.getElementById('modal-input-dep-date').value = document.getElementById('input-dep-date').value;
+      }
+      if (document.getElementById('input-ret-date')) {
+        document.getElementById('modal-input-ret-date').value = document.getElementById('input-ret-date').value;
+      }
+      if (document.getElementById('input-adults')) {
+        document.getElementById('modal-input-adults').value = document.getElementById('input-adults').value;
+      }
+      if (document.getElementById('input-children')) {
+        document.getElementById('modal-input-children').value = document.getElementById('input-children').value;
+      }
+
+      // 2. Load stored threshold & cron if available
+      const savedThreshold = localStorage.getItem('travel_monitor_threshold');
+      if (savedThreshold && document.getElementById('modal-input-threshold')) {
+        document.getElementById('modal-input-threshold').value = savedThreshold;
+      }
+      const savedCron = localStorage.getItem('travel_monitor_cron');
+      if (savedCron) {
+        const radio = document.querySelector(`input[name="cron-opt"][value="${savedCron}"]`);
+        if (radio) radio.checked = true;
+      }
+
       document.getElementById('monitor-modal').classList.remove('hidden');
+    }
+
+    function syncModalWithMainInputs() {
+      if (document.getElementById('input-origin')) {
+        document.getElementById('modal-input-origin').value = document.getElementById('input-origin').value;
+      }
+      if (document.getElementById('input-dest')) {
+        document.getElementById('modal-input-dest').value = document.getElementById('input-dest').value;
+      }
+      if (document.getElementById('input-dep-date')) {
+        document.getElementById('modal-input-dep-date').value = document.getElementById('input-dep-date').value;
+      }
+      if (document.getElementById('input-ret-date')) {
+        document.getElementById('modal-input-ret-date').value = document.getElementById('input-ret-date').value;
+      }
+      if (document.getElementById('input-adults')) {
+        document.getElementById('modal-input-adults').value = document.getElementById('input-adults').value;
+      }
+      if (document.getElementById('input-children')) {
+        document.getElementById('modal-input-children').value = document.getElementById('input-children').value;
+      }
+      showToast('🔄 已同步主畫面最新航線與日期！', '🔄');
+    }
+
+    function saveMonitorSettings() {
+      // 1. Read values from modal inputs
+      const newOrigin = document.getElementById('modal-input-origin').value;
+      const newDest = document.getElementById('modal-input-dest').value;
+      const newDepDate = document.getElementById('modal-input-dep-date').value;
+      const newRetDate = document.getElementById('modal-input-ret-date').value;
+      const newAdults = document.getElementById('modal-input-adults').value;
+      const newChildren = document.getElementById('modal-input-children').value;
+      const threshold = document.getElementById('modal-input-threshold').value || '60000';
+      const selectedCron = document.querySelector('input[name="cron-opt"]:checked')?.value || 'daily_morning';
+
+      // 2. Push to main screen inputs
+      if (document.getElementById('input-origin')) document.getElementById('input-origin').value = newOrigin;
+      if (document.getElementById('input-dest')) document.getElementById('input-dest').value = newDest;
+      if (document.getElementById('input-dep-date')) document.getElementById('input-dep-date').value = newDepDate;
+      if (document.getElementById('input-ret-date')) document.getElementById('input-ret-date').value = newRetDate;
+      if (document.getElementById('input-adults')) document.getElementById('input-adults').value = newAdults;
+      if (document.getElementById('input-children')) document.getElementById('input-children').value = newChildren;
+
+      // 3. Persist in localStorage
+      localStorage.setItem('travel_monitor_threshold', threshold);
+      localStorage.setItem('travel_monitor_cron', selectedCron);
+
+      // 4. Update calculations and close modal
+      onFilterChange();
+      closeMonitorModal();
+      showToast(`💾 監控目標與降價門檻 (NT$ ${Number(threshold).toLocaleString()}) 已成功儲存！`, '✅');
     }
 
     function closeMonitorModal() {

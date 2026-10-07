@@ -1,8 +1,8 @@
 name: Hotel monitor executor
 on:
   schedule:
-    # GitHub Actions cron uses UTC. 01:50 UTC = 09:50 Asia/Taipei.
-    - cron: "50 1 * * *"
+    # GitHub Actions cron uses UTC. 01:12 UTC = 09:12 Asia/Taipei.
+    - cron: "12 1 * * *"
   workflow_dispatch:
     inputs:
       monitor:

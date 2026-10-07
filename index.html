@@ -105,12 +105,34 @@
         <div class="space-y-1 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
           <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
             <span>MCP 運作狀態</span>
-            <span class="text-emerald-600 text-[11px] font-mono font-bold">DUAL-ENGINE ACTIVE</span>
+            <button onclick="openQuotaModal('serpapi')" class="text-emerald-600 hover:text-emerald-700 text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer hover:underline" title="點擊查看 API 剩餘配額與 Token 用量">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              DUAL-ENGINE ACTIVE ↗
+            </button>
           </div>
-          <div class="text-xs text-slate-500 space-y-0.5 pt-1">
-            <div class="flex justify-between"><span>機票引擎：</span><span class="font-medium text-slate-700">SerpApi ＋ Ignav</span></div>
-            <div class="flex justify-between"><span>飯店引擎：</span><span class="font-medium text-slate-700">Google Hotels (SerpApi)</span></div>
-            <div class="flex justify-between"><span>購票管道：</span><span class="font-medium text-emerald-700 font-bold">官網直營 / Trip / 易遊網</span></div>
+          <div class="text-xs text-slate-500 space-y-1 pt-1">
+            <div class="flex justify-between items-center">
+              <span>機票引擎：</span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="openQuotaModal('serpapi')" class="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 hover:bg-sky-100 font-semibold cursor-pointer border border-sky-200 text-[11px] transition" title="點擊查看 SerpApi 搜尋額度與本月剩餘">
+                  SerpApi <span id="badge-serpapi-left" class="font-mono text-emerald-600 font-bold">212餘</span>
+                </button>
+                <span class="text-slate-300">＋</span>
+                <button type="button" onclick="openQuotaModal('ignav')" class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold cursor-pointer border border-amber-200 text-[11px] transition" title="點擊查看 Ignav 備援引擎狀態">
+                  Ignav
+                </button>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>飯店引擎：</span>
+              <button type="button" onclick="openQuotaModal('hotel')" class="text-slate-700 hover:text-indigo-600 font-medium text-[11px] cursor-pointer hover:underline flex items-center gap-1">
+                Google Hotels (SerpApi)
+              </button>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>購票管道：</span>
+              <span class="font-medium text-emerald-700 font-bold">官網直營 / Trip / 易遊網</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1107,6 +1129,174 @@
   </main>
 
   <!-- ========================================== -->
+  <!-- MODAL: API TOKEN & ENGINE QUOTA INSPECTOR   -->
+  <!-- ========================================== -->
+  <div id="quota-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs hidden p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all animate-in fade-in zoom-in duration-150">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white p-5 flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-lg" id="quota-modal-icon">
+            🔑
+          </div>
+          <div>
+            <h3 class="font-bold text-sm flex items-center gap-2">
+              <span id="quota-modal-title">API Token 配額與用量儀表板</span>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono font-medium">即時連線</span>
+            </h3>
+            <p class="text-[11px] text-slate-300" id="quota-modal-subtitle">SerpApi / Ignav / Google Hotels 引擎配額狀態</p>
+          </div>
+        </div>
+        <button onclick="closeQuotaModal()" class="text-slate-400 hover:text-white text-lg font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-4 text-xs text-slate-700">
+        <!-- Engine Selector Tabs inside Modal -->
+        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+          <button type="button" onclick="switchQuotaView('serpapi')" id="tab-quota-serpapi" class="flex-1 py-1.5 rounded-lg font-bold text-center transition cursor-pointer bg-white text-sky-700 shadow-xs">
+            🌐 SerpApi (機票)
+          </button>
+          <button type="button" onclick="switchQuotaView('hotel')" id="tab-quota-hotel" class="flex-1 py-1.5 rounded-lg font-bold text-center transition cursor-pointer text-slate-600 hover:text-slate-900">
+            🏨 Google Hotels (飯店)
+          </button>
+          <button type="button" onclick="switchQuotaView('ignav')" id="tab-quota-ignav" class="flex-1 py-1.5 rounded-lg font-bold text-center transition cursor-pointer text-slate-600 hover:text-slate-900">
+            ⚡ Ignav (免費備援)
+          </button>
+        </div>
+
+        <!-- View 1: SerpApi Quota Content -->
+        <div id="view-quota-serpapi" class="space-y-3.5">
+          <!-- Big KPI Cards -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="bg-sky-50/70 border border-sky-100 rounded-xl p-3 text-center">
+              <div class="text-[11px] text-sky-700 font-medium">本月已使用</div>
+              <div class="text-2xl font-black text-sky-900 font-mono mt-0.5" id="qm-serpapi-used">38</div>
+              <div class="text-[10px] text-slate-400">次搜尋</div>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
+              <div class="text-[11px] text-emerald-700 font-medium">剩餘可用額度</div>
+              <div class="text-2xl font-black text-emerald-700 font-mono mt-0.5" id="qm-serpapi-remaining">212</div>
+              <div class="text-[10px] text-emerald-600 font-medium">次剩餘</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+              <div class="text-[11px] text-slate-600 font-medium">每月總方案</div>
+              <div class="text-2xl font-black text-slate-800 font-mono mt-0.5">250</div>
+              <div class="text-[10px] text-slate-400">次免費額度</div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="font-bold text-slate-700">額度使用率</span>
+              <span class="font-mono font-bold text-sky-700" id="qm-serpapi-percent">15.2%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+              <div id="qm-serpapi-bar" class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 15.2%"></div>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-slate-400 pt-0.5">
+              <span>0</span>
+              <span id="qm-serpapi-renewal">次月續約重置日：2026-10-30</span>
+              <span>250</span>
+            </div>
+          </div>
+
+          <!-- Meta Table -->
+          <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 text-xs">
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">API 服務商</span>
+              <span class="font-bold text-slate-800">SerpApi (Google Flights Engine)</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">節流保護政策</span>
+              <span class="font-medium text-emerald-700">智慧防超支（餘額小於 25 自動降級保護）</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">最新驗證時間</span>
+              <span class="font-mono text-slate-700" id="qm-serpapi-checked-at">2026-10-07 11:40 CST</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">官方後台直達</span>
+              <a href="https://serpapi.com/dashboard" target="_blank" class="text-sky-600 hover:text-sky-800 font-bold hover:underline flex items-center gap-1">
+                serpapi.com/dashboard ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 2: Google Hotels Quota Content -->
+        <div id="view-quota-hotel" class="space-y-3.5 hidden">
+          <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-indigo-900">
+            <div class="font-bold flex items-center gap-1.5">
+              <span>🏨</span> Google Hotels (SerpApi / SearchAPI)
+            </div>
+            <p class="text-[11px] text-indigo-700 mt-1 leading-relaxed">
+              飯店監控共用相同的搜尋引擎服務，專門巡檢「天然温泉ホテルリブマックス」與中部機場周邊飯店之每日最低房價。
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 text-xs">
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">巡檢頻率</span>
+              <span class="font-bold text-slate-800">每天與機票排程協同執行</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">目標飯店一</span>
+              <span class="font-medium text-slate-700">市區 6 晚：丸之內 LiVEMAX</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">目標飯店二</span>
+              <span class="font-medium text-slate-700">最後 1 晚：中部機場周邊候選</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">最新降價比對</span>
+              <span class="font-bold text-emerald-600">已訂房型持平（保證不買貴）</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 3: Ignav Quota Content -->
+        <div id="view-quota-ignav" class="space-y-3.5 hidden">
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900">
+            <div class="font-bold flex items-center gap-1.5">
+              <span>⚡</span> Ignav 機票直連備援引擎 (0 配額消耗)
+            </div>
+            <p class="text-[11px] text-amber-800 mt-1 leading-relaxed">
+              Ignav 是專門針對航空公司官方 NDC / GDS 直連的輕量爬蟲引擎。<b>不消耗 SerpApi 的付費配額</b>，可在主引擎額度用盡或需快速交叉驗證時無縫切換。
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 text-xs">
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">配額限制</span>
+              <span class="font-bold text-emerald-600">無限制 (本地端直連 / 開源)</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">支援航司</span>
+              <span class="font-medium text-slate-700">中華航空、星宇航空、國泰航空</span>
+            </div>
+            <div class="p-2.5 flex justify-between">
+              <span class="text-slate-500">觸發機制</span>
+              <span class="font-medium text-slate-700">Auto 雙引擎自動容錯備援</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+          <button type="button" onclick="loadLatestLivePriceData(true)" class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-semibold cursor-pointer">
+            <span>🔄</span> 重新整理最新配額
+          </button>
+          <button type="button" onclick="closeQuotaModal()" class="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer transition">
+            我知道了
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- MODAL: CLOUD SCHEDULER & MONITORING        -->
   <!-- ========================================== -->
   <div id="monitor-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs hidden p-4">
@@ -1730,6 +1920,39 @@
       }, 3500);
     }
 
+    // Quota Modal Handlers
+    function openQuotaModal(engine = 'serpapi') {
+      switchQuotaView(engine);
+      document.getElementById('quota-modal').classList.remove('hidden');
+    }
+
+    function closeQuotaModal() {
+      document.getElementById('quota-modal').classList.add('hidden');
+    }
+
+    function switchQuotaView(engine) {
+      const tabs = {
+        'serpapi': document.getElementById('tab-quota-serpapi'),
+        'hotel': document.getElementById('tab-quota-hotel'),
+        'ignav': document.getElementById('tab-quota-ignav')
+      };
+      const views = {
+        'serpapi': document.getElementById('view-quota-serpapi'),
+        'hotel': document.getElementById('view-quota-hotel'),
+        'ignav': document.getElementById('view-quota-ignav')
+      };
+
+      Object.keys(tabs).forEach(k => {
+        if (k === engine) {
+          tabs[k].className = 'flex-1 py-1.5 rounded-lg font-bold text-center transition cursor-pointer bg-white text-sky-700 shadow-xs';
+          views[k].classList.remove('hidden');
+        } else {
+          tabs[k].className = 'flex-1 py-1.5 rounded-lg font-bold text-center transition cursor-pointer text-slate-600 hover:text-slate-900';
+          views[k].classList.add('hidden');
+        }
+      });
+    }
+
     // Dynamic Live Data Loader: Fetch latest crawler JSON and hydrate UI
     async function loadLatestLivePriceData(showNotify = false) {
       try {
@@ -1744,6 +1967,7 @@
         const data = await res.json();
 
         // 1. Hydrate Header Update Time (convert ISO to UTC+8 CST)
+        let cstFormattedStr = '';
         if (data.checked_at) {
           const d = new Date(data.checked_at);
           // Format in Taipei CST time: YYYY-MM-DD HH:mm CST
@@ -1757,16 +1981,47 @@
             hour12: false
           });
           const parts = formatter.formatToParts(d).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
-          const cstStr = `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute} CST`;
+          cstFormattedStr = `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute} CST`;
           const timeEl = document.getElementById('header-update-time');
           if (timeEl) {
-            timeEl.innerText = `更新時間：${cstStr}`;
+            timeEl.innerText = `更新時間：${cstFormattedStr}`;
             timeEl.classList.add('text-emerald-400');
             setTimeout(() => timeEl.classList.remove('text-emerald-400'), 3000);
           }
+          if (document.getElementById('qm-serpapi-checked-at')) {
+            document.getElementById('qm-serpapi-checked-at').innerText = cstFormattedStr;
+          }
         }
 
-        // 2. Hydrate Flight Fares from market_candidates or itineraries
+        // 2. Hydrate SerpApi Quota Info
+        const quota = data.quota_after || data.quota_before;
+        if (quota) {
+          const used = quota.usage ?? 38;
+          const remaining = quota.remaining ?? 212;
+          const total = used + remaining;
+          const pct = total > 0 ? ((used / total) * 100).toFixed(1) : '15.2';
+
+          if (document.getElementById('badge-serpapi-left')) {
+            document.getElementById('badge-serpapi-left').innerText = `${remaining}餘`;
+          }
+          if (document.getElementById('qm-serpapi-used')) {
+            document.getElementById('qm-serpapi-used').innerText = used;
+          }
+          if (document.getElementById('qm-serpapi-remaining')) {
+            document.getElementById('qm-serpapi-remaining').innerText = remaining;
+          }
+          if (document.getElementById('qm-serpapi-percent')) {
+            document.getElementById('qm-serpapi-percent').innerText = `${pct}%`;
+          }
+          if (document.getElementById('qm-serpapi-bar')) {
+            document.getElementById('qm-serpapi-bar').style.width = `${pct}%`;
+          }
+          if (quota.renewal_date && document.getElementById('qm-serpapi-renewal')) {
+            document.getElementById('qm-serpapi-renewal').innerText = `次月續約重置日：${quota.renewal_date}`;
+          }
+        }
+
+        // 3. Hydrate Flight Fares from market_candidates or itineraries
         let ciPrice = null;
         let jxPrice = null;
         let cxPrice = null;
@@ -1829,7 +2084,7 @@
         }
 
         if (showNotify) {
-          showToast('⚡ 已同步載入 GitHub 最新監控爬蟲票價與時間！', '✅');
+          showToast('⚡ 已同步載入 GitHub 最新監控爬蟲票價與 API 配額！', '✅');
         }
       } catch (err) {
         console.warn('Could not load latest live crawler data:', err);

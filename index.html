@@ -336,12 +336,15 @@
           </div>
           <div class="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 text-center lg:text-right flex flex-col justify-between h-full">
             <div>
-              <div class="text-xs text-sky-200 font-medium">4 人全含總價 (2大2小)</div>
+              <div class="text-xs text-sky-200 font-medium">CI 154 + CI 155 午回 4 人總價</div>
               <div class="text-3xl sm:text-4xl font-black text-amber-300 tracking-tight my-1" id="ci-hero-price">
-                NT$ 63,038
+                NT$ 68,414
               </div>
-              <div class="text-xs text-slate-300 line-through" id="ci-hero-orig-price">原基準價 NT$ 68,466</div>
-              <div class="text-xs text-emerald-300 font-bold mt-1" id="ci-hero-avg-price">人均約 NT$ 15,760・含 23kg 托運 + 機上餐</div>
+              <div class="text-xs text-slate-300">原基準價 NT$ 68,466・人均約 NT$ 17,104</div>
+              <div class="mt-2 pt-2 border-t border-white/15 text-[11px] text-emerald-300 flex items-center justify-between lg:justify-end gap-2">
+                <span class="text-slate-300">若搭 CI 151 (早回)：</span>
+                <span class="font-bold font-mono text-xs text-amber-200" id="ci-hero-price-151">NT$ 63,038 起</span>
+              </div>
             </div>
           </div>
         </div>
@@ -352,7 +355,7 @@
         <div class="flex justify-between items-center mb-4">
           <div>
             <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>🛒</span> 各大購票管道實測比價與選購指南（華航 CI 154）
+              <span>🛒</span> 各大購票管道實測比價與選購指南（華航 CI 154 ＋ CI 155 午回）
             </h3>
             <p class="text-xs text-slate-500">比對官網直營 vs 各大 OTA 管道之價格、親子權益與退改簽條件</p>
           </div>
@@ -372,7 +375,7 @@
               </div>
             </div>
             <div class="text-2xl font-black text-emerald-700">
-              <span id="ci-direct-price">NT$ 63,038</span>
+              <span id="ci-direct-price">NT$ 68,414</span>
               <span class="text-xs font-normal text-slate-500">/ 4人全含</span>
             </div>
             <ul class="text-xs text-slate-600 space-y-1.5 pt-1 border-t border-emerald-100">
@@ -498,24 +501,43 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 font-sans">
-              <!-- CI Best FSC -->
-              <tr class="flight-row bg-amber-50/60 font-medium transition-all" data-airline="CI">
+              <!-- CI Best Pick 1: CI 154 + CI 155 (Noon Return - Recommended) -->
+              <tr class="flight-row bg-amber-50/80 font-medium transition-all border-l-4 border-amber-500" data-airline="CI">
                 <td class="py-2.5 px-3 font-bold text-slate-900">
-                  <span class="text-amber-500">🏆</span> 中華航空
+                  <span class="text-amber-500">🏆</span> 中華航空 <span class="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.2 rounded font-bold ml-1">午回首選</span>
                 </td>
                 <td class="py-2.5 px-3 bg-sky-50/30">
                   <b class="text-sky-800 font-mono">CI 154</b> <span class="font-bold text-slate-900">07:30 - 11:20</span>
                   <div class="text-[10px] text-slate-500">直飛 2h 50m・中午即達玩整天</div>
                 </td>
                 <td class="py-2.5 px-3 bg-indigo-50/30">
-                  <b class="text-indigo-800 font-mono">CI 155</b> <span class="font-bold text-slate-900">12:15 - 14:15</span>
-                  <div class="text-[10px] text-slate-500">直飛 3h 00m・午回返台不勞累</div>
+                  <b class="text-indigo-800 font-mono">CI 155</b> <span class="font-bold text-slate-900">12:20 - 14:30</span>
+                  <div class="text-[10px] text-indigo-700 font-bold">午回返台不勞累・免趕路</div>
+                </td>
+                <td class="py-2.5 px-3 text-emerald-700 font-semibold">含 23kg + 機上餐</td>
+                <td class="py-2.5 px-3 font-black text-amber-700 text-sm">
+                  <span id="price-ci154-155">NT$ 68,414</span> <span class="text-[10px] text-slate-400 font-normal">(/4人全含)</span>
+                </td>
+                <td class="py-2.5 px-3"><span class="bg-amber-500 text-white px-2 py-0.5 rounded font-bold shadow-2xs">早去午回黃金時段</span></td>
+              </tr>
+              <!-- CI Best Pick 2: CI 154 + CI 151 (Early Return - Budget Pick) -->
+              <tr class="flight-row bg-emerald-50/40 font-medium transition-all" data-airline="CI">
+                <td class="py-2.5 px-3 font-bold text-slate-900">
+                  <span class="text-emerald-600">💰</span> 中華航空 <span class="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.2 rounded font-bold ml-1">省錢早回</span>
+                </td>
+                <td class="py-2.5 px-3 bg-sky-50/30">
+                  <b class="text-sky-800 font-mono">CI 154</b> <span class="font-bold text-slate-900">07:30 - 11:20</span>
+                  <div class="text-[10px] text-slate-500">直飛 2h 50m・中午即達玩整天</div>
+                </td>
+                <td class="py-2.5 px-3">
+                  <b class="text-slate-700 font-mono">CI 151</b> <span class="font-bold text-slate-900">09:55 - 12:05</span>
+                  <div class="text-[10px] text-amber-700 font-medium">⚠️ 07:30 需到機場</div>
                 </td>
                 <td class="py-2.5 px-3 text-emerald-700 font-semibold">含 23kg + 機上餐</td>
                 <td class="py-2.5 px-3 font-black text-emerald-700 text-sm">
-                  <span id="price-ci154">NT$ 63,038</span> <span class="text-[10px] text-emerald-600 font-normal">(-NT$5,428)</span>
+                  <span id="price-ci154-151">NT$ 63,038</span> <span class="text-[10px] text-emerald-600 font-normal">(-NT$5,428)</span>
                 </td>
-                <td class="py-2.5 px-3"><span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold">最佳首選 (早去午回)</span></td>
+                <td class="py-2.5 px-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">極致省錢 (需早起)</span></td>
               </tr>
               <!-- CI Late Flight -->
               <tr class="flight-row transition-all" data-airline="CI">
@@ -2022,7 +2044,7 @@
         }
 
         // 3. Hydrate Flight Fares from market_candidates or itineraries
-        let ciPrice = null;
+        let ci154CandPrice = null;
         let jxPrice = null;
         let cxPrice = null;
         let ci150Price = null;
@@ -2032,35 +2054,42 @@
             const flight = cand.outbound_flight || '';
             const price = cand.displayed_price_twd;
             if (!price) return;
-            if (flight.includes('CI 154') || flight.includes('CI154')) ciPrice = price;
+            if (flight.includes('CI 154') || flight.includes('CI154')) ci154CandPrice = price;
             else if (flight.includes('JX 838') || flight.includes('JX838')) jxPrice = price;
             else if (flight.includes('CX 530') || flight.includes('CX530')) cxPrice = price;
             else if (flight.includes('CI 150') || flight.includes('CI150')) ci150Price = price;
           });
         }
 
-        // Fallback to itineraries if candidates missing
-        if (!ciPrice && Array.isArray(data.itineraries)) {
-          const ciMatch = data.itineraries.find(it => it.itinerary_key === 'CI154+CI151' || it.itinerary_key === 'CI154+CI155');
-          if (ciMatch) ciPrice = ciMatch.displayed_price_twd;
+        // Separate extraction for CI 154 + CI 155 (Noon) and CI 154 + CI 151 (Early)
+        let ci155Price = 68414; // Default baseline for noon return
+        let ci151Price = 63038; // Default baseline for early return
+
+        if (Array.isArray(data.itineraries)) {
+          const match155 = data.itineraries.find(it => it.itinerary_key === 'CI154+CI155');
+          if (match155 && match155.displayed_price_twd) ci155Price = match155.displayed_price_twd;
+
+          const match151 = data.itineraries.find(it => it.itinerary_key === 'CI154+CI151');
+          if (match151 && match151.displayed_price_twd) ci151Price = match151.displayed_price_twd;
         }
 
         // Apply hydrated flight prices to DOM elements
-        if (ciPrice) {
-          if (document.getElementById('ci-hero-price')) {
-            document.getElementById('ci-hero-price').innerText = `NT$ ${ciPrice.toLocaleString()}`;
-          }
-          if (document.getElementById('ci-direct-price')) {
-            document.getElementById('ci-direct-price').innerText = `NT$ ${ciPrice.toLocaleString()}`;
-          }
-          if (document.getElementById('price-ci154')) {
-            document.getElementById('price-ci154').innerText = `NT$ ${ciPrice.toLocaleString()}`;
-          }
-          if (document.getElementById('ci-hero-avg-price')) {
-            const avg = Math.round(ciPrice / 4);
-            document.getElementById('ci-hero-avg-price').innerText = `人均約 NT$ ${avg.toLocaleString()}・含 23kg 托運 + 機上餐`;
-          }
+        if (document.getElementById('price-ci154-155')) {
+          document.getElementById('price-ci154-155').innerText = `NT$ ${ci155Price.toLocaleString()}`;
         }
+        if (document.getElementById('ci-hero-price')) {
+          document.getElementById('ci-hero-price').innerText = `NT$ ${ci155Price.toLocaleString()}`;
+        }
+        if (document.getElementById('ci-direct-price')) {
+          document.getElementById('ci-direct-price').innerText = `NT$ ${ci155Price.toLocaleString()}`;
+        }
+        if (document.getElementById('price-ci154-151')) {
+          document.getElementById('price-ci154-151').innerText = `NT$ ${ci151Price.toLocaleString()}`;
+        }
+        if (document.getElementById('ci-hero-price-151')) {
+          document.getElementById('ci-hero-price-151').innerText = `NT$ ${ci151Price.toLocaleString()} 起`;
+        }
+
         if (jxPrice && document.getElementById('price-jx838')) {
           document.getElementById('price-jx838').innerText = `NT$ ${jxPrice.toLocaleString()}`;
         }
@@ -2071,16 +2100,14 @@
           document.getElementById('price-ci150').innerText = `NT$ ${ci150Price.toLocaleString()}`;
         }
 
-        // Update overall hero budget estimate with live CI price
-        if (ciPrice) {
-          const hotelTotal = 22735;
-          const grandTotal = ciPrice + hotelTotal;
-          if (document.getElementById('hero-total-price')) {
-            document.getElementById('hero-total-price').innerText = `約 NT$ ${grandTotal.toLocaleString()}`;
-          }
-          if (document.getElementById('hero-price-subtext')) {
-            document.getElementById('hero-price-subtext').innerText = `華航首選 NT$${ciPrice.toLocaleString()} + 飯店 7 晚約 NT$${hotelTotal.toLocaleString()}`;
-          }
+        // Update overall hero budget estimate with preferred CI 155 price
+        const hotelTotal = 22735;
+        const grandTotal = ci155Price + hotelTotal;
+        if (document.getElementById('hero-total-price')) {
+          document.getElementById('hero-total-price').innerText = `約 NT$ ${grandTotal.toLocaleString()}`;
+        }
+        if (document.getElementById('hero-price-subtext')) {
+          document.getElementById('hero-price-subtext').innerText = `華航午回首選 NT$${ci155Price.toLocaleString()} + 飯店 7 晚約 NT$${hotelTotal.toLocaleString()}`;
         }
 
         if (showNotify) {

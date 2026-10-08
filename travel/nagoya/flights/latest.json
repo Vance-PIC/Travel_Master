@@ -1,35 +1,33 @@
 {
-  "checked_at": "2026-10-07T07:44:26+00:00",
+  "checked_at": "2026-10-08T03:29:03+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 2,
-  "searches_used": 2,
-  "api_searches_used": 2,
-  "account_calls": 3,
+  "planned_searches": 1,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 40,
-    "remaining": 210,
+    "usage": 42,
+    "remaining": 208,
     "tier": "normal",
-    "plan_searches_left": 210,
+    "plan_searches_left": 208,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 40,
-    "remaining": 210,
+    "usage": 42,
+    "remaining": 208,
     "tier": "normal",
-    "plan_searches_left": 210,
+    "plan_searches_left": 208,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 0,
-  "monitoring_mode": "market_plus_return",
-  "refreshed_outbounds": [
-    "JX838"
-  ],
+  "monitoring_mode": "market_only",
+  "refreshed_outbounds": [],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
   "booking_verification_checks": [],
-  "refresh_complete": true,
+  "refresh_complete": false,
   "schema_version": 7,
   "skill_version": 2,
   "route": {
@@ -82,7 +80,7 @@
       "outbound_flight": "CI 150",
       "outbound_departure": "2027-07-11 17:15",
       "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 55368,
+      "displayed_price_twd": 55376,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -99,7 +97,7 @@
       "outbound_flight": "CI 154",
       "outbound_departure": "2027-07-11 07:30",
       "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 64272,
+      "displayed_price_twd": 64280,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -116,7 +114,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 71828,
+      "displayed_price_twd": 71840,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -125,10 +123,7 @@
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_low",
-        "drop_5_percent"
-      ]
+      "deep_search_triggers": []
     },
     {
       "airline": "國泰航空",
@@ -427,8 +422,8 @@
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
       "checked_at": "2026-10-07T07:44:26+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
+      "observed_this_run": false,
+      "observation_status": "retained",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
       "previous_displayed_price_twd": 70214.0,
@@ -442,46 +437,7 @@
       ]
     }
   ],
-  "options": [
-    {
-      "airline": "星宇航空",
-      "airline_iata": "JX",
-      "outbound_flight": "JX 838",
-      "outbound_departure": "2027-07-11 14:55",
-      "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 71828,
-      "price_scope": "unknown",
-      "family_total_twd": null,
-      "currency": "TWD",
-      "baggage_status": "unknown",
-      "inbound_preference_match": false,
-      "outbound_preference_match": false,
-      "time_preference_match": false,
-      "departure_token_available": true,
-      "deep_search_triggers": [
-        "new_low",
-        "drop_5_percent"
-      ],
-      "inbound_flight": "JX 839",
-      "inbound_departure": "2027-07-18 19:55",
-      "inbound_arrival": "2027-07-18 22:00",
-      "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-07T07:44:26+00:00",
-      "observed_this_run": true,
-      "observation_status": "observed",
-      "route_key": "75b20fde19f839d7",
-      "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 70214.0,
-      "price_changes": [
-        "price_increase"
-      ],
-      "historical_low_twd": 70214.0,
-      "refresh_reasons": [
-        "new_low",
-        "drop_5_percent"
-      ]
-    }
-  ],
+  "options": [],
   "market_price_lows": {
     "CI154": 63038,
     "CX530": 79660,

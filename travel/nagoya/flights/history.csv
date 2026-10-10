@@ -64,3 +64,7 @@ checked_at,status,source,airline,airline_iata,outbound_flight,outbound_departure
 2026-10-09T07:20:10+00:00,observed,SerpApi Google Flights,中華航空,CI,CI 154,2027-07-11 07:30,2027-07-11 11:20,,,,64312,unknown,,TWD,unknown,,,market,monitor_query,1,normal,44,206,True,,,,,75b20fde19f839d7,,,,,,
 2026-10-09T07:20:10+00:00,observed,SerpApi Google Flights,星宇航空,JX,JX 838,2027-07-11 14:55,2027-07-11 18:45,,,,71872,unknown,,TWD,unknown,False,,market,monitor_query,1,normal,44,206,False,,,,,75b20fde19f839d7,,,,,,
 2026-10-09T07:20:10+00:00,observed,SerpApi Google Flights,國泰航空,CX,CX 530,2027-07-11 11:30,2027-07-11 15:30,,,,82114,unknown,,TWD,unknown,,,market,monitor_query,1,normal,44,206,True,,,,,75b20fde19f839d7,,,,,,
+2026-10-10T07:00:15+00:00,observed,SerpApi Google Flights,中華航空,CI,CI 150,2027-07-11 17:15,2027-07-11 21:05,,,,55458,unknown,,TWD,unknown,False,,market,monitor_query,1,normal,46,204,False,,,,,75b20fde19f839d7,,,,,,
+2026-10-10T07:00:15+00:00,observed,SerpApi Google Flights,中華航空,CI,CI 154,2027-07-11 07:30,2027-07-11 11:20,,,,64362,unknown,,TWD,unknown,,,market,monitor_query,1,normal,46,204,True,,,,,75b20fde19f839d7,,,,,,
+2026-10-10T07:00:15+00:00,observed,SerpApi Google Flights,星宇航空,JX,JX 838,2027-07-11 14:55,2027-07-11 18:45,,,,79732,unknown,,TWD,unknown,False,,market,monitor_query,1,normal,46,204,False,,,,,75b20fde19f839d7,,,,,,
+2026-10-10T07:00:15+00:00,observed,SerpApi Google Flights,國泰航空,CX,CX 530,2027-07-11 11:30,2027-07-11 15:30,,,,82156,unknown,,TWD,unknown,,,market,monitor_query,1,normal,46,204,True,,,,,75b20fde19f839d7,,,,,,

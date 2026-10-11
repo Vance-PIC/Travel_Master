@@ -1,4 +1,5 @@
 """Read local quote snapshots and project only fields approved for publication."""
+import csv
 import json
 import math
 from datetime import datetime, timedelta
@@ -113,6 +114,43 @@ def cell(value: object) -> str:
     return escape(str(value if value is not None else '—'), quote=True)
 
 
+
+def history_summary(path: Path) -> dict:
+    grouped = {}
+    try:
+        with path.open(encoding='utf-8-sig', newline='') as stream:
+            for record in csv.DictReader(stream):
+                if record.get('record_type') != 'itinerary' or record.get('status') != 'observed':
+                    continue
+                key = record.get('itinerary_key', '')
+                try:
+                    price = float(record.get('displayed_price_twd', ''))
+                except (ValueError, TypeError):
+                    continue
+                if key and math.isfinite(price) and price >= 0:
+                    grouped.setdefault(key, []).append(price)
+    except (OSError, csv.Error):
+        return {}
+    return {key: {'low': min(v), 'previous': v[-2] if len(v) > 1 else None} for key, v in grouped.items()}
+
+
+def add_comparisons(flights, history, target, preferences):
+    for item in flights:
+        key = item['outbound_flight'].replace(' ', '') + '+' + item['inbound_flight'].replace(' ', '')
+        past = history.get(key, {})
+        price = item['displayed_price_twd']
+        previous = past.get('previous')
+        item['historical_low'] = past.get('low')
+        item['price_change'] = price - previous if previous is not None else None
+        item['target_difference'] = price - target
+        item['target_percentage'] = round((price - target) / target * 100, 1)
+        outbound = item['outbound_departure'][-5:]
+        inbound = item['inbound_arrival'][-5:]
+        item['time_preference'] = ('符合' if outbound < preferences.get('outbound_before', '12:00')
+                                  and inbound < preferences.get('inbound_arrival_before', '21:00')
+                                  else '不符合')
+
+
 def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
     """Render explicit public columns; unknown keys never enter the document."""
     def rows(items, fields):
@@ -123,10 +161,10 @@ def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
             result.append('<tr>' + ''.join('<td>' + value + '</td>' for value in values) + '</tr>')
         return ''.join(result) or '<tr><td colspan="' + str(len(fields) + 1) + '">無可用報價</td></tr>'
 
-    flight_fields = ('origin', 'destination', 'outbound_date', 'inbound_date', 'airline',
-                     'outbound_flight', 'outbound_departure', 'outbound_arrival',
+    flight_fields = ('airline', 'outbound_flight', 'outbound_departure', 'outbound_arrival',
                      'inbound_flight', 'inbound_departure', 'inbound_arrival',
-                     'displayed_price_twd', 'price_label', 'checked_at')
+                     'displayed_price_twd', 'price_label', 'price_change', 'historical_low',
+                     'target_difference', 'target_percentage', 'time_preference', 'checked_at')
     hotel_fields = ('hotel_name', 'check_in', 'check_out', 'total_amount', 'query_currency',
                     'nightly_amount', 'source', 'verification_status', 'comparison_status', 'observed_at')
     allowed = {'正常', '無可用報價', '資料無法讀取', '無有效觀測'}
@@ -146,6 +184,12 @@ def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
             messages.append(label + '：資料過期')
     if any(item.get('price_scope') != 'family_total' for item in flights):
         messages.append('機票價格範圍未驗證；行李狀態未知')
+    run = status.get('last_run', {})
+    if isinstance(run, dict):
+        if _timestamp(run.get('checked_at')):
+            messages.append('最後監控執行：' + cell(run['checked_at']))
+        if run.get('refresh_complete') is False:
+            messages.append('完整行程未刷新；報價並非即時')
     template = (Path(__file__).resolve().parents[1] / 'site/public_price_template.html').read_text(encoding='utf-8')
     replacements = {'{{FLIGHT_ROWS}}': rows(flights, flight_fields),
                     '{{HOTEL_ROWS}}': rows(hotels, hotel_fields),
@@ -174,7 +218,16 @@ def build_page(root: Path, now: datetime) -> str:
         if value == '正常' and not _has_hotel_observations(snapshot):
             value = '無有效觀測'
         hotel_statuses.append(value)
-    return render_page(flights, hotels, {'flights': [flight_status],
+    config, _ = read_snapshot(base / 'flight-monitor.json')
+    preferences = config.get('preferences', {})
+    if not isinstance(preferences, dict):
+        preferences = {}
+    target = config.get('family_target_twd', 50000)
+    if type(target) is not int or target <= 0:
+        target = 50000
+    add_comparisons(flights, history_summary(base / 'flights/itinerary_history.csv'), target, preferences)
+    last_run, _ = read_snapshot(base / 'flights/last-run.json')
+    return render_page(flights, hotels, {'last_run': last_run, 'flights': [flight_status],
                                         'hotels': hotel_statuses or ['無可用報價']})
 
 

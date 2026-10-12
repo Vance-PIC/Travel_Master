@@ -2,8 +2,8 @@
   "schema_version": 1,
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "run_id": "e8484d32568c43f8a7152d917d18b229",
-  "checked_at": "2026-10-05T02:23:17.593303+00:00",
+  "run_id": "c8f41d78db2f4a539a4947dcc393ae17",
+  "checked_at": "2026-10-12T02:01:52.638027+00:00",
   "config_fingerprint": "32c46456d93b6f5fbc5ee7fed45bedb175042f3bbabb39c5ed1653645db3d807",
   "comparison_key": "74455415d7ffa895b23d120437fe44d658570d6ecdd4bcb4616b406bbc22226b",
   "effective_request": {
@@ -177,7 +177,7 @@
       "hotel_name": "Hotel Live Max PREMIUM Nagoya Marunouchi",
       "hotel_data_id": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
       "source": "Booking.com",
-      "room_name": "Twin Room - Non-Smoking",
+      "room_name": "Twin Room - Smoking",
       "evidence_path": "property.featured_offers[1].rooms[0].rates[0]",
       "total_amount": 76273,
       "nightly_amount": 12712,
@@ -186,15 +186,15 @@
       "reported_num_guests": null,
       "room_size_m2": null,
       "beds": null,
-      "smoking": "non-smoking",
+      "smoking": "smoking",
       "cancellation": true,
       "payment": null,
       "benefits": null,
       "tax_fee_inclusion": "unknown",
-      "room_match": "uncertain",
-      "comparison_status": "pending_confirmation",
+      "room_match": "mismatch",
+      "comparison_status": "not_comparable",
       "alert_eligible": false,
-      "observed_at": "2026-10-05T02:23:17.592938+00:00",
+      "observed_at": "2026-10-12T02:01:52.637765+00:00",
       "stay": {
         "check_in": "2027-07-11",
         "check_out": "2027-07-17"
@@ -208,44 +208,44 @@
         ],
         "rooms": 1
       },
-      "rate_key": "6a28b9ca1e98f158dbbd3661f797ce50eaaafd4f381470383c2832351e79b4b2",
+      "rate_key": "291c55cfcab88ec4495abc11d55a888472d82731fa088735948a68327a680238",
       "evidence": {
         "hotel_data_id": {
           "field": "hotel_data_id",
           "literal_value": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-05T02:23:17.592938+00:00"
+          "observed_at": "2026-10-12T02:01:52.637765+00:00"
         },
         "room_name": {
           "field": "room_name",
-          "literal_value": "Twin Room - Non-Smoking",
+          "literal_value": "Twin Room - Smoking",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-05T02:23:17.592938+00:00"
+          "observed_at": "2026-10-12T02:01:52.637765+00:00"
         },
         "total_amount": {
           "field": "total_amount",
           "literal_value": 76273,
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-05T02:23:17.592938+00:00"
+          "observed_at": "2026-10-12T02:01:52.637765+00:00"
         },
         "nightly_amount": {
           "field": "nightly_amount",
           "literal_value": 12712,
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-05T02:23:17.592938+00:00"
+          "observed_at": "2026-10-12T02:01:52.637765+00:00"
         },
         "smoking": {
           "field": "smoking",
-          "literal_value": "non-smoking",
+          "literal_value": "smoking",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].name",
-          "observed_at": "2026-10-05T02:23:17.592938+00:00",
+          "observed_at": "2026-10-12T02:01:52.637765+00:00",
           "derived_from": "room_name",
-          "source_text": "Twin Room - Non-Smoking"
+          "source_text": "Twin Room - Smoking"
         }
       },
       "field_status": {
@@ -255,10 +255,10 @@
         "room_size_m2": "unknown",
         "beds.count": "unknown",
         "beds.type": "unknown",
-        "smoking": "pass",
+        "smoking": "fail",
         "hotel_identity": "pass"
       },
-      "filter_status": "pending_confirmation",
+      "filter_status": "excluded",
       "fresh": true,
       "retained": false,
       "difference": null,

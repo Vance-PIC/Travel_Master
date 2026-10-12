@@ -43,7 +43,7 @@
             }
           ]
         },
-        "min_room_size_m2": 30,
+        "min_room_size_m2": 25,
         "beds": {
           "count": 2,
           "type": null
@@ -52,7 +52,21 @@
         "occupancy": "must_accommodate_configured_party",
         "price_ceiling": null
       },
-      "preferences": {},
+      "preferences": {
+        "preferred_min_room_size_m2": 30,
+        "booked_primary_option": {
+          "hotel": "Comfort Hotel Central International Airport",
+          "room": "Superior Twin Room - Non-Smoking",
+          "amount": 24530,
+          "currency": "JPY"
+        },
+        "booked_backup_option": {
+          "hotel": "Four Points by Sheraton Nagoya, Chubu International Airport",
+          "room": "Superior Twin Room - Non-Smoking",
+          "amount": 28798,
+          "currency": "JPY"
+        }
+      },
       "sources": [
         "searchapi.io/google_hotels",
         "searchapi.io/google_hotels_property"

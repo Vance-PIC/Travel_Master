@@ -43,6 +43,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Diagnose scheduled start delay
+        if: github.event_name == 'schedule'
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime, timedelta, timezone
+          now = datetime.now(timezone.utc) + timedelta(hours=8)
+          expected = now.replace(hour=9, minute=12, second=0, microsecond=0)
+          delay = (now - expected).total_seconds() / 60
+          print("Taiwan scheduled:", expected.isoformat())
+          print("Taiwan actual:", now.isoformat())
+          print("Start delay minutes:", round(delay, 1))
+          if delay > 30:
+              print("::warning::Scheduled workflow started more than 30 minutes late")
+          PY
+
       - name: Check SerpApi credential
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}

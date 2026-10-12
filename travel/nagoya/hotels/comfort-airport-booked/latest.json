@@ -2,8 +2,8 @@
   "schema_version": 1,
   "monitor_id": "comfort-airport-booked",
   "stage": "booked_room_compare",
-  "run_id": "34631ef1af1f43819b9a5b080db2bb99",
-  "checked_at": "2026-10-12T02:58:47.847864+00:00",
+  "run_id": "bb5ccf64342244a99c28c778c638521b",
+  "checked_at": "2026-10-12T07:17:44.371933+00:00",
   "config_fingerprint": "846c1b8a4166e800e2efa9fbf577656b8760b4e045083ce95906013189fd0648",
   "comparison_key": "64a417d44cfa93fc24551ebb075864d7f8e89960e47ba8a94166941f998930d0",
   "effective_request": {

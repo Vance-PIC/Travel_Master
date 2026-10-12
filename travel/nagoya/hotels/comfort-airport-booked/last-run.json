@@ -1,10 +1,10 @@
 {
-  "run_id": "34631ef1af1f43819b9a5b080db2bb99",
+  "run_id": "bb5ccf64342244a99c28c778c638521b",
   "monitor_id": "comfort-airport-booked",
   "stage": "booked_room_compare",
-  "started_at": "2026-10-12T02:58:44.912317+00:00",
+  "started_at": "2026-10-12T07:17:39.673044+00:00",
   "status": "success",
-  "snapshot_run_id": "34631ef1af1f43819b9a5b080db2bb99",
+  "snapshot_run_id": "bb5ccf64342244a99c28c778c638521b",
   "effective_request": {
     "monitor_id": "comfort-airport-booked",
     "stage": "booked_room_compare",
@@ -153,5 +153,5 @@
     "resolution_mode": "discovery"
   },
   "attempted_requests": 2,
-  "ended_at": "2026-10-12T02:58:47.847864+00:00"
+  "ended_at": "2026-10-12T07:17:44.371933+00:00"
 }

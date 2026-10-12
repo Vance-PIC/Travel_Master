@@ -2,8 +2,8 @@
   "schema_version": 1,
   "monitor_id": "fourpoints-airport-booked",
   "stage": "booked_room_compare",
-  "run_id": "1c6ab7e8148b4076b3785640c3e7e3cc",
-  "checked_at": "2026-10-12T02:59:40.822749+00:00",
+  "run_id": "48ebd34e743c4273ac8d1c15861a9501",
+  "checked_at": "2026-10-12T07:17:47.268716+00:00",
   "config_fingerprint": "cebafa460db0637c99b06e3667f6e2f8a6cf4fb51baabec85ddcaa8c112b45af",
   "comparison_key": "62fc6b538129d912da3c6dd08d4625d3766a69ba295541fbe6f92afe3a120f5d",
   "effective_request": {

@@ -1,10 +1,10 @@
 {
-  "run_id": "c8f41d78db2f4a539a4947dcc393ae17",
+  "run_id": "08ddc1229e8f470fac526458a583b6b7",
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "started_at": "2026-10-12T02:01:51.108320+00:00",
+  "started_at": "2026-10-12T07:17:38.083933+00:00",
   "status": "success",
-  "snapshot_run_id": "c8f41d78db2f4a539a4947dcc393ae17",
+  "snapshot_run_id": "08ddc1229e8f470fac526458a583b6b7",
   "effective_request": {
     "monitor_id": "marunouchi-booked",
     "stage": "booked_room_compare",
@@ -81,7 +81,7 @@
     },
     "preferences": {},
     "booking_baseline": {
-      "amount": 77836,
+      "amount": 71294,
       "currency": null,
       "source": null,
       "price_scope": "unknown",
@@ -100,7 +100,7 @@
       ]
     },
     "alert": {
-      "operator": "lt",
+      "operator": "lte",
       "amount": 70000,
       "currency": null,
       "price_scope": "unknown",
@@ -158,7 +158,7 @@
       "property_token_evidence": null
     }
   },
-  "config_hash": "b7891df7d9bc2acdef05df58da5a73b068808e56a4cb2e3dcef33f0ac97e8837",
+  "config_hash": "84d9c515472a79872e8ae0c2fd24df68f8c8e95e34a524497d3c5c5aa11d5f8b",
   "coverage": {
     "requested": [
       "0x6003711bc3781f9b:0x8adc85566de9c8fe"
@@ -172,5 +172,5 @@
     "resolution_mode": "direct_token"
   },
   "attempted_requests": 1,
-  "ended_at": "2026-10-12T02:01:52.638027+00:00"
+  "ended_at": "2026-10-12T07:17:39.588422+00:00"
 }

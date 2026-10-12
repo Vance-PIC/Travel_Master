@@ -1,10 +1,10 @@
 {
-  "run_id": "b202d1a107364711b454dab863c318b7",
+  "run_id": "f9ad6104f0d64b328b6dfbe0c4a73956",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-10-12T02:44:23.763872+00:00",
+  "started_at": "2026-10-12T07:17:24.137375+00:00",
   "status": "success",
-  "snapshot_run_id": "b202d1a107364711b454dab863c318b7",
+  "snapshot_run_id": "f9ad6104f0d64b328b6dfbe0c4a73956",
   "effective_request": {
     "monitor_id": "airport-candidate",
     "stage": "candidate_search",
@@ -93,20 +93,22 @@
   "config_hash": "7e710273831b676e976cc27db98fe3978d5e2bf22ca497b378ce74968b4113e8",
   "coverage": {
     "requested": [
+      "0x60047d8c4a20df69:0xc83f5655a6941a10",
       "0x60048773140611ad:0x1d734d496cd25fd0",
       "0x60048bf7a88b18b5:0x4eb8ec2c9795d2f",
-      "0x600489ec805d9de5:0x63e165a6dadf7d3d"
+      "0x60048862825c20a9:0xab5cff893d057366"
     ],
     "completed": [
+      "0x60047d8c4a20df69:0xc83f5655a6941a10",
       "0x60048773140611ad:0x1d734d496cd25fd0",
       "0x60048bf7a88b18b5:0x4eb8ec2c9795d2f",
-      "0x600489ec805d9de5:0x63e165a6dadf7d3d"
+      "0x60048862825c20a9:0xab5cff893d057366"
     ],
     "deferred": [],
     "failed": [],
     "provider": "searchapi.io",
     "resolution_mode": "discovery"
   },
-  "attempted_requests": 4,
-  "ended_at": "2026-10-12T02:44:42.808638+00:00"
+  "attempted_requests": 5,
+  "ended_at": "2026-10-12T07:17:37.997814+00:00"
 }

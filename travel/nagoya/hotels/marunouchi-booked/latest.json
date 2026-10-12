@@ -2,10 +2,10 @@
   "schema_version": 1,
   "monitor_id": "marunouchi-booked",
   "stage": "booked_room_compare",
-  "run_id": "c8f41d78db2f4a539a4947dcc393ae17",
-  "checked_at": "2026-10-12T02:01:52.638027+00:00",
-  "config_fingerprint": "32c46456d93b6f5fbc5ee7fed45bedb175042f3bbabb39c5ed1653645db3d807",
-  "comparison_key": "74455415d7ffa895b23d120437fe44d658570d6ecdd4bcb4616b406bbc22226b",
+  "run_id": "08ddc1229e8f470fac526458a583b6b7",
+  "checked_at": "2026-10-12T07:17:39.588422+00:00",
+  "config_fingerprint": "df32c176fd29a46d60fdd43a4bfb4eb3a5181fdb4527315c1504e31b0db384d1",
+  "comparison_key": "8ff34d575e4e2c0b23ebdab5b4757f72d5577af7c58eab927d90f7250d453e2e",
   "effective_request": {
     "monitor_id": "marunouchi-booked",
     "stage": "booked_room_compare",
@@ -82,7 +82,7 @@
     },
     "preferences": {},
     "booking_baseline": {
-      "amount": 77836,
+      "amount": 71294,
       "currency": null,
       "source": null,
       "price_scope": "unknown",
@@ -101,7 +101,7 @@
       ]
     },
     "alert": {
-      "operator": "lt",
+      "operator": "lte",
       "amount": 70000,
       "currency": null,
       "price_scope": "unknown",
@@ -159,7 +159,7 @@
       "property_token_evidence": null
     }
   },
-  "config_hash": "b7891df7d9bc2acdef05df58da5a73b068808e56a4cb2e3dcef33f0ac97e8837",
+  "config_hash": "84d9c515472a79872e8ae0c2fd24df68f8c8e95e34a524497d3c5c5aa11d5f8b",
   "coverage": {
     "requested": [
       "0x6003711bc3781f9b:0x8adc85566de9c8fe"
@@ -194,7 +194,7 @@
       "room_match": "mismatch",
       "comparison_status": "not_comparable",
       "alert_eligible": false,
-      "observed_at": "2026-10-12T02:01:52.637765+00:00",
+      "observed_at": "2026-10-12T07:17:39.588099+00:00",
       "stay": {
         "check_in": "2027-07-11",
         "check_out": "2027-07-17"
@@ -215,35 +215,35 @@
           "literal_value": "0x6003711bc3781f9b:0x8adc85566de9c8fe",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-12T02:01:52.637765+00:00"
+          "observed_at": "2026-10-12T07:17:39.588099+00:00"
         },
         "room_name": {
           "field": "room_name",
           "literal_value": "Twin Room - Smoking",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-12T02:01:52.637765+00:00"
+          "observed_at": "2026-10-12T07:17:39.588099+00:00"
         },
         "total_amount": {
           "field": "total_amount",
           "literal_value": 76273,
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-12T02:01:52.637765+00:00"
+          "observed_at": "2026-10-12T07:17:39.588099+00:00"
         },
         "nightly_amount": {
           "field": "nightly_amount",
           "literal_value": 12712,
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].rates[0]",
-          "observed_at": "2026-10-12T02:01:52.637765+00:00"
+          "observed_at": "2026-10-12T07:17:39.588099+00:00"
         },
         "smoking": {
           "field": "smoking",
           "literal_value": "smoking",
           "source": "searchapi.io",
           "repo_path": "property.featured_offers[1].rooms[0].name",
-          "observed_at": "2026-10-12T02:01:52.637765+00:00",
+          "observed_at": "2026-10-12T07:17:39.588099+00:00",
           "derived_from": "room_name",
           "source_text": "Twin Room - Smoking"
         }

@@ -26,7 +26,7 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertIn('if: always()', artifact)
         self.assertIn('actions/upload-artifact@v4', artifact)
         self.assertIn('schedule:', text)
-        self.assertIn('50 1 * * *', text)
+        self.assertIn('12 1 * * *', text)
         self.assertIn('airport-candidate', text)
         self.assertIn('marunouchi-booked', text)
 

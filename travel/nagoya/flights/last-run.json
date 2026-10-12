@@ -1,30 +1,29 @@
 {
-  "checked_at": "2026-10-11T07:07:06+00:00",
+  "checked_at": "2026-10-12T01:38:55+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 3,
-  "searches_used": 3,
-  "api_searches_used": 3,
-  "account_calls": 4,
+  "planned_searches": 2,
+  "searches_used": 2,
+  "api_searches_used": 2,
+  "account_calls": 3,
   "quota_before": {
-    "usage": 46,
-    "remaining": 204,
+    "usage": 49,
+    "remaining": 201,
     "tier": "normal",
-    "plan_searches_left": 204,
+    "plan_searches_left": 201,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 47,
-    "remaining": 203,
+    "usage": 50,
+    "remaining": 200,
     "tier": "normal",
-    "plan_searches_left": 203,
+    "plan_searches_left": 200,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 1,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
-    "CI154",
-    "CX530"
+    "JX838"
   ],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],

@@ -1,0 +1,1 @@
+schema_version,run_id,monitor_id,stage,comparison_key,observed_at,source,hotel_key,room_key,rate_key,status,amount,currency,price_scope,tax_fee_inclusion,filter_status,room_match,comparison_status,evidence_ref

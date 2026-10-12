@@ -13,6 +13,8 @@ on:
         options:
           - marunouchi-booked
           - airport-candidate
+          - comfort-airport-booked
+          - fourpoints-airport-booked
       request_json:
         description: Optional unified hotel request JSON; overrides the selected monitor input
         required: false
@@ -60,6 +62,8 @@ jobs:
           if [ "$EVENT_NAME" = "schedule" ]; then
             python scripts/hotel_executor.py run --monitor airport-candidate
             python scripts/hotel_executor.py run --monitor marunouchi-booked
+            python scripts/hotel_executor.py run --monitor comfort-airport-booked
+            python scripts/hotel_executor.py run --monitor fourpoints-airport-booked
           elif [ -n "$REQUEST_JSON" ]; then
             printf '%s' "$REQUEST_JSON" > hotel-request.json
             python scripts/hotel_executor.py run-request --request-file hotel-request.json > hotel-request-result.json

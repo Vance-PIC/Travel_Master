@@ -95,10 +95,10 @@
         <div class="space-y-1">
           <div class="flex items-center gap-1.5">
             <span class="text-xs text-slate-400 font-medium">最新機加酒預估總額</span>
-            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded">降價 NT$5,376!</span>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded">已訂精省！</span>
           </div>
-          <div class="text-2xl font-black text-emerald-600" id="hero-total-price">約 NT$ 85,825</div>
-          <p class="text-xs text-slate-500" id="hero-price-subtext">華航首選 NT$63,090 + 飯店 7 晚約 NT$22,735</p>
+          <div class="text-2xl font-black text-emerald-600" id="hero-total-price">約 NT$ 89,016</div>
+          <p class="text-xs text-slate-500" id="hero-price-subtext">華航午回約 NT$68,414 + 飯店7晚已訂 NT$20,602 (早回版約 NT$83,640)</p>
         </div>
 
         <!-- System Engine Status -->
@@ -612,80 +612,165 @@
     <div id="hotel-tab" class="space-y-6 hidden">
 
       <!-- Hotel Stage Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- Stage 2 Card -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
-          <div class="absolute top-0 right-0 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg">
-            Stage 2: 已訂房型降價比價
-          </div>
-          <div class="flex items-center gap-2 text-xs font-semibold text-blue-700 uppercase mb-1">
-            <span>📍 名古屋市區（連住 6 晚）</span>
-          </div>
-          <h2 class="text-xl font-bold text-slate-900">天然温泉ホテルリブマックス PREMIUM 名古屋丸の内</h2>
-          <p class="text-xs text-slate-500 font-mono mt-0.5">Hotel LiVEMAX PREMIUM Nagoya Marunouchi</p>
+        <!-- Card 1: 市區連住 6 晚（已訂定案） -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="absolute top-0 right-0 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg">
+              市區首選・已訂定案
+            </div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-blue-700 uppercase mb-1">
+              <span>📍 名古屋市區（連住 6 晚）</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 leading-snug">天然温泉ホテルリブマックス PREMIUM 名古屋丸の内</h2>
+            <p class="text-xs text-slate-500 font-mono mt-0.5">Hotel LiVEMAX PREMIUM Nagoya Marunouchi</p>
 
-          <div class="mt-4 grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs">
-            <div>
-              <span class="text-slate-400 block">入住期間</span>
-              <span class="font-bold text-slate-800">2027/07/11 ～ 07/17 (6 晚)</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">鎖定房型</span>
-              <span class="font-bold text-blue-700">Luxury Twin (39 m²・禁菸)</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">已訂基準價 (JPY)</span>
-              <span class="font-bold text-slate-900 text-sm">¥77,836 <span class="text-[10px] text-slate-500 font-normal">(約 NT$ 16,735)</span></span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">降價警報門檻</span>
-              <span class="font-bold text-emerald-600 text-sm">&lt; ¥70,000 <span class="text-[10px] text-slate-500 font-normal">(約 NT$ 15,050)</span></span>
-            </div>
-          </div>
-
-          <div class="mt-4 flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-            <span class="text-slate-500">最新快照：Booking.com <b class="text-slate-800">¥76,273</b></span>
-            <span class="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded text-[11px]">房型待確認 / 維持保留</span>
-          </div>
-        </div>
-
-        <!-- Stage 1 Card -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
-          <div class="absolute top-0 right-0 bg-indigo-600 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg">
-            Stage 1: 機場候選飯店搜尋
-          </div>
-          <div class="flex items-center gap-2 text-xs font-semibold text-indigo-700 uppercase mb-1">
-            <span>🛫 最後一晚（近機場方便回程）</span>
-          </div>
-          <h2 class="text-xl font-bold text-slate-900">中部國際機場周邊大房型候選</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Chubu Centrair International Airport (NGO) Area</p>
-
-          <div class="mt-4 grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs">
-            <div>
-              <span class="text-slate-400 block">入住期間</span>
-              <span class="font-bold text-slate-800">2027/07/17 ～ 07/18 (1 晚)</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">空間硬性指標</span>
-              <span class="font-bold text-indigo-700">房間面積 ≥ 30 m²</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">家庭入住條件</span>
-              <span class="font-bold text-slate-800">2 大 2 小・2 張床・禁菸</span>
-            </div>
-            <div>
-              <span class="text-slate-400 block">交通位置要求</span>
-              <span class="font-bold text-slate-800">機場直達 或 電車 1 站</span>
+            <div class="mt-4 space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">入住期間</span>
+                <span class="font-bold text-slate-800">2027/07/11 ～ 07/17 (6 晚)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">鎖定房型</span>
+                <span class="font-bold text-blue-700">Luxury Twin Room - Non-Smoking</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">房間空間／床型</span>
+                <span class="font-bold text-slate-800">39 ㎡ (約 11.8 坪)・2 床</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">已訂真實總價</span>
+                <span class="font-black text-slate-900 text-sm">¥71,294 <span class="text-[11px] text-slate-500 font-normal">(約 NT$ 15,328)</span></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">降價警報門檻</span>
+                <span class="font-bold text-emerald-600 text-xs">&le; ¥70,000 <span class="text-[10px] text-slate-400 font-normal">(約 NT$ 15,050)</span></span>
+              </div>
+              <div class="pt-2 border-t border-slate-200/60 flex items-start gap-1.5 text-emerald-800 bg-emerald-50/70 p-2 rounded-lg">
+                <span class="font-bold text-emerald-600">✓ 2大2小：</span>
+                <span class="text-[11px] text-emerald-900 font-medium">飯店已確認可用既有床鋪入住 4 人</span>
+              </div>
             </div>
           </div>
 
           <div class="mt-4 flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-            <span class="text-slate-500">首選候選：Centrair Hotel (直通航廈)</span>
-            <span class="bg-blue-100 text-blue-800 font-medium px-2 py-0.5 rounded text-[11px]">具體房型面積驗證中</span>
+            <span class="text-slate-500">今日快照：Booking.com <b class="text-slate-800">¥76,273</b></span>
+            <span class="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[11px]">吸菸房已排除 / 維持預訂</span>
           </div>
         </div>
 
+        <!-- Card 2: 機場首選 1 晚（已訂定案） -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="absolute top-0 right-0 bg-emerald-600 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg">
+              機場首選・已訂定案
+            </div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-emerald-700 uppercase mb-1">
+              <span>🛫 最後一晚（機場直通）</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 leading-snug">Comfort Hotel Central International Airport</h2>
+            <p class="text-xs text-slate-500 mt-0.5">中部國際機場康福酒店（空橋直連航廈）</p>
+
+            <div class="mt-4 space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">入住期間</span>
+                <span class="font-bold text-slate-800">2027/07/17 ～ 07/18 (1 晚)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">鎖定房型</span>
+                <span class="font-bold text-emerald-700">Superior Twin Room - Non-Smoking</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">房間空間／床型</span>
+                <span class="font-bold text-slate-800">25 ㎡ / 269 ft²・2 張單人床</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">已訂真實總價</span>
+                <span class="font-black text-slate-900 text-sm">¥24,530 <span class="text-[11px] text-slate-500 font-normal">(約 NT$ 5,274)</span></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">交通位置</span>
+                <span class="font-bold text-slate-800">機場空橋直通，推行李免淋雨</span>
+              </div>
+              <div class="pt-2 border-t border-slate-200/60 flex items-start gap-1.5 text-emerald-800 bg-emerald-50/70 p-2 rounded-lg">
+                <span class="font-bold text-emerald-600">✓ 2大2小：</span>
+                <span class="text-[11px] text-emerald-900 font-medium">已確認可入住，小孩免費併床＋早餐免費</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+            <span class="text-slate-500">定位：<b class="text-emerald-700">回程前夜最安穩首選</b></span>
+            <span class="bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded text-[11px]">已訂保留</span>
+          </div>
+        </div>
+
+        <!-- Card 3: 機場備案 1 晚（已訂備案） -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="absolute top-0 right-0 bg-indigo-600 text-white text-[11px] font-bold px-3 py-1 rounded-bl-lg">
+              機場備案・大空間首選
+            </div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-indigo-700 uppercase mb-1">
+              <span>🛫 最後一晚（備用鎖定方案）</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 leading-snug">Four Points by Sheraton Nagoya</h2>
+            <p class="text-xs text-slate-500 mt-0.5">名古屋中部國際機場福朋喜來登酒店 (萬豪體系)</p>
+
+            <div class="mt-4 space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">入住期間</span>
+                <span class="font-bold text-slate-800">2027/07/17 ～ 07/18 (1 晚)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">鎖定房型</span>
+                <span class="font-bold text-indigo-700">Superior Twin Room - Non-Smoking</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">房間空間／床型</span>
+                <span class="font-bold text-indigo-900">30 ㎡ / 323 ft² (寬敞空間)・2 張單人床</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">已訂真實總價</span>
+                <span class="font-black text-slate-900 text-sm">¥28,798 <span class="text-[11px] text-slate-500 font-normal">(約 NT$ 6,192)</span></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400">備用亮點</span>
+                <span class="font-bold text-slate-800">空間比首選大 5㎡，舒適度更佳</span>
+              </div>
+              <div class="pt-2 border-t border-slate-200/60 flex items-start gap-1.5 text-amber-800 bg-amber-50/80 p-2 rounded-lg">
+                <span class="font-bold text-amber-600">✓ 2大2小：</span>
+                <span class="text-[11px] text-amber-900 font-medium">飯店確認可免費併床（Voucher顯示0 child無礙）</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+            <span class="text-slate-500">定位：<b class="text-indigo-700">大空間高舒適度備案</b></span>
+            <span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded text-[11px]">彈性保留</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stage 1 Ongoing Radar Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4.5 shadow-sm border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-xl shrink-0">
+            📡
+          </div>
+          <div>
+            <div class="text-sm font-bold flex items-center gap-2">
+              <span>Stage 1: 機場周邊大房型自動巡檢雷達持續工作中</span>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono">ACTIVE</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">每日 09:12 定時掃描中部國際機場周邊 ≥ 30㎡、禁菸、2大2小之高性價比房型，若有更好方案自動通報。</p>
+          </div>
+        </div>
+        <div class="text-xs text-slate-400 whitespace-nowrap bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+          住宿 7 晚已訂總花費：<b class="text-amber-300 font-mono text-sm">¥95,824</b> (約 NT$ 20,602)
+        </div>
       </div>
 
       <!-- Live Marunouchi Area Real-Time Rate Matrix -->

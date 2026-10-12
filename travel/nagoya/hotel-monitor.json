@@ -157,7 +157,7 @@
       },
       "preferences": {},
       "booking_baseline": {
-        "amount": 77836,
+        "amount": 71294,
         "currency": null,
         "source": null,
         "price_scope": "unknown",
@@ -176,7 +176,7 @@
         ]
       },
       "alert": {
-        "operator": "lt",
+        "operator": "lte",
         "amount": 70000,
         "currency": null,
         "price_scope": "unknown",

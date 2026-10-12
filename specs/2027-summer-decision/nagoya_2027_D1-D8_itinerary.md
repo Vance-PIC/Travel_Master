@@ -17,8 +17,8 @@
 
 ## 住宿安排
 
-- **7/11～7/17：Hotel LiVEMAX PREMIUM Nagoya Marunouchi**
-- **7/17～7/18：Comfort Hotel Central International Airport**
+- **7/11～7/17：Hotel LiVEMAX PREMIUM Nagoya Marunouchi**（6晚，Luxury Twin Room 39㎡，¥71,294，飯店確認2大2小可同住）
+- **7/17～7/18：Comfort Hotel Central International Airport**（1晚首選，Superior Twin 25㎡，¥24,530，確認2大2小可入住含早；備案：Four Points by Sheraton 30㎡，¥28,798）
 
 住宿僅作為每日動線起點／終點使用；住宿價格與比價不在本行程檔處理。
 

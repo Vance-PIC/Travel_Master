@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "monitor_id": "airport-candidate",
+  "stage": "candidate_search",
+  "run_id": "b202d1a107364711b454dab863c318b7",
+  "checked_at": "2026-10-12T02:44:42.808638+00:00",
+  "config_fingerprint": "7e06fd2981bfc53cba0c1f2f699575d574b159e5d2aa1d36c8d45cb6f5e375fd",
+  "comparison_key": "bc1519cd5921946c782b3cc8ae7615753a999f38476d4e27e80076756f111ddd",
+  "effective_request": {
+    "monitor_id": "airport-candidate",
+    "stage": "candidate_search",
+    "stay": {
+      "check_in": "2027-07-17",
+      "check_out": "2027-07-18"
+    },
+    "party": {
+      "adults": 2,
+      "children": 2,
+      "child_ages": [
+        9,
+        7
+      ],
+      "rooms": null
+    },
+    "hard_filters": {
+      "location": {
+        "anchor": "中部國際機場",
+        "requirement": "機場附近，或大眾運輸鄰近一站範圍",
+        "operator": "any_of",
+        "alternatives": [
+          {
+            "type": "near_airport",
+            "max_distance_m": null
+          },
+          {
+            "type": "public_transport",
+            "max_stops_from_airport": 1,
+            "line": null
+          }
+        ]
+      },
+      "min_room_size_m2": 25,
+      "beds": {
+        "count": 2,
+        "type": null
+      },
+      "smoking": "non-smoking",
+      "occupancy": "must_accommodate_configured_party",
+      "price_ceiling": null
+    },
+    "preferences": {
+      "preferred_min_room_size_m2": 30,
+      "booked_primary_option": {
+        "hotel": "Comfort Hotel Central International Airport",
+        "room": "Superior Twin Room - Non-Smoking",
+        "amount": 24530,
+        "currency": "JPY"
+      },
+      "booked_backup_option": {
+        "hotel": "Four Points by Sheraton Nagoya, Chubu International Airport",
+        "room": "Superior Twin Room - Non-Smoking",
+        "amount": 28798,
+        "currency": "JPY"
+      }
+    },
+    "sources": [
+      "searchapi.io/google_hotels",
+      "searchapi.io/google_hotels_property"
+    ],
+    "evidence": [
+      {
+        "type": "user_statement",
+        "reference": "current_task",
+        "fields": [
+          "stay",
+          "party.adults",
+          "party.children",
+          "hard_filters"
+        ]
+      },
+      {
+        "type": "user_statement",
+        "reference": "2026-10-01 confirmation",
+        "fields": [
+          "party.child_ages"
+        ]
+      }
+    ],
+    "needs_evidence": [
+      "party.rooms",
+      "location distance or transport evidence"
+    ]
+  },
+  "config_hash": "7e710273831b676e976cc27db98fe3978d5e2bf22ca497b378ce74968b4113e8",
+  "coverage": {
+    "requested": [
+      "0x60048773140611ad:0x1d734d496cd25fd0",
+      "0x60048bf7a88b18b5:0x4eb8ec2c9795d2f",
+      "0x600489ec805d9de5:0x63e165a6dadf7d3d"
+    ],
+    "completed": [
+      "0x60048773140611ad:0x1d734d496cd25fd0",
+      "0x60048bf7a88b18b5:0x4eb8ec2c9795d2f",
+      "0x600489ec805d9de5:0x63e165a6dadf7d3d"
+    ],
+    "deferred": [],
+    "failed": [],
+    "provider": "searchapi.io",
+    "resolution_mode": "discovery"
+  },
+  "observations": []
+}

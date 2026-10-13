@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-12T01:38:55+00:00",
+  "checked_at": "2026-10-13T07:39:51+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 2,
@@ -7,20 +7,20 @@
   "api_searches_used": 2,
   "account_calls": 3,
   "quota_before": {
-    "usage": 49,
-    "remaining": 201,
+    "usage": 51,
+    "remaining": 199,
     "tier": "normal",
-    "plan_searches_left": 201,
+    "plan_searches_left": 199,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 50,
-    "remaining": 200,
+    "usage": 53,
+    "remaining": 197,
     "tier": "normal",
-    "plan_searches_left": 200,
+    "plan_searches_left": 197,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 1,
+  "actual_usage_delta": 2,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
     "JX838"
@@ -82,7 +82,7 @@
       "outbound_flight": "CI 150",
       "outbound_departure": "2027-07-11 17:15",
       "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 55458,
+      "displayed_price_twd": 55454,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -99,7 +99,7 @@
       "outbound_flight": "CI 154",
       "outbound_departure": "2027-07-11 07:30",
       "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 64362,
+      "displayed_price_twd": 64358,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -116,7 +116,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 79732,
+      "displayed_price_twd": 69562,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -125,7 +125,10 @@
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": []
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ]
     },
     {
       "airline": "國泰航空",
@@ -133,7 +136,7 @@
       "outbound_flight": "CX 530",
       "outbound_departure": "2027-07-11 11:30",
       "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 82156,
+      "displayed_price_twd": 85118,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -356,7 +359,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 71926,
+      "displayed_price_twd": 77032,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -365,23 +368,27 @@
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [],
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-12T01:38:55+00:00",
+      "checked_at": "2026-10-13T07:39:51+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 71828.0,
+      "previous_displayed_price_twd": 71926.0,
       "price_changes": [
         "price_increase"
       ],
       "historical_low_twd": 70214.0,
       "refresh_reasons": [
-        "itinerary_refresh"
+        "new_low",
+        "drop_5_percent"
       ]
     }
   ],
@@ -392,7 +399,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 71926,
+      "displayed_price_twd": 77032,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -401,23 +408,27 @@
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
-      "deep_search_triggers": [],
+      "deep_search_triggers": [
+        "new_low",
+        "drop_5_percent"
+      ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-12T01:38:55+00:00",
+      "checked_at": "2026-10-13T07:39:51+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 71828.0,
+      "previous_displayed_price_twd": 71926.0,
       "price_changes": [
         "price_increase"
       ],
       "historical_low_twd": 70214.0,
       "refresh_reasons": [
-        "itinerary_refresh"
+        "new_low",
+        "drop_5_percent"
       ]
     }
   ],
@@ -425,12 +436,12 @@
     "CI154": 63038,
     "CX530": 79660,
     "CI150": 51640,
-    "JX838": 71828
+    "JX838": 69562
   },
   "outbound_refresh": {
     "CI154": "2026-10-11T07:07:06+00:00",
     "CX530": "2026-10-11T07:07:06+00:00",
-    "JX838": "2026-10-12T01:38:55+00:00"
+    "JX838": "2026-10-13T07:39:51+00:00"
   },
   "pending_deep_search": {},
   "itinerary_refresh_days": 4,

@@ -1,8 +1,8 @@
 {
-  "run_id": "e0df2c128c5f49b6a690a6ad15c8709f",
+  "run_id": "c19f98ef86fb403d909e1656eece6c5c",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-10-13T07:39:22.210895+00:00",
+  "started_at": "2026-10-14T06:04:35.756082+00:00",
   "status": "partial",
   "snapshot_run_id": "f9ad6104f0d64b328b6dfbe0c4a73956",
   "effective_request": {
@@ -142,5 +142,5 @@
     "resolution_mode": "discovery"
   },
   "attempted_requests": 5,
-  "ended_at": "2026-10-13T07:39:33.275273+00:00"
+  "ended_at": "2026-10-14T06:04:49.368875+00:00"
 }

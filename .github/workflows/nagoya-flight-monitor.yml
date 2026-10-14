@@ -4,7 +4,7 @@ on:
   schedule:
     # Daily production monitor at 09:12 Taiwan time (UTC 01:12).
     # Changing the cron also reactivates a deactivated GitHub scheduled workflow.
-    - cron: "12 1 * * *"
+    - cron: "43 16 * * *"
   workflow_dispatch:
     inputs:
       mode:

@@ -1,26 +1,26 @@
 {
-  "checked_at": "2026-10-13T07:39:51+00:00",
+  "checked_at": "2026-10-14T06:06:15+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 2,
-  "searches_used": 2,
-  "api_searches_used": 2,
-  "account_calls": 3,
+  "planned_searches": 3,
+  "searches_used": 3,
+  "api_searches_used": 3,
+  "account_calls": 4,
   "quota_before": {
-    "usage": 51,
-    "remaining": 199,
-    "tier": "normal",
-    "plan_searches_left": 199,
-    "renewal_date": "2026-10-30"
-  },
-  "quota_after": {
     "usage": 53,
     "remaining": 197,
     "tier": "normal",
     "plan_searches_left": 197,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 2,
+  "quota_after": {
+    "usage": 56,
+    "remaining": 194,
+    "tier": "normal",
+    "plan_searches_left": 194,
+    "renewal_date": "2026-10-30"
+  },
+  "actual_usage_delta": 3,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
     "JX838"
@@ -28,7 +28,30 @@
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [],
+  "booking_verification_checks": [
+    {
+      "itinerary_key": "JX838+JX839",
+      "reasons": [
+        "drop_5_percent",
+        "new_low"
+      ],
+      "status": "verified",
+      "quota_before": {
+        "usage": 55,
+        "remaining": 195,
+        "tier": "normal",
+        "plan_searches_left": 195,
+        "renewal_date": "2026-10-30"
+      },
+      "quota_after": {
+        "usage": 56,
+        "remaining": 194,
+        "tier": "normal",
+        "plan_searches_left": 194,
+        "renewal_date": "2026-10-30"
+      }
+    }
+  ],
   "refresh_complete": true,
   "schema_version": 7,
   "skill_version": 2,
@@ -82,7 +105,7 @@
       "outbound_flight": "CI 150",
       "outbound_departure": "2027-07-11 17:15",
       "outbound_arrival": "2027-07-11 21:05",
-      "displayed_price_twd": 55454,
+      "displayed_price_twd": 55448,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -99,7 +122,7 @@
       "outbound_flight": "CI 154",
       "outbound_departure": "2027-07-11 07:30",
       "outbound_arrival": "2027-07-11 11:20",
-      "displayed_price_twd": 64358,
+      "displayed_price_twd": 64352,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -116,7 +139,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 69562,
+      "displayed_price_twd": 69556,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -126,8 +149,7 @@
       "time_preference_match": false,
       "departure_token_available": true,
       "deep_search_triggers": [
-        "new_low",
-        "drop_5_percent"
+        "new_low"
       ]
     },
     {
@@ -136,7 +158,7 @@
       "outbound_flight": "CX 530",
       "outbound_departure": "2027-07-11 11:30",
       "outbound_arrival": "2027-07-11 15:30",
-      "displayed_price_twd": 85118,
+      "displayed_price_twd": 85112,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",
@@ -359,37 +381,83 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 77032,
-      "price_scope": "unknown",
-      "family_total_twd": null,
+      "displayed_price_twd": 69556,
+      "price_scope": "family_total",
+      "family_total_twd": 69556,
       "currency": "TWD",
-      "baggage_status": "unknown",
+      "baggage_status": "booking_option_verified",
       "inbound_preference_match": false,
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
       "deep_search_triggers": [
-        "new_low",
-        "drop_5_percent"
+        "new_low"
       ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-13T07:39:51+00:00",
+      "checked_at": "2026-10-14T06:06:15+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 71926.0,
+      "previous_displayed_price_twd": 77032.0,
       "price_changes": [
-        "price_increase"
+        "price_drop",
+        "drop_5_percent",
+        "new_low"
       ],
-      "historical_low_twd": 70214.0,
+      "historical_low_twd": 69556,
       "refresh_reasons": [
-        "new_low",
-        "drop_5_percent"
-      ]
+        "new_low"
+      ],
+      "price_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-14T06:06:15+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-14T06:06:15+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 69556,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      },
+      "baggage_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-14T06:06:15+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-14T06:06:15+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 69556,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      }
     }
   ],
   "options": [
@@ -399,49 +467,95 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 77032,
-      "price_scope": "unknown",
-      "family_total_twd": null,
+      "displayed_price_twd": 69556,
+      "price_scope": "family_total",
+      "family_total_twd": 69556,
       "currency": "TWD",
-      "baggage_status": "unknown",
+      "baggage_status": "booking_option_verified",
       "inbound_preference_match": false,
       "outbound_preference_match": false,
       "time_preference_match": false,
       "departure_token_available": true,
       "deep_search_triggers": [
-        "new_low",
-        "drop_5_percent"
+        "new_low"
       ],
       "inbound_flight": "JX 839",
       "inbound_departure": "2027-07-18 19:55",
       "inbound_arrival": "2027-07-18 22:00",
       "inbound_airline_iata": "JX",
-      "checked_at": "2026-10-13T07:39:51+00:00",
+      "checked_at": "2026-10-14T06:06:15+00:00",
       "observed_this_run": true,
       "observation_status": "observed",
       "route_key": "75b20fde19f839d7",
       "itinerary_key": "JX838+JX839",
-      "previous_displayed_price_twd": 71926.0,
+      "previous_displayed_price_twd": 77032.0,
       "price_changes": [
-        "price_increase"
+        "price_drop",
+        "drop_5_percent",
+        "new_low"
       ],
-      "historical_low_twd": 70214.0,
+      "historical_low_twd": 69556,
       "refresh_reasons": [
-        "new_low",
-        "drop_5_percent"
-      ]
+        "new_low"
+      ],
+      "price_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-14T06:06:15+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-14T06:06:15+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 69556,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      },
+      "baggage_verification": {
+        "source": "SerpApi Booking Options",
+        "verified_at": "2026-10-14T06:06:15+00:00",
+        "itinerary_key": "JX838+JX839",
+        "quote_checked_at": "2026-10-14T06:06:15+00:00",
+        "passengers": {
+          "adults": 2,
+          "children": 2
+        },
+        "currency": "TWD",
+        "book_with": "STARLUX Airlines",
+        "price": 69556,
+        "local_prices": null,
+        "option_title": null,
+        "extensions": null,
+        "baggage_prices": [
+          "1 free carry-on"
+        ],
+        "marketed_as": [
+          "JX 838",
+          "JX 839"
+        ]
+      }
     }
   ],
   "market_price_lows": {
     "CI154": 63038,
     "CX530": 79660,
     "CI150": 51640,
-    "JX838": 69562
+    "JX838": 69556
   },
   "outbound_refresh": {
     "CI154": "2026-10-11T07:07:06+00:00",
     "CX530": "2026-10-11T07:07:06+00:00",
-    "JX838": "2026-10-13T07:39:51+00:00"
+    "JX838": "2026-10-14T06:06:15+00:00"
   },
   "pending_deep_search": {},
   "itinerary_refresh_days": 4,

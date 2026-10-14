@@ -2,9 +2,9 @@ name: Nagoya SerpApi flight monitor
 
 on:
   schedule:
-    # Daily production monitor at 09:12 Taiwan time (UTC 01:12).
+    # Daily production monitor at 09:12 Taiwan time (UTC 00:43).
     # Changing the cron also reactivates a deactivated GitHub scheduled workflow.
-    - cron: "43 16 * * *"
+    - cron: "43 0 * * *"
   workflow_dispatch:
     inputs:
       mode:

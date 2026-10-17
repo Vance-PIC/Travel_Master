@@ -1,8 +1,8 @@
 {
-  "run_id": "53c55d624722408e823b95346c5ff0b3",
+  "run_id": "b9fd90f88bad47fe9bd8e3cd082349fa",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-10-16T05:46:55.420092+00:00",
+  "started_at": "2026-10-17T05:31:59.794289+00:00",
   "status": "partial",
   "snapshot_run_id": "f9ad6104f0d64b328b6dfbe0c4a73956",
   "effective_request": {
@@ -101,18 +101,16 @@
       "0x60047dec385d0ad9:0xabed8a09389b909e",
       "0x60048757645da5ed:0x25fb97110816e7d0",
       "0x600480ad621cccfd:0x7a80af3b86fff90d",
-      "0x6004874d9cc10255:0x9f2da06b14275aca",
       "0x6004870e9e41becd:0x58503378f14d73bc",
+      "0x6004874d9cc10255:0x9f2da06b14275aca",
       "0x60048747ffdeadcf:0x6f0c884f842fcce1",
       "0x60048100ad7dc371:0xec28c64828a71ab9",
-      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
-      "0x6004874ce9d95feb:0x89694bab0b51bb4",
       "0x60048700688a6f17:0x304c4cf7aed2aea5",
+      "0x6004874ce9d95feb:0x89694bab0b51bb4",
+      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
-      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
-      "ぽんぽこハウス",
-      "バーベキュー＆レジデンス常滑"
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5"
     ],
     "completed": [
       "0x60047dec385d0ad9:0xc8fe87d05bd1b088",
@@ -125,16 +123,16 @@
       "0x60047dec385d0ad9:0xabed8a09389b909e",
       "0x60048757645da5ed:0x25fb97110816e7d0",
       "0x600480ad621cccfd:0x7a80af3b86fff90d",
-      "0x6004874d9cc10255:0x9f2da06b14275aca",
       "0x6004870e9e41becd:0x58503378f14d73bc",
+      "0x6004874d9cc10255:0x9f2da06b14275aca",
       "0x60048747ffdeadcf:0x6f0c884f842fcce1",
       "0x60048100ad7dc371:0xec28c64828a71ab9",
-      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
-      "0x6004874ce9d95feb:0x89694bab0b51bb4",
       "0x60048700688a6f17:0x304c4cf7aed2aea5",
+      "0x6004874ce9d95feb:0x89694bab0b51bb4",
+      "0x600489b1aa253d41:0xcf1d0e91619fc0da",
       "0x60048ba68184f9fd:0x3bd9d999bfb0a816",
-      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "0x600489b7708a923d:0xf1300858ec11d11c",
+      "0x60048760d264884f:0xd8dcabf1d6cf9ab5",
       "additional_results_page"
     ],
     "failed": [],
@@ -142,5 +140,5 @@
     "resolution_mode": "discovery"
   },
   "attempted_requests": 5,
-  "ended_at": "2026-10-16T05:47:04.751331+00:00"
+  "ended_at": "2026-10-17T05:32:09.063496+00:00"
 }

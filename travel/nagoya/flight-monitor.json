@@ -11,7 +11,7 @@
   "locale": "zh-TW",
   "full_service_airlines": ["CI", "CX", "JX", "BR", "NH", "JL"],
   "preferences": {"outbound_before": "12:00", "inbound_arrival_before": "21:00"},
-  "family_target_twd": 50000,
+  "family_target_twd": 60000,
   "target_margin_fraction": 0.10,
   "drop_fraction": 0.05,
   "full_query_outbounds": ["CI154", "CX530", "JX838"],

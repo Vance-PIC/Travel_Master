@@ -14,12 +14,15 @@ class BookingVerificationTests(unittest.TestCase):
         return row
 
     def test_only_price_or_purchase_triggers(self):
-        self.assertEqual(m.booking_reasons(self.row(), CFG), [])
-        self.assertEqual(m.booking_reasons(self.row(changes=['new_itinerary']), CFG), [])
-        self.assertEqual(m.booking_reasons(self.row(changes=['new_airline']), CFG), [])
-        self.assertIn('near_target', m.booking_reasons(self.row(55000), CFG))
+        # Budget is a soft trigger for optional verification, not a flight filter.
+        near_price = int(CFG['family_target_twd'])
+        above_margin = int(CFG['family_target_twd'] * (1 + CFG['target_margin_fraction'])) + 1000
+        self.assertEqual(m.booking_reasons(self.row(above_margin), CFG), [])
+        self.assertEqual(m.booking_reasons(self.row(above_margin, ['new_itinerary']), CFG), [])
+        self.assertEqual(m.booking_reasons(self.row(above_margin, ['new_airline']), CFG), [])
+        self.assertIn('near_target', m.booking_reasons(self.row(near_price), CFG))
         for change in ('new_low', 'drop_5_percent'):
-            self.assertIn(change, m.booking_reasons(self.row(changes=[change]), CFG))
+            self.assertIn(change, m.booking_reasons(self.row(above_margin, [change]), CFG))
         self.assertEqual(m.booking_reasons(self.row(), CFG, True), ['purchase'])
 
     def response(self, price=63064):

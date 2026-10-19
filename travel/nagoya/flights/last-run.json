@@ -1,88 +1,31 @@
 {
-  "checked_at": "2026-10-19T03:40:24+00:00",
+  "checked_at": "2026-10-19T05:18:29+00:00",
   "status": "ok",
-  "mode": "full_query",
-  "planned_searches": 5,
-  "searches_used": 5,
-  "api_searches_used": 5,
-  "account_calls": 6,
+  "mode": "monitor_query",
+  "planned_searches": 1,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 71,
-    "remaining": 179,
-    "tier": "normal",
-    "plan_searches_left": 179,
-    "renewal_date": "2026-10-30"
-  },
-  "quota_after": {
     "usage": 75,
     "remaining": 175,
     "tier": "normal",
     "plan_searches_left": 175,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 4,
-  "monitoring_mode": "market_plus_return",
-  "refreshed_outbounds": [
-    "CI154",
-    "CX530",
-    "JX838"
-  ],
+  "quota_after": {
+    "usage": 76,
+    "remaining": 174,
+    "tier": "normal",
+    "plan_searches_left": 174,
+    "renewal_date": "2026-10-30"
+  },
+  "actual_usage_delta": 1,
+  "monitoring_mode": "market_only",
+  "refreshed_outbounds": [],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [
-    {
-      "itinerary_key": "CI154+CI151",
-      "reasons": [
-        "near_target"
-      ],
-      "status": "verified",
-      "quota_before": {
-        "usage": 73,
-        "remaining": 177,
-        "tier": "normal",
-        "plan_searches_left": 177,
-        "renewal_date": "2026-10-30"
-      },
-      "quota_after": {
-        "usage": 75,
-        "remaining": 175,
-        "tier": "normal",
-        "plan_searches_left": 175,
-        "renewal_date": "2026-10-30"
-      }
-    },
-    {
-      "itinerary_key": "JX838+JX839",
-      "reasons": [
-        "drop_5_percent"
-      ],
-      "status": "deferred",
-      "quota_before": {
-        "usage": 75,
-        "remaining": 175,
-        "tier": "normal",
-        "plan_searches_left": 175,
-        "renewal_date": "2026-10-30"
-      },
-      "deferred_reason": "run_limit"
-    },
-    {
-      "itinerary_key": "CX530+CX531",
-      "reasons": [
-        "drop_5_percent",
-        "new_low"
-      ],
-      "status": "deferred",
-      "quota_before": {
-        "usage": 75,
-        "remaining": 175,
-        "tier": "normal",
-        "plan_searches_left": 175,
-        "renewal_date": "2026-10-30"
-      },
-      "deferred_reason": "run_limit"
-    }
-  ],
-  "refresh_complete": true
+  "booking_verification_checks": [],
+  "refresh_complete": false
 }

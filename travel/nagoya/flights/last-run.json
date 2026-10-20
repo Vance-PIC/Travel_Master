@@ -1,33 +1,31 @@
 {
-  "checked_at": "2026-10-20T02:49:18+00:00",
+  "checked_at": "2026-10-20T05:15:56+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 2,
-  "searches_used": 2,
-  "api_searches_used": 2,
-  "account_calls": 3,
+  "planned_searches": 1,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 78,
-    "remaining": 172,
+    "usage": 80,
+    "remaining": 170,
     "tier": "normal",
-    "plan_searches_left": 172,
+    "plan_searches_left": 170,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 79,
-    "remaining": 171,
+    "usage": 80,
+    "remaining": 170,
     "tier": "normal",
-    "plan_searches_left": 171,
+    "plan_searches_left": 170,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 1,
-  "monitoring_mode": "market_plus_return",
-  "refreshed_outbounds": [
-    "JX838"
-  ],
+  "actual_usage_delta": 0,
+  "monitoring_mode": "market_only",
+  "refreshed_outbounds": [],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
   "booking_verification_checks": [],
-  "refresh_complete": true
+  "refresh_complete": false
 }

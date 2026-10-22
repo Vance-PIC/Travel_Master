@@ -7,6 +7,8 @@ description: Build full round-trip itinerary baselines and monitor fare changes 
 
 Load route, dates, passengers, cabin, airline eligibility, market/currency, time preferences, main outbound flights and budget from the trip configuration. Keep trip-specific values outside this Skill. The current executor is `scripts/nagoya_flight_monitor.py`, with trip configuration under `travel/nagoya/flight-monitor.json`.
 
+For Nagoya, the latest committed GitHub `travel/nagoya/flight-monitor.json` is the sole budget authority. Before every `monitor_query` and every report, read it again and require a positive integer `family_target_twd` with `currency: TWD`; stop and disclose a missing, invalid or unreadable setting. The currently committed target is NT$60,000, but that sentence is context only: always use the value just read from the file. A prior conversation, memory, retained snapshot, test fixture or hardcoded NT$50,000 cannot override it. Do not fall back to an older amount when GitHub is unavailable.
+
 Read [search-policy.md](references/search-policy.md) before querying or changing execution. Read [report-format.md](references/report-format.md) when persisting or presenting results.
 
 Use `full_query` to establish the main outbound flights' return combinations; use `monitor_query` for one default market scan, conditionally expanding return flights or refreshing overdue itineraries. A market fare is a detection signal. Only the price of an explicitly expanded outbound + inbound combination belongs in itinerary price history.
@@ -35,6 +37,7 @@ Keep execution, monitoring logic, and report delivery as separate responsibiliti
 - GitHub Actions is the authoritative scheduled executor for the current repository implementation. The production workflow is `.github/workflows/nagoya-flight-monitor.yml`.
 - For the Nagoya production case, the GitHub Actions schedule runs daily at 09:50 Asia/Taipei (01:50 UTC). Scheduled workflow events must explicitly resolve to `monitor_query`; do not rely on `workflow_dispatch.inputs.mode`, because scheduled events do not provide that input.
 - ChatGPT scheduled tasks are the presentation layer: after the GitHub run, read the repository's current `latest.json`, `last-run.json`, and itinerary history and render the Human report defined in `references/report-format.md`.
+- On every presentation invocation, also read and validate the latest GitHub trip configuration before interpreting prices, even when the run or quote is unchanged. Use its target for all budget labels and identify the configuration as the budget source.
 - Produce a report on every scheduled presentation run, including runs with no meaningful fare change. If GitHub data did not advance as expected, report that execution/data freshness problem instead of presenting retained quotes as today's fresh prices.
 - A ChatGPT task invocation proves only that the presentation task ran. A GitHub Actions run plus updated run evidence proves that the flight monitor executed. Always check repository timestamps/status before calling a quote fresh.
 - Do not duplicate the production fare query in the ChatGPT task merely to compensate for a missing GitHub run. Diagnose or repair the execution chain instead, preserving GitHub as the monitoring system of record.

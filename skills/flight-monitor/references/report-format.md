@@ -22,7 +22,7 @@ Conditional Booking Options adds at most one flight request to those counts. Rep
 
 ## Human report
 
-Use this fixed report layout for every trip. Read route, dates, passengers, currency, target and airline names from trip configuration and stored observations; never hardcode a trip's target amount, dates, route or flight numbers into these rules. Briefly state the trip context before the tables.
+Use this fixed report layout for every trip. Before each report, read the latest committed GitHub `travel/nagoya/flight-monitor.json` for Nagoya, validate a positive integer `family_target_twd` and `currency: TWD`, and use that target for every budget comparison. If the configuration cannot be read or validated, stop budget classification and report the configuration problem; do not reuse a previous conversation, memory, snapshot target or NT$50,000 fallback. Read route, dates, passengers, currency, target and airline names from trip configuration and stored observations; never hardcode a trip's target amount, dates, route or flight numbers into these rules. Briefly state the trip context and current budget source before the tables.
 
 ### Main table: 完整 itinerary 價格 Top 5
 

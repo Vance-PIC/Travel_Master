@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/build_public_dashboard.py'
       - 'site/public_price_template.html'
+      - 'travel/nagoya/flight-monitor.json'
       - '.github/workflows/publish-price-dashboard.yml'
   workflow_run:
     workflows: ['Nagoya SerpApi flight monitor', 'Hotel monitor executor']

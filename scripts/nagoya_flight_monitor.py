@@ -379,6 +379,11 @@ def main(mode="monitor_query", now=None, purchase_itinerary=None):
         if mode not in ("full_query", "monitor_query"):
             raise ValueError("Unsupported execution mode")
         cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
+        if not isinstance(cfg, dict):
+            raise ValueError("Flight monitor configuration must be an object")
+        target = cfg.get("family_target_twd")
+        if type(target) is not int or target <= 0 or cfg.get("currency") != "TWD":
+            raise ValueError("TWD family target must be a positive integer in flight-monitor.json")
         booking_limit = cfg.get("booking_verifications_per_run", 1)
         if type(booking_limit) is not int or booking_limit not in (0, 1):
             raise ValueError("Booking verification limit must be 0 or 1")

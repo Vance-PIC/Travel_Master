@@ -168,6 +168,8 @@ class PublicPageTests(unittest.TestCase):
             hotels = root / 'travel/nagoya/hotels/one'
             flights.mkdir(parents=True)
             hotels.mkdir(parents=True)
+            (root / 'travel/nagoya/flight-monitor.json').write_text(
+                json.dumps({'family_target_twd': 60000, 'currency': 'TWD'}), encoding='utf-8')
             item = quote()
             item['airline'] = 'Safe airline'
             item['child_ages'] = 'PRIVATE_AGES'
@@ -190,6 +192,9 @@ class PublicPageTests(unittest.TestCase):
         from scripts.build_public_dashboard import build_page
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            config = root / 'travel/nagoya/flight-monitor.json'
+            config.parent.mkdir(parents=True)
+            config.write_text(json.dumps({'family_target_twd': 60000, 'currency': 'TWD'}), encoding='utf-8')
             self.assertIn('無可用報價', build_page(root, NOW))
             path = root / 'travel/nagoya/flights/latest.json'
             path.parent.mkdir(parents=True)
@@ -199,6 +204,24 @@ class PublicPageTests(unittest.TestCase):
             self.assertNotIn('SECRET_ERROR', html)
             path.write_text('{"itineraries": []}', encoding='utf-8')
             self.assertIn('無有效觀測', build_page(root, NOW))
+
+    def test_build_requires_current_valid_budget_and_ignores_snapshot_budget(self):
+        from scripts.build_public_dashboard import build_page
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            flights = root / 'travel/nagoya/flights'
+            flights.mkdir(parents=True)
+            flights.joinpath('latest.json').write_text(json.dumps({
+                'route': {'family_target_twd': 50000}, 'itineraries': [quote()]}), encoding='utf-8')
+            config = root / 'travel/nagoya/flight-monitor.json'
+            for value in (None, 0, True, '60000'):
+                config.write_text(json.dumps({'family_target_twd': value, 'currency': 'TWD'}), encoding='utf-8')
+                with self.assertRaisesRegex(ValueError, 'valid TWD family target'):
+                    build_page(root, NOW)
+            config.write_text(json.dumps({'family_target_twd': 60000, 'currency': 'TWD'}), encoding='utf-8')
+            html = build_page(root, NOW)
+            self.assertIn('60,000', html)
+            self.assertNotIn('50,000', html)
 
 class PublicPagesWorkflowTests(unittest.TestCase):
     def setUp(self):
@@ -216,6 +239,7 @@ class PublicPagesWorkflowTests(unittest.TestCase):
         paths = workflow.split('    paths:\n', 1)[1].split('  workflow_run:', 1)[0]
         self.assertEqual(re.findall(r"- '([^']+)'", paths), [
             'scripts/build_public_dashboard.py', 'site/public_price_template.html',
+            'travel/nagoya/flight-monitor.json',
             '.github/workflows/publish-price-dashboard.yml'])
 
     def test_no_fare_api_calls_or_private_artifacts(self):

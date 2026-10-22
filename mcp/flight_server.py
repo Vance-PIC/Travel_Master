@@ -62,6 +62,14 @@ def _monitor_json(path: Path) -> dict[str, Any]:
         raise github_store.GitHubStoreError("GitHub monitor JSON is invalid") from None
 
 
+def _monitor_config() -> dict[str, Any]:
+    config = _monitor_json(NAGOYA_CONFIG)
+    target = config.get("family_target_twd")
+    if type(target) is not int or target <= 0 or config.get("currency") != "TWD":
+        raise github_store.GitHubStoreError("GitHub flight-monitor.json has no valid TWD family target")
+    return config
+
+
 def _monitor_history() -> list[dict[str, str]]:
     path = NAGOYA_FLIGHTS / "itinerary_history.csv"
     if not _remote_mode():
@@ -346,11 +354,12 @@ def flight_monitor(
     if action == "status":
         return {
             "trip_id": trip_id,
-            "config": _monitor_json(NAGOYA_CONFIG),
+            "config": _monitor_config(),
             "last_run": _monitor_json(NAGOYA_FLIGHTS / "last-run.json"),
             "latest_checked_at": _monitor_json(NAGOYA_FLIGHTS / "latest.json").get("checked_at"),
         }
     if _remote_mode():
+        _monitor_config()
         return {"trip_id": trip_id, **github_store.dispatch_monitor(mode, purchase_itinerary)}
     cmd = [sys.executable, str(MONITOR_SCRIPT), "--mode", mode]
     if purchase_itinerary:
@@ -374,6 +383,7 @@ def flight_report(
     """Read current monitor data or itinerary history. Never consumes API quota."""
     if trip_id != "nagoya":
         return {"status": "unsupported_trip", "trip_id": trip_id}
+    config = _monitor_config()
     if action == "current":
         latest = _monitor_json(NAGOYA_FLIGHTS / "latest.json")
         candidates = latest.get("itineraries", [])
@@ -388,9 +398,11 @@ def flight_report(
         )
         return {
             "trip_id": trip_id,
+            "trip_config": config,
+            "budget_source": "travel/nagoya/flight-monitor.json",
             "checked_at": latest.get("checked_at"),
             "status": latest.get("status"),
-            "route": latest.get("route"),
+            "route": config,
             "top_itineraries": itineraries[:5],
             "market_candidates": latest.get("market_candidates", []),
             "execution": {k: latest.get(k) for k in (
@@ -399,7 +411,9 @@ def flight_report(
             )},
         }
     rows = _monitor_history()
-    return {"trip_id": trip_id, "history": rows[-max(1, min(limit, 500)):]}
+    return {"trip_id": trip_id, "trip_config": config,
+            "budget_source": "travel/nagoya/flight-monitor.json",
+            "history": rows[-max(1, min(limit, 500)):]}
 
 
 if __name__ == "__main__":

@@ -187,10 +187,11 @@ class RemoteRoutingTests(unittest.TestCase):
         import github_store
 
         files = {
-            "travel/nagoya/flight-monitor.json": b'{"family_target_twd":50000}',
+            "travel/nagoya/flight-monitor.json": b'{"family_target_twd":60000,"currency":"TWD"}',
             "travel/nagoya/flights/last-run.json": b'{"status":"ok"}',
             "travel/nagoya/flights/latest.json": json.dumps({
                 "checked_at": "2026-10-05T00:00:00Z", "status": "ok",
+                "route": {"family_target_twd": 50000},
                 "itineraries": [{"itinerary_key": str(n), "displayed_price_twd": n}
                                 for n in range(8, 0, -1)],
                 "market_candidates": [{"flight_number": "CI150"}],
@@ -200,21 +201,26 @@ class RemoteRoutingTests(unittest.TestCase):
                 patch.object(github_store, "get_file", side_effect=files.__getitem__) as read:
             status = flight_server.flight_monitor("status")
             report = flight_server.flight_report("current")
-        self.assertEqual(status["config"]["family_target_twd"], 50000)
+        self.assertEqual(status["config"]["family_target_twd"], 60000)
         self.assertEqual(status["latest_checked_at"], "2026-10-05T00:00:00Z")
         self.assertEqual([x["displayed_price_twd"] for x in report["top_itineraries"]], [1, 2, 3, 4, 5])
         self.assertEqual(report["market_candidates"], [{"flight_number": "CI150"}])
-        self.assertEqual(read.call_count, 4)
+        self.assertEqual(report["trip_config"]["family_target_twd"], 60000)
+        self.assertEqual(report["route"]["family_target_twd"], 60000)
+        self.assertEqual(report["budget_source"], "travel/nagoya/flight-monitor.json")
+        self.assertEqual(read.call_count, 5)
 
     def test_remote_run_dispatches_once_without_local_execution(self):
         import flight_server
         import github_store
 
         with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(flight_server, "_monitor_config", return_value={"family_target_twd": 60000}) as config, \
                 patch.object(github_store, "dispatch_monitor", return_value={"status": "queued", "workflow_url": "https://github.com/example"}) as dispatch, \
                 patch.object(flight_server.subprocess, "run") as local_run:
             result = flight_server.flight_monitor("run", mode="full_query", purchase_itinerary="CI154+CI151")
         dispatch.assert_called_once_with("full_query", "CI154+CI151")
+        config.assert_called_once_with()
         local_run.assert_not_called()
         self.assertEqual(result["status"], "queued")
         self.assertNotIn("exit_code", result)
@@ -224,10 +230,12 @@ class RemoteRoutingTests(unittest.TestCase):
         import github_store
 
         with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(flight_server, "_monitor_config", return_value={"family_target_twd": 60000}), \
                 patch.object(github_store, "get_file", return_value=b"itinerary_key,displayed_price_twd\nA,1\nB,2\n"):
             self.assertEqual(flight_server.flight_report("history", limit=1)["history"],
                              [{"itinerary_key": "B", "displayed_price_twd": "2"}])
         with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(flight_server, "_monitor_config", return_value={"family_target_twd": 60000}), \
                 patch.object(github_store, "get_file", return_value=b"{bad"):
             with self.assertRaisesRegex(github_store.GitHubStoreError, "invalid"):
                 flight_server.flight_report("current")
@@ -246,9 +254,26 @@ class RemoteRoutingTests(unittest.TestCase):
         import github_store
 
         with patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                patch.object(flight_server, "_monitor_config", return_value={"family_target_twd": 60000}), \
                 patch.object(github_store, "get_file", return_value=b'{"itineraries":["bad"]}'):
             with self.assertRaisesRegex(github_store.GitHubStoreError, "invalid"):
                 flight_server.flight_report("current")
+
+    def test_invalid_remote_budget_blocks_report_and_dispatch(self):
+        import flight_server
+        import github_store
+
+        for budget in (b'{"family_target_twd":50000}', b'{"family_target_twd":null,"currency":"TWD"}',
+                       b'{"family_target_twd":0,"currency":"TWD"}'):
+            with self.subTest(budget=budget), patch.dict(os.environ, {"FLIGHT_MCP_REMOTE": "1"}), \
+                    patch.object(github_store, "get_file", return_value=budget) as read, \
+                    patch.object(github_store, "dispatch_monitor") as dispatch:
+                with self.assertRaisesRegex(github_store.GitHubStoreError, "valid TWD family target"):
+                    flight_server.flight_report("current")
+                with self.assertRaisesRegex(github_store.GitHubStoreError, "valid TWD family target"):
+                    flight_server.flight_monitor("run")
+                dispatch.assert_not_called()
+                self.assertEqual(read.call_count, 2)
 
     def test_search_network_error_does_not_expose_key(self):
         import flight_server

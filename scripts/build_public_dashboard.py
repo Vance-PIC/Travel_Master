@@ -151,7 +151,7 @@ def add_comparisons(flights, history, target, preferences):
                                   else '不符合')
 
 
-def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
+def render_page(flights: list[dict], hotels: list[dict], status: dict, target: int | None = None) -> str:
     """Render explicit public columns; unknown keys never enter the document."""
     def rows(items, fields):
         result = []
@@ -193,16 +193,21 @@ def render_page(flights: list[dict], hotels: list[dict], status: dict) -> str:
     template = (Path(__file__).resolve().parents[1] / 'site/public_price_template.html').read_text(encoding='utf-8')
     replacements = {'{{FLIGHT_ROWS}}': rows(flights, flight_fields),
                     '{{HOTEL_ROWS}}': rows(hotels, hotel_fields),
-                    '{{STATUS}}': '<br>'.join(messages)}
+                     '{{STATUS}}': '<br>'.join(messages),
+                     '{{TARGET}}': f'目標 NT${target:,}' if type(target) is int and target > 0 else '目標待設定'}
     # Replace template tokens in one pass so data containing tokens stays literal.
     import re
-    return re.sub(r'\{\{(?:FLIGHT_ROWS|HOTEL_ROWS|STATUS)\}\}',
+    return re.sub(r'\{\{(?:FLIGHT_ROWS|HOTEL_ROWS|STATUS|TARGET)\}\}',
                   lambda match: replacements[match.group()], template)
 
 
 def build_page(root: Path, now: datetime) -> str:
     """Read local sources without exposing paths, errors, or raw snapshot contents."""
     base = Path(root) / 'travel/nagoya'
+    config, config_status = read_snapshot(base / 'flight-monitor.json')
+    target = config.get('family_target_twd')
+    if config_status != '正常' or type(target) is not int or target <= 0 or config.get('currency') != 'TWD':
+        raise ValueError('flight-monitor.json has no valid TWD family target')
     snapshot, flight_status = read_snapshot(base / 'flights/latest.json')
     flights = project_flights(snapshot, now)
     if flight_status == '正常' and not flights:
@@ -218,17 +223,13 @@ def build_page(root: Path, now: datetime) -> str:
         if value == '正常' and not _has_hotel_observations(snapshot):
             value = '無有效觀測'
         hotel_statuses.append(value)
-    config, _ = read_snapshot(base / 'flight-monitor.json')
     preferences = config.get('preferences', {})
     if not isinstance(preferences, dict):
         preferences = {}
-    target = config.get('family_target_twd', 50000)
-    if type(target) is not int or target <= 0:
-        target = 50000
     add_comparisons(flights, history_summary(base / 'flights/itinerary_history.csv'), target, preferences)
     last_run, _ = read_snapshot(base / 'flights/last-run.json')
     return render_page(flights, hotels, {'last_run': last_run, 'flights': [flight_status],
-                                        'hotels': hotel_statuses or ['無可用報價']})
+                                        'hotels': hotel_statuses or ['無可用報價']}, target)
 
 
 def _has_hotel_observations(snapshot: dict) -> bool:

@@ -100,6 +100,22 @@ class MonitorTests(unittest.TestCase):
         row.update(price_scope="family_total", family_total_twd=50000)
         self.assertNotIn("near_family_target", m.deep_reasons(row, [row], {}, CFG))
 
+    def test_each_run_reads_current_target_and_rejects_invalid_budget_before_api(self):
+        config = m.CONFIG
+        self.assertEqual(CFG["family_target_twd"], 60000)
+        for target, should_run in ((60000, True), (None, False), (0, False), (True, False), ("60000", False)):
+            with self.subTest(target=target):
+                current = dict(CFG, booking_verifications_per_run=0)
+                current["family_target_twd"] = target
+                config.write_text(json.dumps(current))
+                self.seed([offer()])
+                with patch.dict(m.os.environ, {"SERPAPI_KEY": "fake-secret"}), \
+                        patch.object(m, "request_json", side_effect=[self.account(240)]) as api:
+                    result = m.main()
+                self.assertEqual(result, 0 if should_run else 2)
+                self.assertEqual(api.call_count, 1 if should_run else 0)
+                if not should_run:
+                    self.assertEqual(json.loads((self.latest.parent / "last-run.json").read_text())["error_stage"], "configuration")
     def test_api_and_parse_failures_preserve_files_and_redact_secret(self):
         missing_airport = offer()
         del missing_airport["flights"][0]["departure_airport"]["id"]

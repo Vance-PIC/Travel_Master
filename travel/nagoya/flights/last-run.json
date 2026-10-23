@@ -1,55 +1,31 @@
 {
-  "checked_at": "2026-10-23T13:48:20+00:00",
+  "checked_at": "2026-10-23T20:04:49+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 3,
-  "searches_used": 3,
-  "api_searches_used": 3,
-  "account_calls": 4,
+  "planned_searches": 1,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 96,
-    "remaining": 154,
+    "usage": 99,
+    "remaining": 151,
     "tier": "normal",
-    "plan_searches_left": 154,
+    "plan_searches_left": 151,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 98,
-    "remaining": 152,
+    "usage": 100,
+    "remaining": 150,
     "tier": "normal",
-    "plan_searches_left": 152,
+    "plan_searches_left": 150,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 2,
-  "monitoring_mode": "market_plus_return",
-  "refreshed_outbounds": [
-    "JX838"
-  ],
+  "actual_usage_delta": 1,
+  "monitoring_mode": "market_only",
+  "refreshed_outbounds": [],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [
-    {
-      "itinerary_key": "JX838+JX839",
-      "reasons": [
-        "drop_5_percent"
-      ],
-      "status": "verified",
-      "quota_before": {
-        "usage": 97,
-        "remaining": 153,
-        "tier": "normal",
-        "plan_searches_left": 153,
-        "renewal_date": "2026-10-30"
-      },
-      "quota_after": {
-        "usage": 98,
-        "remaining": 152,
-        "tier": "normal",
-        "plan_searches_left": 152,
-        "renewal_date": "2026-10-30"
-      }
-    }
-  ],
-  "refresh_complete": true
+  "booking_verification_checks": [],
+  "refresh_complete": false
 }

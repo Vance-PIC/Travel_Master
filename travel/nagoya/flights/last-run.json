@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-25T22:48:05+00:00",
+  "checked_at": "2026-10-26T05:16:31+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 1,
@@ -7,17 +7,17 @@
   "api_searches_used": 1,
   "account_calls": 2,
   "quota_before": {
-    "usage": 108,
-    "remaining": 142,
+    "usage": 109,
+    "remaining": 141,
     "tier": "normal",
-    "plan_searches_left": 142,
+    "plan_searches_left": 141,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 108,
-    "remaining": 142,
+    "usage": 109,
+    "remaining": 141,
     "tier": "normal",
-    "plan_searches_left": 142,
+    "plan_searches_left": 141,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 0,

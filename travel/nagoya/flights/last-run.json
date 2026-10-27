@@ -1,16 +1,16 @@
 {
-  "checked_at": "2026-10-27T05:34:57+00:00",
+  "checked_at": "2026-10-27T14:54:05+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 4,
-  "searches_used": 4,
-  "api_searches_used": 4,
-  "account_calls": 5,
+  "planned_searches": 1,
+  "searches_used": 1,
+  "api_searches_used": 1,
+  "account_calls": 2,
   "quota_before": {
-    "usage": 113,
-    "remaining": 137,
+    "usage": 117,
+    "remaining": 133,
     "tier": "normal",
-    "plan_searches_left": 137,
+    "plan_searches_left": 133,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
@@ -20,37 +20,12 @@
     "plan_searches_left": 133,
     "renewal_date": "2026-10-30"
   },
-  "actual_usage_delta": 4,
-  "monitoring_mode": "market_plus_return",
-  "refreshed_outbounds": [
-    "CI154",
-    "CX530"
-  ],
+  "actual_usage_delta": 0,
+  "monitoring_mode": "market_only",
+  "refreshed_outbounds": [],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [
-    {
-      "itinerary_key": "CI154+CI151",
-      "reasons": [
-        "near_target"
-      ],
-      "status": "verified",
-      "quota_before": {
-        "usage": 114,
-        "remaining": 136,
-        "tier": "normal",
-        "plan_searches_left": 136,
-        "renewal_date": "2026-10-30"
-      },
-      "quota_after": {
-        "usage": 117,
-        "remaining": 133,
-        "tier": "normal",
-        "plan_searches_left": 133,
-        "renewal_date": "2026-10-30"
-      }
-    }
-  ],
-  "refresh_complete": true
+  "booking_verification_checks": [],
+  "refresh_complete": false
 }

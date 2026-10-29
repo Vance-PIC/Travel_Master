@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-28T21:19:04+00:00",
+  "checked_at": "2026-10-29T06:26:56+00:00",
   "status": "ok",
   "mode": "monitor_query",
   "planned_searches": 1,
@@ -7,17 +7,17 @@
   "api_searches_used": 1,
   "account_calls": 2,
   "quota_before": {
-    "usage": 121,
-    "remaining": 129,
+    "usage": 168,
+    "remaining": 82,
     "tier": "normal",
-    "plan_searches_left": 129,
+    "plan_searches_left": 82,
     "renewal_date": "2026-10-30"
   },
   "quota_after": {
-    "usage": 121,
-    "remaining": 129,
+    "usage": 168,
+    "remaining": 82,
     "tier": "normal",
-    "plan_searches_left": 129,
+    "plan_searches_left": 82,
     "renewal_date": "2026-10-30"
   },
   "actual_usage_delta": 0,
@@ -114,7 +114,7 @@
       "outbound_flight": "JX 838",
       "outbound_departure": "2027-07-11 14:55",
       "outbound_arrival": "2027-07-11 18:45",
-      "displayed_price_twd": 67702,
+      "displayed_price_twd": 74872,
       "price_scope": "unknown",
       "family_total_twd": null,
       "currency": "TWD",

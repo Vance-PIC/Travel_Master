@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PLANNER_REQUIRE_AUTH=true
+WORKDIR /app
+COPY flight-tracker/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt && useradd --create-home --uid 10001 planner
+COPY flight-tracker/src /app/flight-tracker/src
+COPY flight-tracker/config /app/flight-tracker/config
+COPY flight-tracker/web /app/flight-tracker/web
+COPY mcp/*.py /app/mcp/
+RUN mkdir -p /app/flight-tracker/data && chown -R planner:planner /app
+USER planner
+WORKDIR /app/flight-tracker
+EXPOSE 8000
+CMD ["uvicorn", "src.api.server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

@@ -97,6 +97,8 @@ exchange_rates:
   TWD: 1.0
 database:
   path: data/flight_tracker.db
+planner:
+  price_freshness_hours: 24
 reports:
   output_dir: data/reports
 scraper:

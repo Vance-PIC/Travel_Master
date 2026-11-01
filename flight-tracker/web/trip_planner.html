@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102e3a">
+  <link rel="icon" href="data:,">
+  <title>Roam Plan｜旅程規劃・旅行大師 Travel-Master</title>
+  <style>
+    :root{--ink:#152d37;--muted:#5c6b71;--paper:#f4f1e8;--card:#fffefa;--surface-alt:#f7f6f0;--control-bg:#ffffff;--line:#d9ded8;--navy:#102e3a;--lime:#d7f36a;--coral:#ed7656;--coral-soft:#fbe6df;--coral-ink:#aa4c32;--blue:#2467ba;--blue-soft:#e8eff9;--emerald:#059669;--emerald-soft:#ecfdf5;--amber-soft:#fffdf7;--pale:#eaf0e8;--tag-bg:#edf3e7;--tag-ink:#425734;--shadow:0 14px 40px #203d3310;font-family:Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink)}
+    html[data-theme="dark"]{--ink:#f1f5f4;--muted:#a9bcc0;--paper:#122028;--card:#1a2d37;--surface-alt:#15252e;--control-bg:#13222a;--line:#334d59;--navy:#0b1c24;--lime:#d7f36a;--coral:#ff9879;--coral-soft:#4a2c24;--coral-ink:#ffb49e;--blue:#6ea8fe;--blue-soft:#1e3a56;--emerald:#34d399;--emerald-soft:#13392f;--amber-soft:#252820;--pale:#223844;--tag-bg:#22382c;--tag-ink:#a7f3d0;--shadow:0 14px 40px #00000045;color-scheme:dark}
+    @media(prefers-color-scheme:dark){html:not([data-theme="light"]):not([data-theme="dark"]){--ink:#f1f5f4;--muted:#a9bcc0;--paper:#122028;--card:#1a2d37;--surface-alt:#15252e;--control-bg:#13222a;--line:#334d59;--navy:#0b1c24;--lime:#d7f36a;--coral:#ff9879;--coral-soft:#4a2c24;--coral-ink:#ffb49e;--blue:#6ea8fe;--blue-soft:#1e3a56;--emerald:#34d399;--emerald-soft:#13392f;--amber-soft:#252820;--pale:#223844;--tag-bg:#22382c;--tag-ink:#a7f3d0;--shadow:0 14px 40px #00000045;color-scheme:dark}}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-size:15px;transition:background .15s,color .15s}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit}.topbar{background:var(--navy);color:white;position:sticky;top:0;z-index:30;border-bottom:1px solid #1e4250}.topinner{max-width:1280px;margin:auto;padding:13px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.brand{display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:.02em}.brandmark{background:var(--lime);color:#102e3a;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:22px}.brand small{display:block;font-size:10px;color:#a7bfc5;letter-spacing:.18em;margin-top:2px}.top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}.theme-switch{display:inline-flex;gap:3px;padding:3px;background:#183b49;border:1px solid #2b5768;border-radius:8px}.theme-switch button{border:0;border-radius:6px;padding:4px 8px;background:transparent;color:#cfe0e3;font-size:12px;font-weight:650}.theme-switch button:hover{color:white}.theme-switch button[aria-pressed="true"]{background:#f9faf5;color:#102e3a;font-weight:800}.engine-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:#10b9811a;color:#6ee7b7;border:1px solid #10b98140;font-weight:600}.pulse-dot{width:7px;height:7px;border-radius:99px;background:#34d399;display:inline-block}.quota-btn{background:#183b49;color:#e0f2fe;border:1px solid #2b5768;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:700}.quota-btn:hover{background:#214d5e}.quota-btn b{color:#6ee7b7;font-family:monospace}.navlink{color:#c3d0d2;text-decoration:none;font-size:12px;padding:5px 9px;border-radius:7px;border:1px solid #2a4d5c}.navlink:hover{color:white;background:#183b49}.wrap{max-width:1120px;margin:auto;padding:34px 26px 70px}.eyebrow{color:var(--coral);font-weight:800;font-size:12px;letter-spacing:.16em}.intro{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:28px}.intro h1{font-size:clamp(32px,4vw,50px);line-height:1.15;margin:12px 0 9px;letter-spacing:-.04em}.intro p{color:var(--muted);margin:0}.draft-tag{background:var(--coral-soft);color:var(--coral-ink);font-size:13px;font-weight:700;padding:10px 14px;border-radius:8px;white-space:nowrap}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:34px}.step{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:15px 18px;display:flex;gap:13px;align-items:center;color:var(--muted);cursor:pointer;text-align:left}.step.active{border-color:var(--blue);background:var(--blue-soft);color:var(--ink);box-shadow:0 0 0 1px var(--blue)}.stepnum{border:1px solid var(--line);border-radius:99px;width:34px;height:34px;display:grid;place-items:center;font-weight:800}.step.active .stepnum{background:var(--blue);border-color:var(--blue);color:white}.step strong{display:block;color:var(--ink)}.step small{display:block;margin-top:3px}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin:24px 0 16px}.section-head h2{font-size:25px;margin:0 0 6px}.section-head p{color:var(--muted);margin:0}.surface{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:24px}.grid{display:grid;gap:18px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}.field label,.field-label{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:7px}.control{width:100%;height:47px;border:1px solid var(--line);border-radius:9px;padding:0 12px;background:var(--control-bg);color:var(--ink)}.control:focus{outline:3px solid #2467ba30;border-color:var(--blue)}.airport-row{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}.destination-wrap{position:relative}.suggestions{position:absolute;top:75px;left:0;right:0;z-index:15;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);max-height:240px;overflow:auto}.suggestion{display:flex;justify-content:space-between;padding:10px 13px;border:0;border-bottom:1px solid var(--line);background:var(--card);color:var(--ink);width:100%;text-align:left}.suggestion:hover{background:var(--pale)}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.chip{background:var(--pale);border:1px solid var(--line);border-radius:99px;padding:6px 10px;font-size:12px;color:var(--ink)}.chip button{border:0;background:none;margin-left:7px;color:var(--muted)}.quick-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:14px;padding:10px 12px;background:var(--surface-alt);border:1px solid var(--line);border-radius:10px;font-size:12px}.route-chip{border:1px solid var(--line);background:var(--control-bg);color:var(--ink);border-radius:7px;padding:4px 9px;font-size:12px;font-weight:600;transition:.15s}.route-chip:hover{background:var(--blue-soft);border-color:var(--blue)}.route-chip.active{background:var(--blue);color:white;border-color:var(--blue)}.deeplink-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding:11px 14px;background:var(--surface-alt);border:1px solid var(--line);border-radius:10px;font-size:12px}.deeplink-badges{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.deeplink-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.deeplink-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;background:var(--control-bg);border:1px solid var(--line);font-size:12px;font-weight:650;text-decoration:none;color:var(--ink)}.deeplink-btn:hover{border-color:var(--blue);color:var(--blue)}.party{padding:16px;border-radius:12px;background:var(--surface-alt)}.countrow{display:grid;grid-template-columns:1fr auto;align-items:center;padding:6px 0}.counter{display:flex;gap:14px;align-items:center}.counter button{border:1px solid var(--line);background:var(--control-bg);color:var(--ink);border-radius:8px;width:36px;height:36px;font-size:20px}.counter output{min-width:20px;text-align:center;font-weight:800}.children{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:12px}.child-age label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}.actions{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding-top:18px;margin-top:22px}.note{font-size:12px;color:var(--muted)}.btn{border:1px solid var(--line);background:var(--control-bg);color:var(--ink);border-radius:9px;padding:11px 16px;font-weight:750}.btn.primary{background:var(--blue);border-color:var(--blue);color:white}.btn.navy{background:#183b49;color:white;border-color:#2b5768}.btn.danger{color:var(--coral-ink);border-color:var(--coral-ink)}.btn.sm{padding:7px 12px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}.alert{margin:16px 0;padding:12px 14px;border-radius:9px;background:var(--coral-soft);color:var(--coral-ink);font-size:13px}.hidden{display:none!important}.result-head{display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;margin:28px 0 12px}.result-head h3{margin:0 0 3px;font-size:20px}.dest-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.dest-tab{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:750;display:inline-flex;align-items:center;gap:8px;color:var(--ink);transition:.15s}.dest-tab:hover{border-color:var(--blue);background:var(--blue-soft)}.dest-tab.active{background:var(--blue);color:white;border-color:var(--blue)}.dest-tab small{font-weight:500;opacity:.9;font-size:11px}.result-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;margin-bottom:14px;background:var(--surface-alt);border:1px solid var(--line);border-radius:10px;font-size:12px}.toolbar-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.pill-btn{border:1px solid var(--line);background:var(--control-bg);color:var(--ink);border-radius:99px;padding:5px 11px;font-size:12px;font-weight:650;transition:.15s}.pill-btn:hover{border-color:var(--blue);color:var(--blue)}.pill-btn.active{background:var(--blue);color:white;border-color:var(--blue)}.result-list{display:grid;gap:14px}.flight{display:grid;grid-template-columns:minmax(190px,1.2fr) 1fr 1fr auto;align-items:center;gap:18px;padding:16px;border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:0 4px 14px #203d3308}.flight.recommended{border-left:4px solid #f59e0b;background:var(--amber-soft)}.flight-dates{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:12px;margin-top:2px;display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:9px}.date-pill{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-alt);font-size:12px;transition:.15s}.date-pill:hover{border-color:var(--blue);background:var(--blue-soft)}.date-pill.cheapest{border-color:var(--emerald);background:var(--emerald-soft)}.date-pill b{font-size:15px;color:var(--ink)}.date-pill.cheapest b{color:var(--emerald)}.airline{font-weight:800}.airline small{display:block;color:var(--muted);font-weight:500;margin-top:5px}.leg{font-size:13px}.leg b{font-size:15px}.leg small{display:block;color:var(--muted);margin-top:4px}.price{text-align:right;white-space:nowrap}.price b{font-size:18px}.price small{display:block;color:var(--muted);font-size:11px}.tag{display:inline-flex;background:var(--tag-bg);color:var(--tag-ink);border-radius:99px;padding:5px 8px;font-size:11px;margin-top:7px}.tag.amber{background:#fef3c7;color:#92400e;font-weight:700}.empty{border:1px dashed var(--line);border-radius:12px;padding:24px;color:var(--muted);background:var(--card)}.tabbar{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px}.candidate-tab{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;text-align:left}.candidate-tab.active{border-color:var(--blue);background:var(--blue-soft)}.candidate-tab b{display:block}.candidate-tab small{color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.metric{padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--control-bg)}.metric small{color:var(--muted)}.metric strong{display:block;font-size:24px;margin:6px 0 3px}.metric em{font-style:normal;color:var(--muted);font-size:12px}.chart{width:100%;height:180px;background:linear-gradient(180deg,var(--blue-soft) 0%,var(--card) 82%);border:1px solid var(--line);border-radius:11px;margin:14px 0;padding:10px}.chart svg{width:100%;height:100%;overflow:visible}.chart .axis{stroke:var(--line);stroke-width:1}.chart .line{fill:none;stroke:var(--blue);stroke-width:3}.chart .dot{fill:var(--coral);stroke:var(--card);stroke-width:2}.target{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}.target input{width:150px}.candidate-info{display:flex;justify-content:space-between;gap:18px;align-items:start}.candidate-info h3{margin:0 0 7px}.split{display:grid;grid-template-columns:1fr 1fr;gap:20px}.booking{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}.booking:last-child{border:0}.booking small{display:block;color:var(--muted);margin-top:4px}.channel-card{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--control-bg);display:flex;flex-direction:column;justify-content:space-between;position:relative}.channel-card.winner{border:2px solid var(--emerald);background:var(--emerald-soft)}.channel-badge{position:absolute;top:-10px;right:14px;background:var(--emerald);color:white;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px}.channel-list{list-style:none;padding:10px 0 0;margin:10px 0 14px;border-top:1px solid var(--line);font-size:12px;line-height:1.65;color:var(--ink)}.channel-list li{margin-bottom:4px}.modal-backdrop{position:fixed;inset:0;background:#091e2699;backdrop-filter:blur(2px);z-index:50;display:grid;place-items:center;padding:16px}.modal{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:540px;width:100%;box-shadow:0 24px 60px #00000040;overflow:hidden}.modal-head{background:var(--navy);color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}.modal-body{padding:20px;font-size:13px}.progress-bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}.progress-fill{height:100%;background:var(--emerald)}.status{color:var(--muted);font-size:12px}.mono{font-variant-numeric:tabular-nums}.footer{margin-top:30px;color:var(--muted);font-size:12px;text-align:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:12px 18px;border-radius:99px;box-shadow:var(--shadow);z-index:60}
+    @media(max-width:760px){.wrap{padding:26px 15px 54px}.topinner{padding:13px 15px}.intro{display:block}.draft-tag{display:inline-block;margin-top:16px}.steps{gap:6px}.step{padding:10px 8px;gap:7px;font-size:12px}.step small{display:none}.stepnum{width:28px;height:28px}.surface{padding:16px}.grid.two,.grid.three,.airport-row,.split{grid-template-columns:1fr}.flight{grid-template-columns:1fr 1fr;gap:12px}.flight .price{grid-column:1/-1;text-align:left;display:flex;justify-content:space-between;align-items:center}.flight .price small{display:none}.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.actions{align-items:start;flex-direction:column}.actions .btn{width:100%}.candidate-info{display:block}.booking{grid-template-columns:1fr auto}.booking .btn{grid-column:1/-1}.section-head{align-items:start;flex-direction:column}}
+    /* P1 follows the approved compact flight discovery prototype. */
+    body{font-size:16px;line-height:1.5}
+    .topbar{position:relative;height:68px;display:flex;align-items:center;border-bottom:0}
+    .topinner{width:min(1240px,calc(100% - 48px));max-width:none;padding:0;flex-wrap:nowrap;gap:20px}
+    .brand{gap:12px;font-size:16px;white-space:nowrap}
+    .brandmark{width:36px;height:36px;border-radius:12px;font-size:21px}
+    .brand small{font-size:12px;letter-spacing:0;font-weight:500;color:#b9ced1}
+    .top-right{gap:16px;flex-wrap:nowrap}
+    .top-meta{color:#c5d6da;font-size:13px;white-space:nowrap}
+    .status-menu{position:relative;font-size:12px}
+    .status-menu>summary{list-style:none;cursor:pointer;color:#c5d6da;border:1px solid #3a5965;border-radius:8px;padding:7px 10px;white-space:nowrap}
+    .status-menu>summary::-webkit-details-marker{display:none}
+    .status-menu>summary:hover,.status-menu[open]>summary{background:#244c5b;color:white}
+    .status-panel{position:absolute;right:0;top:calc(100% + 9px);z-index:35;width:320px;max-width:calc(100vw - 30px);padding:14px;background:var(--navy);border:1px solid #3a5965;border-radius:10px;box-shadow:0 18px 34px #0004;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    .status-panel #header-update-time{color:#b9ced1;width:100%}
+    .theme-switch{padding:4px;gap:2px;border:1px solid #ffffff29;background:#ffffff14;border-radius:10px}
+    .theme-switch button{width:34px;height:32px;padding:0;display:grid;place-items:center;font-size:17px;border-radius:7px}
+    .theme-switch button[aria-pressed="true"]{background:#fff;color:#123646}
+    .wrap{max-width:1240px;padding:40px 24px 72px}
+    .intro{margin-bottom:24px;align-items:end}
+    .intro h1{font-size:36px;line-height:1.12;margin:8px 0;letter-spacing:-.035em}
+    .intro p{max-width:670px}
+    .steps{margin-bottom:32px}
+    .step{min-height:60px;padding:12px 16px;border-radius:10px}
+    .step.active{box-shadow:inset 0 0 0 1px var(--blue)}
+    .section-head{margin:0 0 14px}
+    .section-head h2{font-size:24px}
+    .surface{border-radius:14px;box-shadow:0 12px 32px #2134360f}
+    #history-insights-box{box-shadow:0 12px 32px #2134360c}
+    .field label,.field-label{color:var(--ink);font-size:14px;font-weight:650}
+    .field-hint{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:2px}
+    .quick-bar{margin-bottom:20px;border:0;padding:10px 12px}
+    .flight-options{grid-column:1/-1;border-top:1px solid var(--line);margin-top:2px}
+    .flight-options summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;color:var(--muted);font-size:13px;font-weight:700}
+    .flight-options summary::-webkit-details-marker{display:none}
+    .flight-options[open] summary span:last-child{transform:rotate(180deg)}
+    .flight-options .flight-dates{border:0;margin:0;padding:12px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:9px}
+    .date-pill .btn{white-space:nowrap}
+    .scope-summary{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;color:var(--ink)}
+    .scope-summary span{border:1px solid var(--line);background:var(--card);padding:6px 10px;border-radius:8px;font-size:13px}
+    .archived-candidates{margin-top:16px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+    .archived-candidates summary{cursor:pointer;font-weight:700;color:var(--ink)}
+    .archived-candidates-list{display:grid;gap:9px;margin-top:14px}
+    .archived-candidate{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-alt)}
+    .archived-candidate small{display:block;color:var(--muted);margin-top:3px}
+    .time-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;width:100%;padding:8px 2px}
+    .time-filter{min-width:0}
+    .time-filter-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13px;margin-bottom:10px}
+    .time-filter-head output{font-variant-numeric:tabular-nums;color:var(--blue);font-weight:750;white-space:nowrap}
+    .time-track{position:relative;height:30px;--from:0%;--to:100%}
+    .time-track::before{content:"";position:absolute;left:0;right:0;top:12px;height:6px;border-radius:99px;background:linear-gradient(to right,var(--line) 0 var(--from),var(--blue) var(--from) var(--to),var(--line) var(--to) 100%)}
+    .time-track input{position:absolute;left:0;top:0;width:100%;height:30px;margin:0;appearance:none;background:transparent;pointer-events:none}
+    .time-track input::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border:3px solid var(--blue);border-radius:50%;background:var(--card);box-shadow:0 1px 4px #0003;pointer-events:auto;cursor:grab}
+    .time-track input::-moz-range-thumb{width:14px;height:14px;border:3px solid var(--blue);border-radius:50%;background:var(--card);box-shadow:0 1px 4px #0003;pointer-events:auto;cursor:grab}
+    .time-track input:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+    .time-track input[data-edge="start"]{z-index:2}
+    .time-track input[data-edge="end"]{z-index:3}
+    .time-track input[data-edge="start"]:focus{z-index:4}
+    .time-ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+    @media(max-width:760px){.topbar{height:auto;min-height:68px}.topinner{width:calc(100% - 30px);padding:12px 0;flex-wrap:wrap}.top-right{width:100%;justify-content:space-between;gap:8px}.top-meta{display:none}.wrap{padding:26px 15px 54px}.intro h1{font-size:32px}.status-panel{left:0;right:auto}.flight-options .flight-dates{grid-template-columns:1fr}}
+    @media(max-width:760px){.time-filters{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topinner">
+      <div class="brand">
+        <span class="brandmark" aria-hidden="true">↗</span>
+        <span>ROAM PLAN<small>旅程規劃工作室</small></span>
+      </div>
+      <div class="top-right">
+        <span class="top-meta" id="top-phase-label">P1 航班探索　·　價格與日期先比較</span>
+        <details class="status-menu">
+          <summary>API 與監控</summary>
+          <div class="status-panel">
+            <span class="engine-pill"><span class="pulse-dot"></span><span id="engine-status-text">API 狀態載入中</span></span>
+            <button type="button" class="quota-btn" id="btn-open-quota" title="查看 SerpApi 配額與 API 設定狀態">SerpApi <b id="badge-serpapi-left">配額未知</b></button>
+            <button type="button" class="quota-btn" id="btn-open-monitor" title="設定定時監控與降價門檻">定時監控設定</button>
+            <span id="header-update-time">更新：載入中…</span>
+            <button type="button" class="quota-btn" id="btn-refresh-engine" title="重新同步最新爬蟲狀態">重新整理</button>
+            <a class="navlink" href="/legacy">舊版數據主控台 ↗</a>
+          </div>
+        </details>
+        <div class="theme-switch" role="group" aria-label="外觀主題">
+          <button type="button" data-theme-choice="system" aria-label="系統外觀" title="跟隨系統" aria-pressed="true">◉</button>
+          <button type="button" data-theme-choice="light" aria-label="淺色外觀" title="淺色" aria-pressed="false">☼</button>
+          <button type="button" data-theme-choice="dark" aria-label="深色外觀" title="深色" aria-pressed="false">◐</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="intro"><div><div class="eyebrow">FROM AN IDEA TO A TRIP · FLIGHT DISCOVERY</div><h1>先看價格，再決定旅程。</h1><p>先框出想去的地方與日期，再比較航班與不同日期組合。加入候選後會立即開始價格追蹤。</p></div><div class="draft-tag" id="draft-state">旅程草案</div></div>
+    <nav class="steps" aria-label="旅程規劃階段">
+      <button class="step active" data-step="p1"><span class="stepnum">1</span><span><strong>P1 草案</strong><small>地點與時間範圍</small></span></button>
+      <button class="step" data-step="p2"><span class="stepnum">2</span><span><strong>P2 價格追蹤</strong><small>候選航班與趨勢</small></span></button>
+      <button class="step" data-step="p3"><span class="stepnum">3</span><span><strong>P3 決選</strong><small>確定航班與購票管道</small></span></button>
+    </nav>
+
+    <section id="pane-p1">
+      <div class="section-head"><div><h2>先說說這趟旅行的範圍</h2><p>目的地可輸入機場名稱或代碼；日期可設定彈性區間。</p></div></div>
+      <details class="surface" id="history-insights-box" style="margin-bottom:20px;padding:16px 24px">
+        <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px">
+          <div><strong style="font-size:16px">📊 歷史航班價格參考</strong><span class="note" style="margin-left:10px">提供近期價格基準</span></div>
+          <span aria-hidden="true">⌄</span>
+        </summary>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+          <div class="candidate-info"><div><p class="note" style="margin:0">整合系統累積的來回快照最低價與住宿交通估算，點擊航點即可直接加入下方草案目的地。</p></div><button class="btn sm" id="load-history-btn" type="button">載入歷史相符航班</button></div>
+          <div id="phase1-insights" class="grid three" style="margin-top:14px"></div>
+        </div>
+      </details>
+      <div class="surface">
+        <div class="quick-bar">
+          <strong style="color:var(--muted)">常用目的地</strong>
+          <button type="button" class="route-chip" data-quick-dest="NGO">名古屋 NGO</button>
+          <button type="button" class="route-chip" data-quick-dest="KIX">大阪 (KIX)</button>
+          <button type="button" class="route-chip" data-quick-dest="HND">東京羽田 (HND)</button>
+          <button type="button" class="route-chip" data-quick-dest="NRT">東京成田 (NRT)</button>
+          <button type="button" class="route-chip" data-quick-dest="FUK">福岡 (FUK)</button>
+          <button type="button" class="route-chip" data-quick-dest="OKA">沖繩 (OKA)</button>
+        </div>
+        <div class="airport-row">
+          <div class="field destination-wrap" id="origin-wrap"><label for="origin">從哪個機場出發？<span class="field-hint">可輸入城市、機場名稱或代碼</span></label><input class="control" id="origin" value="台北桃園 (TPE)" placeholder="輸入中文城市、機場或 IATA 代碼（如：桃園、松山、高雄、TPE）" autocomplete="off"><div class="suggestions hidden" id="origin-suggestions"></div></div>
+          <div class="field destination-wrap" id="dest-wrap"><label for="airport-query">想去哪裡？<span class="field-hint">支援多個目的地，可自行輸入</span></label><input class="control" id="airport-query" placeholder="例如：名古屋、KIX、東京羽田" autocomplete="off"><div class="suggestions hidden" id="airport-suggestions"></div><div class="chips" id="destination-chips"></div></div>
+        </div>
+        <div class="grid two" style="margin-top:20px">
+          <div><div class="field-label">可出發日期</div><div class="grid two"><label class="field"><span class="field-label">最早</span><input class="control" type="date" id="out-start"></label><label class="field"><span class="field-label">最晚</span><input class="control" type="date" id="out-end"></label></div></div>
+          <div><div class="field-label">可回程日期</div><div class="grid two"><label class="field"><span class="field-label">最早</span><input class="control" type="date" id="return-start"></label><label class="field"><span class="field-label">最晚</span><input class="control" type="date" id="return-end"></label></div></div>
+        </div>
+        <div class="grid two" style="margin-top:20px;align-items:start">
+          <div class="party"><div class="field-label">旅客人數設定</div><div class="countrow"><div><b>成人</b><div class="note">出發時 18 歲以上</div></div><div class="counter"><button type="button" data-count="adults" data-delta="-1" aria-label="減少成人">−</button><output id="adult-count">2</output><button type="button" data-count="adults" data-delta="1" aria-label="增加成人">＋</button></div></div><div class="countrow"><div><b>兒童</b><div class="note">出發時 0 至 17 歲</div></div><div class="counter"><button type="button" data-count="children" data-delta="-1" aria-label="減少兒童">−</button><output id="child-count">0</output><button type="button" data-count="children" data-delta="1" aria-label="增加兒童">＋</button></div></div><div class="children" id="child-ages"></div></div>
+          <div>
+            <div class="field" style="margin-bottom:12px">
+              <label for="airline-filter">航班搜尋範圍</label>
+              <select class="control" id="airline-filter">
+                <option value="all">全部航空公司（傳航＋廉航全景）</option>
+                <option value="CI">中華航空 (CI 首選)</option>
+                <option value="JX">星宇航空 (JX)</option>
+                <option value="BR">長榮航空 (BR)</option>
+                <option value="CX">國泰航空 (CX)</option>
+                <option value="LCC">廉價航空 (台灣虎航 / 樂桃 / 酷航 / 亞航)</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:12px">
+              <label for="p1-budget">機票總預算（TWD）</label>
+              <input class="control" type="number" id="p1-budget" min="1" step="1" inputmode="numeric" placeholder="例如 60000" aria-describedby="p1-budget-hint">
+              <span class="field-hint" id="p1-budget-hint">選填・全體旅客來回總價。新增候選時帶入 P2，各航班可個別修改。</span>
+            </div>
+            <div class="alert" style="margin:0"><b>人數如何影響價格</b><br>搜尋與價格追蹤會帶入成人數、兒童數與出發年齡。12–17 歲按供應商成人級距查詢；未滿 2 歲目前還需確認抱坐或佔位，未補選前不會顯示家庭總價。</div>
+          </div>
+        </div>
+        <div class="deeplink-bar">
+          <div class="deeplink-badges">
+            <span>🔗 <b>即時市場比價直達：</b></span>
+            <span class="tag" style="margin:0" id="label-trip-days">8天7夜</span>
+            <span class="tag amber" style="margin:0" id="label-pax-summary">2大2小 (共4人)</span>
+          </div>
+          <div class="deeplink-actions">
+            <a id="link-google-flights" href="https://www.google.com/travel/flights" target="_blank" rel="noopener noreferrer" class="deeplink-btn">✈️ Google Flights 即時查價 ↗</a>
+            <a id="link-google-hotels" href="https://www.google.com/travel/hotels" target="_blank" rel="noopener noreferrer" class="deeplink-btn">🏨 Google Hotels 即時查價 ↗</a>
+            <button type="button" id="btn-copy-mcp" class="deeplink-btn">📋 複製 MCP 查詢指令</button>
+          </div>
+        </div>
+        <div class="actions"><span class="note" id="draft-save-status" role="status" aria-live="polite">草案條件會自動儲存。</span><button class="btn primary" id="search-btn">搜尋航班　→</button></div>
+      </div>
+      <div id="search-message" class="alert hidden"></div>
+      <div id="search-results-wrap" class="hidden">
+        <div class="result-head">
+          <div><h3>符合條件的直航組合</h3><span class="note" id="result-count"></span></div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="tag" style="margin:0" id="p1-candidate-count">0 組候選追蹤中</span>
+            <button class="btn primary sm" id="to-p2-top-btn" type="button" data-goto="p2" disabled>查看 P2 價格追蹤 →</button>
+          </div>
+        </div>
+        <div class="dest-tabs" id="dest-tabs"></div>
+        <div class="result-toolbar">
+          <div class="toolbar-group">
+            <strong style="color:var(--muted)">↕️ 排序方式：</strong>
+            <button type="button" class="pill-btn active" data-sort="recommended">🏆 智慧推薦（早去午回＋傳航優先）</button>
+            <button type="button" class="pill-btn" data-sort="price">💰 價格最低優先</button>
+            <button type="button" class="pill-btn" data-sort="time">🛫 去程時間（早→晚）</button>
+          </div>
+          <div class="time-filters" aria-label="航班出發時段過濾">
+            <div class="time-filter"><div class="time-filter-head"><strong>🛫 去程出發</strong><output id="out-time-label" aria-live="polite">00:00–24:00</output></div><div class="time-track" id="out-time-track"><input type="range" min="0" max="1440" step="15" value="0" data-time-leg="out" data-edge="start" aria-label="去程最早出發時間"><input type="range" min="0" max="1440" step="15" value="1440" data-time-leg="out" data-edge="end" aria-label="去程最晚出發時間"></div><div class="time-ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div>
+            <div class="time-filter"><div class="time-filter-head"><strong>🛬 回程出發</strong><output id="return-time-label" aria-live="polite">00:00–24:00</output></div><div class="time-track" id="return-time-track"><input type="range" min="0" max="1440" step="15" value="0" data-time-leg="return" data-edge="start" aria-label="回程最早出發時間"><input type="range" min="0" max="1440" step="15" value="1440" data-time-leg="return" data-edge="end" aria-label="回程最晚出發時間"></div><div class="time-ticks"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div>
+          </div>
+        </div>
+        <div class="result-list" id="search-results"></div>
+        <div class="actions">
+          <span class="note">每組候選皆獨立保留「去回程日期＋班號」，加入後即開始追蹤價格與歷史折線。</span>
+          <button class="btn primary" id="to-p2-btn" type="button" data-goto="p2" disabled>查看 P2 價格追蹤 →</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pane-p2" class="hidden">
+      <div class="section-head"><div><h2>P2｜追蹤價格，再比較候選</h2><p>這裡優先顯示符合目前 P1 地點、日期與旅客設定的候選。</p></div><button class="btn" data-goto="p1">← 調整 P1 條件</button></div>
+      <div class="scope-summary" id="p2-scope-summary"></div>
+      <div class="surface"><div class="candidate-info"><div><h3>目前條件的候選</h3><p class="note">每個頁籤是一組完整的去回航班與日期；先前條件的候選可在下方展開查看。</p></div><span class="tag" id="candidate-count">0 組追蹤中</span></div><div class="p2-candidate-switch" style="margin-top:16px"><button class="tab-arrow" id="candidate-tabs-left" type="button" aria-label="向左切換候選">‹</button><div id="candidate-tabs" class="tabbar"></div><button class="tab-arrow" id="candidate-tabs-right" type="button" aria-label="向右切換候選">›</button></div><div id="candidate-empty" class="empty">目前 P1 條件尚無候選。請回到 P1 搜尋並加入航班；先前條件的候選可在下方查看。</div><div id="candidate-panel" class="hidden"></div></div>
+      <details class="archived-candidates hidden" id="archived-candidates"><summary id="archived-candidates-summary"></summary><p class="note">這些候選的地點、日期或旅客條件與目前草案不一致，或建立時尚未記錄旅客條件。需要重新追蹤同一航班時，請先移除舊候選，再從 P1 加入。</p><div class="archived-candidates-list" id="archived-candidates-list"></div></details>
+      <div class="actions"><span class="note">價格超過設定的新鮮度時會重新查詢雙 API；進入 P2 時也會檢查。歷史觀測持續保留於趨勢圖，另可手動更新。</span><button class="btn primary" id="to-p3-btn" disabled>前往 P3 比價 →</button></div>
+    </section>
+
+    <section id="pane-p3" class="hidden">
+      <div class="section-head"><div><div style="color:var(--coral);font-size:12px;font-weight:850;letter-spacing:.13em">P3 · BOOKING CHANNEL COMPARISON</div><h2>比較實際購票通路</h2><p>P2 選出的航班會一起帶進來。先確認相同旅客、行李和票規的可訂總價，再決定最終航班。</p></div></div>
+      <div id="decision-empty" class="empty">請先在 P2 加入至少一組航班。</div><div id="decision-content" class="surface hidden"></div>
+      <div class="footer">通路價格可能變動；最終金額、行李與退改條件請以訂票頁面為準。未取得的資料會明確標示，不以示意數字替代。</div>
+    </section>
+  </main>
+
+  <!-- API Quota Modal -->
+  <div id="quota-modal" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <div><strong>🔑 API Token 配額與雙引擎狀態儀表板</strong><div style="font-size:11px;color:#a7bfc5;margin-top:2px">SerpApi Google Flights ＋ Ignav 雙引擎漏斗架構</div></div>
+        <button type="button" class="btn sm" id="close-quota-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="metric" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <b>SerpApi (Google Flights 終極驗證引擎)</b>
+          <span class="tag" style="margin:0" id="qm-serpapi-pct">尚無配額資料</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="qm-serpapi-bar" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+            <span>本月已用：<b id="qm-serpapi-used">尚無資料</b> 次</span>
+            <span>本月剩餘：<b id="qm-serpapi-rem" style="color:var(--emerald)">尚無資料</b> 次</span>
+            <span id="qm-serpapi-renew">重置日：未知</span>
+          </div>
+        </div>
+        <div class="metric">
+          <b>Ignav (高頻哨兵查價與訂票深連結引擎)</b>
+          <p class="note" style="margin:6px 0 0">負責第一線即時探索與 <code>flight_booking_links</code> 通路連結擷取；缺傳航時由 SerpApi 自動補齊中華航空、星宇與國泰之 2大2小家庭含稅報價。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitor Settings Modal -->
+  <style>
+    .tracking-settings{width:min(640px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
+    .tracking-settings .modal-head{position:sticky;top:0;z-index:1}
+    .settings-subtitle{font-size:14px;color:#b9ced1;margin-top:8px}
+    .settings-row{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:24px;align-items:start;padding:24px 0;border-bottom:1px solid var(--line)}
+    .settings-row:first-child{padding-top:0}.settings-row .note{margin:8px 0 0;line-height:1.6}
+    .settings-number{display:flex;align-items:center;gap:8px}.settings-number input{width:88px;font-variant-numeric:tabular-nums}.settings-number span{white-space:nowrap;color:var(--muted);font-size:14px}
+    .settings-preview{padding:16px;background:var(--blue-soft);border-radius:8px;font-size:14px;color:var(--ink);line-height:1.6}
+    .settings-advanced{padding:16px 0;font-size:14px;border-top:1px solid var(--line);margin-top:24px}.settings-advanced summary{cursor:pointer;font-weight:600}.settings-advanced a{color:var(--blue)}
+    .settings-footer{gap:16px}.settings-footer>div{display:flex;gap:8px}.tracking-settings button:focus-visible,.tracking-settings input:focus-visible,.tracking-settings summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+    @media(max-width:480px){.settings-row{grid-template-columns:1fr;gap:12px;padding:16px 0}.settings-footer{align-items:stretch;flex-direction:column}.settings-footer>div{justify-content:flex-end}}
+  </style>
+  <div id="monitor-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="tracking-settings-title">
+    <div class="modal tracking-settings">
+      <div class="modal-head">
+        <div><strong id="tracking-settings-title">價格追蹤設定</strong><div class="settings-subtitle">調整查價節奏，掌握價格變化</div></div>
+        <button type="button" class="btn sm" id="close-monitor-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <section class="settings-row"><div><label class="field-label" for="modal-tracking-hours">多久自動查一次價格？</label><p class="note" id="tracking-help">定時更新 P2 追蹤中的航班，累積價格趨勢。查得越頻繁，API 用量越高。</p></div><div class="settings-number"><input class="control" type="number" id="modal-tracking-hours" aria-describedby="tracking-help" min="1" max="168" step="1" value="6"><span>小時</span></div></section>
+        <section class="settings-row"><div><label class="field-label" for="modal-freshness-hours">價格資料可以沿用多久？</label><p class="note" id="freshness-help">P1 搜尋與 P2 現價在期限內可沿用；P3 報價超過期限須更新才能決選。手動查價隨時取得新報價。</p></div><div class="settings-number"><input class="control" type="number" id="modal-freshness-hours" aria-describedby="freshness-help" min="1" max="168" step="1" value="24"><span>小時</span></div></section>
+        <p id="settings-preview" class="settings-preview" aria-live="polite"></p>
+        <p class="note">套用全部追蹤中的候選；航班與目標價請至 P2 管理。自動追蹤需要服務持續運行，關閉期間暫停；排程每 15 分鐘檢查一次。</p>
+        <details class="settings-advanced"><summary>進階：GitHub 雲端監控</summary><p class="note">獨立的固定航線監控，不會同步這裡的設定。連結只開啟工作流程頁面。</p><a href="https://github.com/Vance-PIC/Travel_Master/actions/workflows/nagoya-flight-monitor.yml" target="_blank" rel="noopener noreferrer">開啟雲端監控頁面 ↗</a></details>
+        <p id="settings-message" class="note" role="status"></p>
+        <div class="actions settings-footer"><button type="button" class="btn" id="settings-defaults">恢復建議值</button><div><button type="button" class="btn" id="settings-cancel">取消</button><button type="button" class="btn primary" id="save-monitor-btn">儲存設定</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const state={draftId:localStorage.getItem('roamPlannerDraftId'),theme:localStorage.getItem('roam-plan-theme')||localStorage.getItem('roamPlannerTheme')||'system',destinations:['NGO'],adults:2,children:0,childAges:[],airlineFilter:'all',activeDestTab:null,sortBy:'recommended',timeRanges:{out:{start:0,end:1440},return:{start:0,end:1440}},results:[],candidates:[],activeCandidate:null,decision:null,priceFreshnessHours:24,p2RefreshInFlight:false,step:['p1','p2','p3'].includes(localStorage.getItem('roamPlannerStep'))?localStorage.getItem('roamPlannerStep'):'p1'};
+function setTheme(theme){state.theme=theme||'system';localStorage.setItem('roam-plan-theme',state.theme);localStorage.setItem('roamPlannerTheme',state.theme);if(state.theme==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',state.theme);$$('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===state.theme)))}
+$$('[data-theme-choice]').forEach(b=>b.onclick=()=>setTheme(b.dataset.themeChoice));
+setTheme(state.theme);
+$('#out-start').value='2027-07-10';$('#out-end').value='2027-07-11';$('#return-start').value='2027-07-17';$('#return-end').value='2027-07-18';
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtTime(t){const m=String(t||'').match(/(\d{2}:\d{2})/);return m?m[1]:String(t||'')}
+function fmtRange(leg){const d=fmtTime(leg?.departure_time),a=fmtTime(leg?.arrival_time);return d&&a?`${d} → ${a}`:d||a||''}
+function money(n,c='TWD'){if(n==null)return '—';const cur=String(c||'TWD').toUpperCase();const val=cur==='USD'?Math.round(Number(n)*31.75):Math.round(Number(n));try{return new Intl.NumberFormat('zh-TW',{style:'currency',currency:'TWD',maximumFractionDigits:0}).format(val)}catch{return `NT$${val.toLocaleString()}`}}
+function when(s){if(!s)return '資料時間未提供';const raw=String(s);const parsed=new Date(/^\d{4}-\d\d-\d\d[ T]\d\d:\d\d:\d\d$/.test(raw)?raw.replace(' ','T')+'Z':raw);return Number.isNaN(parsed.getTime())?'資料時間未提供':parsed.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false})}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2600)}
+async function api(url,options={}){const r=await fetch(url,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.detail||`HTTP ${r.status}`);return d}
+function showStep(step){const enteringP2=step==='p2'&&state.step!=='p2';state.step=step;localStorage.setItem('roamPlannerStep',step);for(const s of ['p1','p2','p3']){$(`#pane-${s}`).classList.toggle('hidden',s!==step);$(`.step[data-step="${s}"]`).classList.toggle('active',s===step)}$('#top-phase-label').textContent={p1:'P1 航班探索　·　價格與日期先比較',p2:'P2 價格追蹤　·　比較候選趨勢',p3:'P3 決選　·　確認航班與通路'}[step];if(step==='p1'&&state.results.length)renderResults();if(step==='p2'&&enteringP2)saveDraft().then(()=>loadCandidates({refreshStale:true})).catch(e=>toast(e.message));if(step==='p3')loadDecision()}
+$$('.step').forEach(b=>b.onclick=()=>showStep(b.dataset.step));$$('[data-goto]').forEach(b=>b.onclick=()=>showStep(b.dataset.goto));
+const AIRPORTS_DB=[
+  {code:'TPE',city:'台北',name:'桃園國際機場 (Taiwan Taoyuan)',country:'台灣',keywords:'台北 桃園 台灣 tpe taipei taoyuan'},
+  {code:'TSA',city:'台北',name:'台北松山機場 (Taipei Songshan)',country:'台灣',keywords:'台北 松山 台灣 tsa songshan'},
+  {code:'KHH',city:'高雄',name:'小港國際機場 (Kaohsiung)',country:'台灣',keywords:'高雄 小港 台灣 khh kaohsiung'},
+  {code:'RMQ',city:'台中',name:'清泉崗機場 (Taichung)',country:'台灣',keywords:'台中 清泉崗 台灣 rmq taichung'},
+  {code:'NGO',city:'名古屋',name:'中部國際機場 (Chubu Centrair)',country:'日本',keywords:'名古屋 中部 ngo chubu centrair nagoya'},
+  {code:'KIX',city:'大阪',name:'關西國際機場 (Kansai)',country:'日本',keywords:'大阪 關西 京都 kix kansai osaka'},
+  {code:'ITM',city:'大阪',name:'伊丹機場 (Osaka Itami)',country:'日本',keywords:'大阪 伊丹 itm itami osaka'},
+  {code:'HND',city:'東京',name:'東京羽田國際機場 (Haneda)',country:'日本',keywords:'東京 羽田 hnd tokyo haneda'},
+  {code:'NRT',city:'東京',name:'東京成田國際機場 (Narita)',country:'日本',keywords:'東京 成田 nrt tokyo narita'},
+  {code:'FUK',city:'福岡',name:'福岡機場 (Fukuoka)',country:'日本',keywords:'福岡 九州 fuk fukuoka'},
+  {code:'OKA',city:'沖繩',name:'那霸機場 (Okinawa Naha)',country:'日本',keywords:'沖繩 那霸 oka okinawa naha'},
+  {code:'KMJ',city:'熊本',name:'阿蘇熊本機場 (Aso Kumamoto)',country:'日本',keywords:'熊本 阿蘇 九州 kmj kumamoto aso'},
+  {code:'CTS',city:'札幌',name:'新千歲機場 (New Chitose)',country:'日本',keywords:'札幌 新千歲 北海道 cts sapporo chitose hokkaido'},
+  {code:'KOJ',city:'鹿兒島',name:'鹿兒島機場 (Kagoshima)',country:'日本',keywords:'鹿兒島 九州 koj kagoshima'},
+  {code:'MYJ',city:'松山',name:'四國松山機場 (Matsuyama)',country:'日本',keywords:'松山 四國 myj matsuyama'},
+  {code:'TAK',city:'高松',name:'高松機場 (Takamatsu)',country:'日本',keywords:'高松 四國 tak takamatsu'},
+  {code:'SDJ',city:'仙台',name:'仙台機場 (Sendai)',country:'日本',keywords:'仙台 東北 sdj sendai'},
+  {code:'AOJ',city:'青森',name:'青森機場 (Aomori)',country:'日本',keywords:'青森 東北 aoj aomori'},
+  {code:'HKD',city:'函館',name:'函館機場 (Hakodate)',country:'日本',keywords:'函館 北海道 hkd hakodate'},
+  {code:'OKJ',city:'岡山',name:'岡山桃太郎機場 (Okayama)',country:'日本',keywords:'岡山 桃太郎 okj okayama'},
+  {code:'HIJ',city:'廣島',name:'廣島機場 (Hiroshima)',country:'日本',keywords:'廣島 hij hiroshima'},
+  {code:'ICN',city:'首爾',name:'仁川國際機場 (Incheon)',country:'韓國',keywords:'首爾 仁川 韓國 icn incheon seoul'},
+  {code:'GMP',city:'首爾',name:'金浦國際機場 (Gimpo)',country:'韓國',keywords:'首爾 金浦 韓國 gmp gimpo seoul'},
+  {code:'PUS',city:'釜山',name:'金海國際機場 (Gimhae)',country:'韓國',keywords:'釜山 金海 韓國 pus busan'},
+  {code:'BKK',city:'曼谷',name:'蘇凡納布機場 (Suvarnabhumi)',country:'泰國',keywords:'曼谷 泰國 bkk bangkok'},
+  {code:'DMK',city:'曼谷',name:'廊曼國際機場 (Don Mueang)',country:'泰國',keywords:'曼谷 廊曼 泰國 dmk'},
+  {code:'SIN',city:'新加坡',name:'樟宜國際機場 (Changi)',country:'新加坡',keywords:'新加坡 樟宜 sin singapore changi'},
+  {code:'HKG',city:'香港',name:'香港國際機場 (Hong Kong)',country:'香港',keywords:'香港 赤鱲角 hkg hong kong'},
+  {code:'DAD',city:'峴港',name:'峴港國際機場 (Da Nang)',country:'越南',keywords:'峴港 越南 dad da nang'}
+];
+function searchLocalAirports(query){if(!query||!query.trim())return AIRPORTS_DB.slice(0,8);const q=query.trim().toLowerCase();return AIRPORTS_DB.filter(item=>item.code.toLowerCase().includes(q)||item.city.toLowerCase().includes(q)||item.name.toLowerCase().includes(q)||item.country.toLowerCase().includes(q)||item.keywords.toLowerCase().includes(q)).slice(0,10)}
+function resolveIata(val,fallback='TPE'){if(!val)return fallback;const clean=val.trim();const paren=clean.match(/\(([A-Za-z]{3})\)/);if(paren)return paren[1].toUpperCase();const word=clean.match(/(?:^|\s)([A-Za-z]{3})(?:\s|$)/);if(word){const u=word[1].toUpperCase();if(AIRPORTS_DB.some(a=>a.code===u)||clean.length===3)return u}const lower=clean.toLowerCase();const match=AIRPORTS_DB.find(a=>a.code.toLowerCase()===lower||a.city.toLowerCase()===lower||lower.includes(a.city.toLowerCase())||a.name.toLowerCase().includes(lower)||a.keywords.toLowerCase().includes(lower));if(match)return match.code;return clean.length===3?clean.toUpperCase():clean}
+function getAirportInfo(codeOrText){const iata=resolveIata(codeOrText,'');const found=AIRPORTS_DB.find(a=>a.code===iata);if(found){let cleanName=found.name.split(' ')[0].replace('國際機場','').replace('機場','').trim();cleanName=cleanName.replace(found.city,'').trim();const inputCity=(['台北','東京','大阪','首爾','曼谷'].includes(found.city)&&cleanName)?`${found.city}${cleanName}`:found.city;return{code:found.code,city:found.city,name:found.name,inputVal:`${inputCity} (${found.code})`}}return{code:iata,city:iata,name:iata,inputVal:iata}}
+function syncDeepLinks(){
+  const origin=resolveIata($('#origin').value,'TPE');
+  const dest=state.destinations[0]||'NGO';
+  const dep=$('#out-end').value||$('#out-start').value||'2027-07-11';
+  const ret=$('#return-end').value||$('#return-start').value||'2027-07-18';
+  const d1=new Date(dep),d2=new Date(ret);
+  const diff=d2>d1?Math.round((d2-d1)/86400000)+1:8;
+  $('#label-trip-days').textContent=`${diff}天${Math.max(1,diff-1)}夜`;
+  $('#label-pax-summary').textContent=`${state.adults}大${state.children}小 (共${state.adults+state.children}人)`;
+  $('#link-google-flights').href=`https://www.google.com/travel/flights?q=Flights%20to%20${dest}%20from%20${origin}%20on%20${dep}%20through%20${ret}`;
+  const hotelCities={NGO:'Nagoya',KIX:'Osaka',FUK:'Fukuoka',OKA:'Okinawa',KMJ:'Kumamoto',CTS:'Sapporo',HND:'Tokyo',NRT:'Tokyo'};
+  $('#link-google-hotels').href=`https://www.google.com/travel/hotels/${hotelCities[dest]||dest}?dates=${dep}%2C${ret}`;
+  $$('[data-quick-dest]').forEach(b=>b.classList.toggle('active',state.destinations.includes(b.dataset.quickDest)));
+}
+function renderDestinations(){$('#destination-chips').innerHTML=state.destinations.map(d=>{const info=getAirportInfo(d);return `<span class="chip">${esc(info.inputVal||d)}<button data-remove-dest="${esc(d)}" aria-label="移除 ${esc(d)}">×</button></span>`}).join('');$$('[data-remove-dest]').forEach(b=>b.onclick=()=>{state.destinations=state.destinations.filter(x=>x!==b.dataset.removeDest);renderDestinations();scheduleDraftAutosave()});syncDeepLinks()}
+$$('[data-quick-dest]').forEach(b=>b.onclick=()=>{const code=b.dataset.quickDest;if(state.destinations.includes(code)){if(state.destinations.length>1)state.destinations=state.destinations.filter(x=>x!==code)}else{state.destinations.push(code)}renderDestinations();scheduleDraftAutosave();toast(`🎯 已更新目的地：${state.destinations.map(c=>getAirportInfo(c).inputVal).join('、')}`)});
+['#out-start','#out-end','#return-start','#return-end'].forEach(sel=>$(sel).addEventListener('change',()=>{syncDeepLinks();scheduleDraftAutosave()}));$('#origin').addEventListener('change',scheduleDraftAutosave);
+$('#airline-filter').addEventListener('change',e=>{state.airlineFilter=e.target.value;renderResults()});
+let draftAutosaveTimer;
+$('#p1-budget').addEventListener('input',scheduleDraftAutosave);
+$('#btn-copy-mcp').onclick=()=>{const origin=resolveIata($('#origin').value,'TPE'),dest=state.destinations[0]||'NGO',dep=$('#out-end').value||$('#out-start').value,ret=$('#return-end').value||$('#return-start').value;const cmd=`flight_search(origin="${origin}", destination="${dest}", outbound_date="${dep}", inbound_date="${ret}", adults=${state.adults}, children=${state.children})`;navigator.clipboard.writeText(cmd).then(()=>toast('📋 已複製 MCP 查詢指令至剪貼簿！')).catch(()=>toast(cmd))};
+function renderSuggestionBox(box,items,onPick){box.innerHTML=items.length?items.map(a=>`<button type="button" class="suggestion" data-iata="${esc(a.code||a.iata)}"><span><b>${esc(a.city||a.name)}</b>${a.country?`<small> (${esc(a.country)})</small>`:''}<small> ${esc(a.name)}</small></span><strong>${esc(a.code||a.iata)}</strong></button>`).join(''):'<div class="suggestion">沒有找到相符機場，可直接輸入 3 碼 IATA 代碼</div>';box.classList.remove('hidden');box.querySelectorAll('[data-iata]').forEach(b=>b.onclick=()=>onPick(b.dataset.iata))}
+let originTimer,destTimer;
+function updateOriginDropdown(){const q=$('#origin').value.trim();const local=searchLocalAirports(q);renderSuggestionBox($('#origin-suggestions'),local,code=>{const info=getAirportInfo(code);$('#origin').value=info.inputVal;$('#origin-suggestions').classList.add('hidden');syncDeepLinks();scheduleDraftAutosave();toast(`🛫 出發地已設為：${info.inputVal}`)});if(q.length>=2&&local.length<4){clearTimeout(originTimer);originTimer=setTimeout(async()=>{try{const data=await api(`/api/planner/airports?q=${encodeURIComponent(q)}`);if(data.airports?.length)renderSuggestionBox($('#origin-suggestions'),data.airports,code=>{const info=getAirportInfo(code);$('#origin').value=info.inputVal;$('#origin-suggestions').classList.add('hidden');syncDeepLinks();scheduleDraftAutosave()})}catch{}},260)}}
+function updateDestDropdown(){const q=$('#airport-query').value.trim();const local=searchLocalAirports(q);const pick=code=>{if(!state.destinations.includes(code))state.destinations.push(code);$('#airport-query').value='';$('#airport-suggestions').classList.add('hidden');renderDestinations();scheduleDraftAutosave();toast(`🎯 已加入目的地：${getAirportInfo(code).inputVal}`)};renderSuggestionBox($('#airport-suggestions'),local,pick);if(q.length>=2&&local.length<4){clearTimeout(destTimer);destTimer=setTimeout(async()=>{try{const data=await api(`/api/planner/airports?q=${encodeURIComponent(q)}`);if(data.airports?.length)renderSuggestionBox($('#airport-suggestions'),data.airports,pick)}catch{}},260)}}
+$('#origin').addEventListener('focus',updateOriginDropdown);
+$('#origin').addEventListener('input',updateOriginDropdown);
+$('#origin').addEventListener('blur',()=>setTimeout(()=>{const v=$('#origin').value.trim();if(v){const info=getAirportInfo(v);if(info.code&&/^[A-Z]{3}$/.test(info.code)){$('#origin').value=info.inputVal;syncDeepLinks()}}},220));
+$('#airport-query').addEventListener('focus',updateDestDropdown);
+$('#airport-query').addEventListener('input',updateDestDropdown);
+$('#airport-query').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();const v=$('#airport-query').value.trim();if(!v)return;const code=resolveIata(v,'');if(/^[A-Z]{3}$/.test(code)){if(!state.destinations.includes(code))state.destinations.push(code);$('#airport-query').value='';$('#airport-suggestions').classList.add('hidden');renderDestinations();scheduleDraftAutosave()}}});
+document.addEventListener('click',e=>{if(!e.target.closest('#origin-wrap'))$('#origin-suggestions').classList.add('hidden');if(!e.target.closest('#dest-wrap'))$('#airport-suggestions').classList.add('hidden')});
+function renderAges(){const box=$('#child-ages');while(state.childAges.length<state.children)state.childAges.push(7);state.childAges=state.childAges.slice(0,state.children);box.innerHTML=state.childAges.map((age,i)=>`<div class="child-age"><label for="age-${i}">兒童 ${i+1}｜出發年齡</label><select class="control" id="age-${i}" data-age="${i}">${Array.from({length:18},(_,n)=>`<option value="${n}" ${n===age?'selected':''}>${n} 歲</option>`).join('')}</select></div>`).join('');$$('[data-age]').forEach(s=>s.onchange=()=>{state.childAges[Number(s.dataset.age)]=Number(s.value);scheduleDraftAutosave()});$('#adult-count').textContent=state.adults;$('#child-count').textContent=state.children;syncDeepLinks()}
+$$('[data-count]').forEach(b=>b.onclick=()=>{const key=b.dataset.count,delta=Number(b.dataset.delta);if(key==='adults')state.adults=Math.max(1,Math.min(9-state.children,state.adults+delta));else state.children=Math.max(0,Math.min(8,state.children+delta));renderAges();scheduleDraftAutosave()});renderAges();
+function draftPayload(){const budgetText=$('#p1-budget').value.trim(),budget=budgetText===''?null:Number(budgetText);if(budget!==null&&(!Number.isSafeInteger(budget)||budget<=0))throw Error('機票總預算請輸入大於 0 的整數。');return{origin:resolveIata($('#origin').value,'TPE'),destinations:state.destinations.map(d=>resolveIata(d,d)),outbound_start:$('#out-start').value,outbound_end:$('#out-end').value,return_start:$('#return-start').value,return_end:$('#return-end').value,budget_twd:budget,travelers:{adults:state.adults,children:state.childAges.map(age_at_departure=>({age_at_departure}))}}}
+async function persistDraft(syncCandidates=false){const payload=draftPayload();if(state.draftId)payload.id=state.draftId;const draft=await api('/api/planner/drafts',{method:'POST',body:JSON.stringify(payload)});state.draftId=draft.id;state.savedDraft=draft;localStorage.setItem('roamPlannerDraftId',draft.id);$('#draft-state').textContent=`草案｜${payload.destinations.join('、')||'尚未選擇'}`;$('#draft-save-status').textContent=`已儲存 · ${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;if(syncCandidates)await loadCandidates();return draft}
+async function saveDraft(){return persistDraft(true)}
+function scheduleDraftAutosave(){clearTimeout(draftAutosaveTimer);$('#draft-save-status').textContent='條件已修改，儲存中…';draftAutosaveTimer=setTimeout(async()=>{try{await persistDraft(false)}catch(e){$('#draft-save-status').textContent=`自動儲存失敗：${e.message}`}},700)}
+function candidateKey(i){return [i.outbound_date,i.outbound?.flight_number,i.return_date,i.inbound?.flight_number].join(':')}
+function matchAirlineFilter(i){const f=state.airlineFilter;if(!f||f==='all')return true;const no=String(i.outbound?.flight_number||'').toUpperCase();const prefix=no.slice(0,2);if(f==='LCC')return ['IT','MM','TR','D7','FD','GK','SL','VZ','TW','BX'].includes(prefix);return prefix===f}
+function depMinutes(leg){const m=String(leg?.departure_time||'').match(/(\d{2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):720}
+function matchTimeFilter(i){return [['out',i.outbound],['return',i.inbound]].every(([leg,flight])=>{const range=state.timeRanges[leg];if(range.start===0&&range.end===1440)return true;const match=String(flight?.departure_time||'').match(/(\d{2}):(\d{2})/);if(!match)return false;const minutes=Number(match[1])*60+Number(match[2]);return minutes>=range.start&&minutes<=range.end})}
+function providerLabel(p){const s=String(p||'');if(s==='serpapi+ignav')return 'SerpApi + Ignav 雙引擎';if(s.toLowerCase()==='serpapi')return 'SerpApi 即時';if(s.includes('SerpApi'))return 'SerpApi 驗證快照';if(s.startsWith('history:'))return '歷史快照';return 'Ignav 即時'}
+function fareTimeLabel(i){const source=i.data_age_source==='cache'?'快取查詢時間':i.data_age_source==='history'?'歷史觀測時間':'本次查詢時間';return `${source}：${when(i.observed_at)}`}
+function fmtBags(b){if(!b||typeof b!=='string'||b.includes('[object'))return '';return ` · ${esc(b)}`}
+function shortDate(iso){const s=String(iso||'');return s.length>=10?s.slice(5).replace('-','/'):s}
+function daysBadge(d1,d2){const a=new Date(d1),b=new Date(d2);const diff=b>a?Math.round((b-a)/86400000)+1:0;return diff>0?`${diff}天${Math.max(1,diff-1)}夜`:''}
+function groupScore(g){
+  const rep=g.rep,outNo=String(rep.outbound?.flight_number||'').toUpperCase(),inNo=String(rep.inbound?.flight_number||'').toUpperCase();
+  const isHero=outNo==='CI154'&&['CI155','CI151'].includes(inNo);
+  const isFsc=['CI','JX','BR','CX','JL','NH'].includes(outNo.slice(0,2));
+  const outMin=depMinutes(rep.outbound),inMin=depMinutes(rep.inbound);
+  const isGolden=outMin>=420&&outMin<=750&&inMin>=600&&inMin<=1200;
+  const isRedeye=outMin<390;
+  return (isHero?-1000000:0)+(isGolden?-200000:0)+(isFsc?-80000:0)+(isRedeye?120000:0)+(g.minPrice??999999);
+}
+function sameAirline(i){const o=String(i.outbound?.flight_number||'').slice(0,2).toUpperCase(),b=String(i.inbound?.flight_number||'').slice(0,2).toUpperCase();return o&&b&&o===b}
+function itineraryGroupCard(g,trackedMap){
+  const i=g.rep;
+  const outNo=String(i.outbound?.flight_number||'').toUpperCase();
+  const inNo=String(i.inbound?.flight_number||'').toUpperCase();
+  const isBest=outNo==='CI154'&&['CI155','CI151'].includes(inNo);
+  const outMin=depMinutes(i.outbound),inMin=depMinutes(i.inbound);
+  const isGolden=!isBest&&outMin>=420&&outMin<=750&&inMin>=570&&inMin<=1200;
+  const isRedeye=outMin<390;
+  const hasPriceSpread=g.maxPrice>g.minPrice;
+  const pills=g.items.map(opt=>{
+    const k=candidateKey(opt);
+    const candId=trackedMap.get(k);
+    const isCheapest=opt.amount!=null&&opt.amount===g.minPrice&&g.items.length>1;
+    const days=daysBadge(opt.outbound_date,opt.return_date);
+    return `<div class="date-pill ${isCheapest?'cheapest':''}">
+      <div>
+        <div style="font-weight:750;color:var(--ink)">📅 ${esc(shortDate(opt.outbound_date))} 去 ➔ ${esc(shortDate(opt.return_date))} 回 ${days?`<span style="color:var(--muted);font-weight:500">(${days})</span>`:''}</div>
+        <div style="margin-top:3px"><b>${money(opt.amount,'TWD')}</b>${isCheapest&&hasPriceSpread?' <span class="tag amber" style="margin:0;padding:1px 6px;font-size:10px">🔥 最低價</span>':''}</div>
+        <div class="note" style="margin-top:3px">${esc(fareTimeLabel(opt))}</div>
+      </div>
+      ${candId?`<button type="button" class="btn danger sm remove-candidate-inline" data-cand-id="${esc(candId)}" title="點擊取消追蹤此日期">－ 取消追蹤</button>`:`<button type="button" class="btn navy sm add-candidate" data-key="${esc(k)}">＋ 追蹤此日</button>`}
+    </div>`;
+  }).join('');
+  return `<article class="flight ${isBest?'recommended':''}">
+    <div class="airline">
+      ${isBest?'<span class="tag amber" style="margin:0 0 5px">🏆 旅行大師推薦首選 · 早去午回</span><br>':isGolden?'<span class="tag" style="margin:0 0 5px;background:#e0f2fe;color:#0369a1">🌅 早去午回優選時段</span><br>':isRedeye?'<span class="tag" style="margin:0 0 5px;background:#fee2e2;color:#991b1b">🌙 凌晨紅眼班機</span><br>':''}
+      ${esc(i.airline||'航班組合')} <span style="font-size:13px;color:var(--blue);font-weight:750">(${esc(outNo)} ⇄ ${esc(inNo)})</span>
+      <small>${esc(getAirportInfo(i.destination).inputVal)} · 直航來回${fmtBags(i.bags)}${i.requires_self_transfer?' · 需自行轉機':''}</small>
+    </div>
+    <div class="leg"><b>🛫 去程　${esc(fmtRange(i.outbound))}</b><small>${esc(outNo)} · ${esc(i.origin)} → ${esc(i.destination)}</small></div>
+    <div class="leg"><b>🛬 回程　${esc(fmtRange(i.inbound))}</b><small>${esc(inNo)} · ${esc(i.destination)} → ${esc(i.origin)}</small></div>
+    <div class="price">
+      <div><b>${money(g.minPrice,'TWD')}${g.items.length>1?'<span style="font-size:12px;font-weight:600;color:var(--muted)"> 起</span>':''}</b><small>${providerLabel(i.provider)}｜共 ${g.items.length} 組日期可選<br>${esc(fareTimeLabel(i))}</small></div>
+    </div>
+    <details class="flight-options"><summary><span>日期組合　${g.items.length} 組 · 最低 ${money(g.minPrice,'TWD')}</span><span aria-hidden="true">⌄</span></summary><div class="flight-dates">${pills}</div></details>
+  </article>`;
+}
+$$('[data-sort]').forEach(b=>b.onclick=()=>{state.sortBy=b.dataset.sort;$$('[data-sort]').forEach(x=>x.classList.toggle('active',x.dataset.sort===state.sortBy));renderResults()});
+function formatClock(minutes){return `${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`}
+function updateTimeRange(leg){const range=state.timeRanges[leg],track=$(`#${leg}-time-track`);track.style.setProperty('--from',`${range.start/14.4}%`);track.style.setProperty('--to',`${range.end/14.4}%`);$(`#${leg}-time-label`).textContent=`${formatClock(range.start)}–${formatClock(range.end)}`;renderResults()}
+$$('[data-time-leg]').forEach(input=>input.addEventListener('input',()=>{const leg=input.dataset.timeLeg,edge=input.dataset.edge,range=state.timeRanges[leg],value=Number(input.value);range[edge]=edge==='start'?Math.min(value,range.end):Math.max(value,range.start);input.value=range[edge];updateTimeRange(leg)}));
+$('#search-btn').onclick=async()=>{const msg=$('#search-message');msg.classList.add('hidden');$('#search-btn').disabled=true;$('#search-btn').textContent='雙引擎搜尋中…';try{await saveDraft();const data=await api(`/api/planner/drafts/${state.draftId}/search`,{method:'POST'});state.results=data.itineraries;state.activeDestTab=null;renderResults();$('#search-results-wrap').classList.remove('hidden');loadEngineStatus(false);if(!data.count)toast('目前沒有符合條件的直航組合')}catch(e){msg.textContent=e.message;msg.classList.remove('hidden')}finally{$('#search-btn').disabled=false;$('#search-btn').textContent='搜尋航班　→'}};
+$('#load-history-btn').onclick=async()=>{const msg=$('#search-message');msg.classList.add('hidden');try{if(state.destinations.length)await saveDraft();const q=state.draftId?`?draft_id=${encodeURIComponent(state.draftId)}`:'';const data=await api(`/api/planner/historical-itineraries${q}`);state.results=data.itineraries;state.activeDestTab=null;renderResults();$('#search-results-wrap').classList.remove('hidden');if(!data.count)toast('歷史資料庫中尚無相符的來回快照')}catch(e){msg.textContent=e.message;msg.classList.remove('hidden')}};
+async function loadPhase1Insights(){try{const d=await api('/api/phase1');const box=$('#phase1-insights');const rows=d.rows||[];box.innerHTML=rows.length?rows.map(r=>`<div class="metric" style="display:flex;flex-direction:column;justify-content:space-between"><div><small>${esc(r.name_zh)} (${esc(r.iata)}) · ${Number(r.matched_schedules||0)} 組歷史班表</small><strong style="font-size:20px">${r.airfare!=null?money(r.airfare,'TWD'):'尚無來回快照'}</strong><em>${r.total!=null?`含食宿交通估算約 ${money(r.total,'TWD')}`:'等待票價快照補充'}</em></div><button class="btn" style="margin-top:10px;padding:7px 10px;font-size:12px" data-pick-dest="${esc(r.iata)}">＋ 加入目的地 (${esc(r.iata)})</button></div>`).join(''):'<div class="note">尚無航點歷史評比資料。</div>';$$('[data-pick-dest]').forEach(b=>b.onclick=()=>{const iata=b.dataset.pickDest;if(!state.destinations.includes(iata)){state.destinations.push(iata);renderDestinations();toast(`已加入目的地 ${iata}`)}})}catch{}}
+function renderResults(){
+  const trackedMap=new Map(state.candidates.map(c=>[candidateKey(c.itinerary),c.id]));
+  const baseFiltered=state.results.filter(i=>sameAirline(i)&&matchAirlineFilter(i)&&matchTimeFilter(i));
+  const destMap=new Map();
+  for(const i of baseFiltered){
+    const d=i.destination;
+    if(!destMap.has(d))destMap.set(d,{dest:d,pairs:new Set(),minPrice:null});
+    const entry=destMap.get(d);
+    entry.pairs.add(`${i.outbound?.flight_number}:${i.inbound?.flight_number}`);
+    if(i.amount!=null&&(entry.minPrice==null||i.amount<entry.minPrice))entry.minPrice=i.amount;
+  }
+  const destKeys=[...destMap.keys()].sort((a,b)=>(a==='NGO'?-1:b==='NGO'?1:a.localeCompare(b)));
+  if(!state.activeDestTab||(state.activeDestTab!=='all'&&!destMap.has(state.activeDestTab))){
+    state.activeDestTab=destKeys.includes('NGO')?'NGO':(destKeys[0]||'all');
+  }
+  const tabsBox=$('#dest-tabs');
+  if(destKeys.length>1){
+    tabsBox.innerHTML=destKeys.map(d=>{
+      const info=getAirportInfo(d),st=destMap.get(d);
+      return `<button type="button" class="dest-tab ${state.activeDestTab===d?'active':''}" data-dest-tab="${esc(d)}">${d==='NGO'?'👑 ':''}${esc(info.inputVal)} <small>${st.pairs.size} 組航班 · ${st.minPrice!=null?`${money(st.minPrice,'TWD')}起`:''}</small></button>`;
+    }).join('')+`<button type="button" class="dest-tab ${state.activeDestTab==='all'?'active':''}" data-dest-tab="all">🌏 全部航點合併 <small>共 ${baseFiltered.length} 筆日期組合</small></button>`;
+    tabsBox.classList.remove('hidden');
+    $$('[data-dest-tab]').forEach(b=>b.onclick=()=>{state.activeDestTab=b.dataset.destTab;renderResults()});
+  }else{
+    tabsBox.innerHTML='';tabsBox.classList.add('hidden');
+  }
+  const destFiltered=state.activeDestTab==='all'?baseFiltered:baseFiltered.filter(i=>i.destination===state.activeDestTab);
+  const groupMap=new Map();
+  for(const i of destFiltered){
+    const gk=`${i.destination}:${i.outbound?.flight_number}:${i.inbound?.flight_number}`;
+    if(!groupMap.has(gk))groupMap.set(gk,{key:gk,rep:i,items:[],minPrice:null,maxPrice:null});
+    const g=groupMap.get(gk);
+    g.items.push(i);
+    if(i.amount!=null){
+      if(g.minPrice==null||i.amount<g.minPrice){g.minPrice=i.amount;g.rep=i}
+      if(g.maxPrice==null||i.amount>g.maxPrice)g.maxPrice=i.amount;
+    }
+  }
+  const groups=[...groupMap.values()];
+  for(const g of groups){
+    g.items.sort((a,b)=>a.outbound_date.localeCompare(b.outbound_date)||a.return_date.localeCompare(b.return_date)||(a.amount||0)-(b.amount||0));
+  }
+  if(state.sortBy==='price'){
+    groups.sort((a,b)=>(a.minPrice??999999)-(b.minPrice??999999)||depMinutes(a.rep.outbound)-depMinutes(b.rep.outbound));
+  }else if(state.sortBy==='time'){
+    groups.sort((a,b)=>depMinutes(a.rep.outbound)-depMinutes(b.rep.outbound)||(a.minPrice??999999)-(b.minPrice??999999));
+  }else{
+    groups.sort((a,b)=>groupScore(a)-groupScore(b));
+  }
+  $('#result-count').textContent=`已將 ${destFiltered.length} 筆日期組合濃縮為 ${groups.length} 組代表性直航航班（全數共 ${baseFiltered.length} 筆）`;
+  $('#search-results').innerHTML=groups.length?groups.map(g=>itineraryGroupCard(g,trackedMap)).join(''):'<div class="empty">沒有符合篩選條件的航班組合。請切換上方時段／航空公司篩選或調整日期區間。</div>';
+  $$('.add-candidate').forEach(b=>b.onclick=async()=>{try{if(!state.draftId){if(!state.destinations.length){const dest=state.results.find(x=>candidateKey(x)===b.dataset.key)?.destination;if(dest){state.destinations.push(dest);renderDestinations()}}await saveDraft()}const i=state.results.find(x=>candidateKey(x)===b.dataset.key);await api('/api/planner/candidates',{method:'POST',body:JSON.stringify({draft_id:state.draftId,itinerary:i})});toast('已加入候選，價格追蹤同步開始');await loadCandidates()}catch(e){toast(e.message)}});
+  $$('.remove-candidate-inline').forEach(b=>b.onclick=async()=>{try{const cid=b.dataset.candId;await api(`/api/planner/candidates/${cid}`,{method:'DELETE'});if(state.activeCandidate===cid)state.activeCandidate=null;toast('已取消追蹤此日期');await loadCandidates()}catch(e){toast(e.message)}});
+}
+async function loadCandidates({refreshStale=false}={}){if(!state.draftId){state.candidates=[];state.archivedCandidates=[];renderCandidates();if(state.results.length)renderResults();return}try{let data=await api(`/api/planner/drafts/${state.draftId}/candidates`);if(refreshStale&&!state.p2RefreshInFlight){state.p2RefreshInFlight=true;$('#candidate-count').textContent='檢查價格新鮮度…';try{const result=await api(`/api/planner/drafts/${state.draftId}/refresh-stale`,{method:'POST'});if(result.refreshed||result.failed){data=await api(`/api/planner/drafts/${state.draftId}/candidates`);if(result.failed)toast(`${result.failed} 組即時更新失敗；舊觀測保留於趨勢圖，請稍後手動更新`);else toast(`已查詢 ${result.refreshed} 組過期候選，新增 ${result.new_observations||0} 筆價格觀測；歷史趨勢已保留`)}}finally{state.p2RefreshInFlight=false}}state.candidates=data.candidates.filter(c=>c.matches_current_draft);state.archivedCandidates=data.candidates.filter(c=>!c.matches_current_draft);if(!state.activeCandidate||!state.candidates.some(c=>c.id===state.activeCandidate))state.activeCandidate=state.candidates[0]?.id||null;renderCandidates();if(state.results.length)renderResults()}catch(e){state.p2RefreshInFlight=false;toast(e.message)}}
+function renderArchivedCandidates(){
+  const old=state.archivedCandidates||[],box=$('#archived-candidates');
+  box.classList.toggle('hidden',!old.length);
+  if(!old.length)return;
+  $('#archived-candidates-summary').textContent=`舊版或不符目前條件的候選 ${old.length} 組 · 展開查看與管理`;
+  $('#archived-candidates-list').innerHTML=old.map(c=>{const i=c.itinerary;return `<div class="archived-candidate"><div><b>${esc(getAirportInfo(i.destination).inputVal)} · ${esc(i.airline||'航班')}</b><small>${esc(i.outbound_date)} ${esc(i.outbound?.flight_number)} 去／${esc(i.return_date)} ${esc(i.inbound?.flight_number)} 回 · ${c.tracking_status==='tracking'?'仍在追蹤':'已暫停'}</small></div><button type="button" class="btn danger sm remove-archived-candidate" data-id="${esc(c.id)}">移除舊候選</button></div>`}).join('');
+  $$('.remove-archived-candidate').forEach(b=>b.onclick=async()=>{try{await api(`/api/planner/candidates/${encodeURIComponent(b.dataset.id)}`,{method:'DELETE'});await loadCandidates();toast('舊候選已移除')}catch(e){toast(e.message)}});
+}
+function renderP2Scope(){const d=state.savedDraft,box=$('#p2-scope-summary');if(!d){box.textContent='';return}box.innerHTML=`<span>出發 ${esc(d.origin)}</span><span>目的地 ${d.destinations.map(esc).join('／')}</span><span>去程 ${esc(d.outbound_start)}～${esc(d.outbound_end)}</span><span>回程 ${esc(d.return_start)}～${esc(d.return_end)}</span><span>${Number(d.travelers?.adults||0)} 位成人 · ${(d.travelers?.children||[]).length} 位兒童</span><span>草案機票總預算 ${d.budget_twd!=null?money(d.budget_twd,'TWD'):'未設定'}</span>`}
+function fareComparableForCandidate(observation,candidate){
+  const scope=String(observation.price_scope||'').toLowerCase();
+  const source=String(observation.source||'').toLowerCase();
+  const party=candidate.itinerary?._draft_scope?.travelers;
+  if(!party||!Array.isArray(party.children))return false;
+  const adults=Number(party.adults),children=party.children.length,total=adults+children;
+  if(scope==='per_person')return total===1;
+  if(source.startsWith('history:')){
+    if(children===0&&scope===`party_of_${adults}`)return true;
+    return adults===2&&children===2&&scope.startsWith('family_total');
+  }
+  if(scope.startsWith(`party_of_${total}`))return true;
+  return scope==='party_total'||scope.startsWith('family_total');
+}
+function trendSvg(obs,target=null){
+  const timestamp=s=>{const raw=String(s||'').replace(' ','T');return Date.parse(/(?:Z|[+-]\d\d:\d\d)$/.test(raw)?raw:raw+'Z')};
+  const points=obs.filter(o=>Number.isFinite(Number(o.amount))&&o.observed_at).map(o=>({...o,time:timestamp(o.observed_at)})).filter(o=>Number.isFinite(o.time)).sort((a,b)=>a.time-b.time);
+  if(!points.length)return '<div class="chart"><div class="note">尚無可比較的價格觀測；更新價格後會開始累積趨勢。</div></div>';
+  const values=points.map(o=>Number(o.amount)),bounds=target!=null?[...values,Number(target)]:values,min=Math.min(...bounds),max=Math.max(...bounds),span=max-min||Math.max(max*.05,1),start=points[0].time,end=points.at(-1).time;
+  const x=t=>80+(end===start?300:(t-start)/(end-start)*650),y=v=>145-(v-min)/span*110;
+  return `<div class="chart" style="height:250px"><svg viewBox="0 0 780 200" role="img" aria-label="價格歷史趨勢，橫軸為觀測日期，縱軸為新台幣金額">${[min,(min+max)/2,max].map(v=>`<line x1="80" x2="740" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="72" y="${y(v)+4}" text-anchor="end" fill="var(--muted)" font-size="12">${Math.round(v).toLocaleString()}</text>`).join('')}${target!=null?`<line x1="80" x2="740" y1="${y(target)}" y2="${y(target)}" stroke="var(--coral-ink)" stroke-dasharray="6 5"/><text x="80" y="${y(target)-7}" fill="var(--coral-ink)" font-size="12">目標 ${money(target)}</text>`:''}<polyline class="line" points="${points.map(o=>`${x(o.time)},${y(o.amount)}`).join(' ')}"/>${points.map(o=>`<circle tabindex="0" class="dot" cx="${x(o.time)}" cy="${y(o.amount)}" r="5"><title>${money(o.amount)} · ${esc(when(o.observed_at))} · ${esc(o.source)}</title></circle>`).join('')}${[points[0],...(points.length>1?[points.at(-1)]:[])].map(o=>`<text x="${x(o.time)}" y="185" text-anchor="middle" fill="var(--muted)" font-size="12">${esc(when(o.observed_at))}</text>`).join('')}</svg></div>`;
+}
+function renderCandidates(){renderP2Scope();renderArchivedCandidates();const tabs=$('#candidate-tabs'),empty=$('#candidate-empty'),panel=$('#candidate-panel');const total=state.candidates.length,tracking=state.candidates.filter(c=>c.tracking_status==='tracking').length;$('#candidate-count').textContent=`${tracking} 組追蹤中`;if($('#p1-candidate-count'))$('#p1-candidate-count').textContent=`${total} 組候選追蹤中`;if($('#to-p2-top-btn'))$('#to-p2-top-btn').disabled=!total;if($('#to-p2-btn'))$('#to-p2-btn').disabled=!total;empty.classList.toggle('hidden',total>0);panel.classList.toggle('hidden',!total);$('#to-p3-btn').disabled=!total;tabs.innerHTML=state.candidates.map(c=>`<button class="candidate-tab ${c.id===state.activeCandidate?'active':''}" data-candidate="${c.id}"><b>${esc(getAirportInfo(c.itinerary.destination).inputVal)} · ${esc(c.itinerary.airline||c.itinerary.outbound?.flight_number)}</b><small>${esc(c.itinerary.outbound_date)} ${esc(c.itinerary.outbound?.flight_number)} / ${esc(c.itinerary.return_date)} ${esc(c.itinerary.inbound?.flight_number)}</small></button>`).join('');$$('[data-candidate]').forEach(b=>b.onclick=()=>{state.activeCandidate=b.dataset.candidate;renderCandidates()});const c=state.candidates.find(x=>x.id===state.activeCandidate);if(!c)return;const it=c.itinerary,obs=c.observations||[],latest=obs.at(-1),lowest=obs.length?obs.reduce((a,b)=>a.amount<=b.amount?a:b):null,target=c.target_price;const histCount=obs.filter(o=>String(o.source||'').startsWith('history:')).length,liveCount=obs.length-histCount;const close=target!=null&&latest?Math.abs(Number(latest.amount)-Number(target)):null;panel.innerHTML=`<div class="metrics"><div class="metric"><small>目前航班價格</small><strong>${latest?money(latest.amount,'TWD'):'—'}</strong><em>${latest?`${esc(it.outbound_date)} ${esc(it.outbound.flight_number)} 去／${esc(it.return_date)} ${esc(it.inbound.flight_number)} 回`:'尚無成功觀測'}</em></div><div class="metric"><small>觀測期間最低</small><strong>${lowest?money(lowest.amount,'TWD'):'—'}</strong><em>${lowest?`${esc(it.outbound_date)} ${esc(it.outbound.flight_number)} 去／${esc(it.return_date)} ${esc(it.inbound.flight_number)} 回`:'等候價格資料'}</em></div><div class="metric"><small>距目標價</small><strong>${close==null?'—':money(close,'TWD')}</strong><em>${target==null?'尚未設定目標價':`目標 ${money(target,'TWD')}`}</em></div></div><div class="candidate-info"><div><h3>${esc(getAirportInfo(it.destination).inputVal)} · ${esc(it.airline||'航班')}</h3><div class="note">去程 ${esc(it.outbound_date)} ${esc(it.outbound.flight_number)} · ${esc(fmtRange(it.outbound))}　/　回程 ${esc(it.return_date)} ${esc(it.inbound.flight_number)} · ${esc(fmtRange(it.inbound))}</div></div><span class="tag">${c.tracking_status==='tracking'?'追蹤中':'已暫停'}｜歷史快照 ${histCount} 筆 · 即時 ${liveCount} 筆</span></div>${trendSvg(obs)}<div class="note">每位旅客的價格走勢僅在供應商明確回傳「單人價」時才可計算；目前資料範圍：${esc(latest?.price_scope||'未知')}。已自動融合 SerpApi 雲端爬蟲與本地資料庫之相符來回歷史快照。</div><div class="target"><label for="target-price" class="field-label" style="margin:0">目標價格</label><input class="control" id="target-price" inputmode="decimal" placeholder="例如 60000" value="${target??''}"><button class="btn" id="save-target">儲存目標</button><span class="note">共 ${obs.length} 次觀測｜最近 ${when(latest?.observed_at)}</span></div><div class="actions"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="refresh-price">更新價格</button><button class="btn" id="toggle-track">${c.tracking_status==='tracking'?'暫停追蹤':'恢復追蹤'}</button><button class="btn danger" id="remove-candidate">移除候選</button></div><button class="btn navy" id="decide-flight">決定這組航班，前往 P3 →</button></div>`;
+  panel.querySelector('label[for="target-price"]').textContent='整組旅客目標總價';
+  const scope=String(latest?.price_scope||'').toLowerCase();
+  if(target!=null&&latest&&!/(party|family|total)/.test(scope)){
+    const distance=panel.querySelector('.metrics .metric:last-child');
+    distance.querySelector('strong').textContent='—';
+    distance.querySelector('em').textContent=`目標 ${money(target,'TWD')}；目前票價不是已確認的整組旅客總價`;
+  }
+  const comparable=obs.filter(o=>fareComparableForCandidate(o,c));
+  const unverified=obs.filter(o=>!fareComparableForCandidate(o,c));
+  const comparableLatest=comparable.at(-1);
+  const comparableLowest=comparable.length?comparable.reduce((a,b)=>Number(a.amount)<=Number(b.amount)?a:b):null;
+  const latestCurrent=comparable.filter(o=>!String(o.source||'').toLowerCase().startsWith('history:')).at(-1);
+  const currentFresh=Boolean(latestCurrent&&p3QuoteIsFresh(latestCurrent.observed_at));
+  const metrics=panel.querySelectorAll('.metrics .metric');
+  metrics[0].querySelector('small').textContent='目前有效參考價';
+  metrics[0].querySelector('strong').textContent=currentFresh?money(latestCurrent.amount,'TWD'):(latestCurrent?'需即時更新':'—');
+  metrics[0].querySelector('em').textContent=currentFresh?`${latestCurrent.source} · ${when(latestCurrent.observed_at)}`:(latestCurrent?`最近報價 ${when(latestCurrent.observed_at)}，已超過 ${state.priceFreshnessHours} 小時`:'尚無計價範圍可確認的報價');
+  metrics[1].querySelector('small').textContent='觀測期間最低參考價';
+  metrics[1].querySelector('strong').textContent=comparableLowest?money(comparableLowest.amount,'TWD'):'—';
+  metrics[1].querySelector('em').textContent=comparableLowest?`${comparableLowest.source} · ${when(comparableLowest.observed_at)}`:'尚無可比較的歷史低價';
+  const distance=metrics[2];
+  distance.querySelector('small').textContent='參考價距目標';
+  const difference=target!=null&&currentFresh?Number(latestCurrent.amount)-Number(target):null;
+  distance.querySelector('strong').textContent=difference==null?'—':money(Math.abs(difference),'TWD');
+  distance.querySelector('em').textContent=target==null?'尚未設定目標價':difference==null?`目標 ${money(target,'TWD')}；等待可比較報價`:`${difference>0?'高於':'低於或等於'}目標 ${money(target,'TWD')}`;
+  panel.querySelector('.chart').outerHTML=trendSvg(comparable,target);
+  panel.querySelector('.chart + .note').textContent=`圖表只比較同旅客條件且計價範圍明確的價格；SerpApi 部分回程以班表配對估算，仍需至訂票通路確認。${unverified.length} 筆範圍未確認或旅客組成不明的資料未納入。`;
+  panel.querySelector('.candidate-info .tag').textContent=`${c.tracking_status==='tracking'?'追蹤中':'已暫停'}｜${currentFresh?'價格在有效期限內':`需更新（${state.priceFreshnessHours} 小時期限）`} · 歷史觀測 ${comparable.length} 筆`;
+  panel.querySelector('.target .note').textContent=`同條件 ${comparable.length} 次觀測｜最近 ${when(comparableLatest?.observed_at)}`;
+  const attempt=c.last_refresh_attempt_at;
+  const attemptRaw=String(attempt||'').replace(' ','T');
+  const attemptTime=Date.parse(/(?:Z|[+-]\d\d:\d\d)$/.test(attemptRaw)?attemptRaw:attemptRaw+'Z');
+  const next=Number.isFinite(attemptTime)?new Date(attemptTime+Number(c.tracking_interval_hours||6)*3600000).toISOString():null;
+  panel.querySelector('.target .note').textContent+=`｜最近查詢 ${when(attempt)}｜${c.tracking_status==='tracking'?`下次預計 ${next?when(next):'排程檢查時查詢'}`:'已暫停自動查價'}（服務運行期間）`;
+  if(unverified.length){
+    const details=document.createElement('details');
+    details.className='archived-candidates';
+    details.innerHTML=`<summary>另有 ${unverified.length} 筆未納入比較的報價（展開查看）</summary><div class="archived-candidates-list">${unverified.slice(-12).reverse().map(o=>`<div class="archived-candidate"><span>${esc(o.source)} · ${esc(o.price_scope||'計價範圍未知')} · ${esc(when(o.observed_at))}</span><b>${money(o.amount,'TWD')}</b></div>`).join('')}</div><p class="note">這些金額可能是單人價、其他旅客組成或供應商未說明的總價，不能拿來和整組旅客預算直接比較。</p>`;
+    panel.querySelector('.target').before(details);
+  }
+$('#refresh-price').onclick=async()=>{const b=$('#refresh-price');b.disabled=true;b.textContent='更新中…';try{const x=await api(`/api/planner/candidates/${c.id}/refresh`,{method:'POST'});toast(x.new_observations?`已更新 ${x.new_observations} 筆觀測`:'供應商沒有回傳這組航班的新票價');await loadCandidates()}catch(e){toast(e.message)}finally{b.disabled=false;b.textContent='更新價格'}};
+$('#toggle-track').onclick=async()=>{await api(`/api/planner/candidates/${c.id}`,{method:'PATCH',body:JSON.stringify({status:c.tracking_status==='tracking'?'paused':'tracking'})});await loadCandidates()};
+$('#save-target').onclick=async()=>{const v=$('#target-price').value.trim(),amount=v===''?null:Number(v);if(amount!==null&&(!Number.isSafeInteger(amount)||amount<=0)){toast('目標價格請輸入大於 0 的整數');return}await api(`/api/planner/candidates/${c.id}`,{method:'PATCH',body:JSON.stringify({target_price:amount})});toast('目標價格已儲存');await loadCandidates()};
+$('#remove-candidate').onclick=async()=>{await api(`/api/planner/candidates/${c.id}`,{method:'DELETE'});state.activeCandidate=null;await loadCandidates();toast('候選與追蹤已移除')};
+$('#decide-flight').onclick=async()=>{try{await api(`/api/planner/candidates/${c.id}/decide`,{method:'POST'});showStep('p3')}catch(e){toast(e.message)}};
+}
+$('#to-p3-btn').onclick=()=>showStep('p3');
+function renderDecision(d){
+  const blank=$('#decision-empty'),box=$('#decision-content');
+  blank.classList.toggle('hidden',!!d);box.classList.toggle('hidden',!d);if(!d)return;
+  const i=d.itinerary,t=d.travelers||{},children=t.children||[];
+  box.innerHTML=`<div class="eyebrow">CONFIRMED ITINERARY · TRAVEL-MASTER SELECTION</div><h2 style="margin:8px 0 16px">${esc(getAirportInfo(i.destination).inputVal)} · ${esc(i.airline||'航班組合')}</h2><div class="grid two"><div class="metric"><small>🛫 去程航班</small><strong style="font-size:19px">${esc(i.outbound_date)}　${esc(i.outbound.flight_number)}</strong><em>${esc(fmtRange(i.outbound))}　${esc(i.origin)} → ${esc(i.destination)}</em></div><div class="metric"><small>🛬 回程航班</small><strong style="font-size:19px">${esc(i.return_date)}　${esc(i.inbound.flight_number)}</strong><em>${esc(fmtRange(i.inbound))}　${esc(i.destination)} → ${esc(i.origin)}</em></div></div><div class="surface" style="margin-top:16px;background:var(--surface-alt);box-shadow:none"><div class="candidate-info"><div><b>👨‍👩‍👧‍👦 本次查價旅客配置</b><div class="note" style="margin-top:6px">${Number(t.adults||0)} 位成人${children.length?`、${children.length} 位兒童（${children.map(x=>`${Number(x.age_at_departure)} 歲`).join('、')}）`:''} · 基準金額：<b>${money(i.amount,'TWD')}</b> (${esc(i.price_scope||'TWD')})</div></div><span class="tag">旅客條件已帶入</span></div></div>
+  <h3 style="margin:24px 0 4px">各通路可訂報價（SerpApi + Ignav 即時查詢）</h3><p class="note">每次查詢皆略過快取，同步呼叫 SerpApi 與 Ignav 即時比對相同日期與去回班號（${state.priceFreshnessHours} 小時新鮮期）。</p>${d.message?`<div class="alert">${esc(d.message)}</div>`:''}${d.booking_options?.length?d.booking_options.map(o=>`<div class="booking"><div><b>[${esc(String(o.api_source||'ignav').toUpperCase())}] ${esc(o.provider)}</b><small>${esc(o.terms||'票價範圍／稅費／行李條件：供應商未完整提供')} · 查詢時間：${esc(when(o.observed_at||d.checked_at))}</small></div><div class="price"><b>${o.amount!=null?money(o.amount,o.currency||'TWD'):'未提供價格'}</b><small>${esc(o.price_scope||'價格範圍未知')} · ${o.verified_party_total?'✓ 已驗證整組總價':esc(o.status_label||o.unverified_reason||'未驗證')}</small></div>${o.url?`<a class="btn primary" href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">${o.amount!=null?'前往訂票 ↗':'前往查看（未提供價格）↗'}</a>`:'<span class="status">訂票連結未提供</span>'}</div>`).join(''):''}<div class="actions"><span class="note">決選已記錄；回 P2 仍可查看與更新其他候選。</span><button class="btn" id="reload-bookings">${d.status==='lookup_required'?'比對航班並查詢價格':'重新查詢價格'}</button></div>`;
+  $('#reload-bookings').onclick=async()=>{const button=$('#reload-bookings');button.disabled=true;button.textContent='雙引擎即時查價中…';try{const result=await api(`/api/planner/candidates/${d.candidate_id}/booking-preview`,{method:'POST'});p3Quotes.set(d.candidate_id,result);state.decision={...result,confirmed_at:d.confirmed_at,decision_persisted:true};renderP3Compare();renderDecision(state.decision);toast(result.status==='ready'?'已更新雙 API 通路報價':result.message||'查詢完成')}catch(e){button.disabled=false;button.textContent='查詢失敗，點此重試';toast(e.message)}}
+}
+async function loadDecision(){try{const d=await api('/api/planner/decision');state.decision=d.decision;renderDecision(state.decision)}catch(e){toast(e.message)}}
+async function loadEngineStatus(notify=false){
+  try{
+    const plannerSettings=await api('/api/planner/settings');
+    state.priceFreshnessHours=Number(plannerSettings.price_freshness_hours)||24;
+    $('#modal-freshness-hours').value=state.priceFreshnessHours;
+    $('#modal-tracking-hours').value=plannerSettings.tracking_interval_hours||6;
+    const s=await api('/api/planner/engine-status');
+    const q=s.serpapi_quota||{};
+    const used=q.used,rem=q.remaining,tot=q.total,pct=(used!=null&&tot)?((used/tot)*100).toFixed(1):null;
+    $('#badge-serpapi-left').textContent=rem==null?'配額未知':`${rem}餘`;
+    $('#engine-status-text').textContent=`SerpApi ${s.serpapi_active?'已設定':'未設定'} · Ignav ${s.ignav_active?'已設定':'未設定'}`;
+    $('#qm-serpapi-used').textContent=used==null?'尚無資料':used;$('#qm-serpapi-rem').textContent=rem==null?'尚無資料':rem;
+    $('#qm-serpapi-pct').textContent=pct==null?'尚無配額資料':`${pct}% 已用`;$('#qm-serpapi-bar').style.width=pct==null?'0%':`${pct}%`;
+    $('#qm-serpapi-renew').textContent=q.renewal_date?`重置日：${q.renewal_date}`:'重置日：未知';
+    if(s.checked_at){
+      const dt=new Date(s.checked_at);
+      $('#header-update-time').textContent=`航班監控快照：${dt.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false})} CST`;
+    }else $('#header-update-time').textContent='航班監控快照：尚無記錄';
+    if(notify)toast(rem==null?'已更新狀態；SerpApi 尚未提供配額資料。':'已同步最新 API 狀態。');
+  }catch{}
+}
+$('#btn-open-quota').onclick=()=>$('#quota-modal').classList.remove('hidden');
+$('#close-quota-modal').onclick=()=>$('#quota-modal').classList.add('hidden');
+let settingsBusy=false;
+function validSettingsHours(value,fallback){const n=Number(value);return Number.isInteger(n)&&n>=1&&n<=168?n:fallback}
+function updateSettingsPreview(){const t=Number($('#modal-tracking-hours').value),f=Number($('#modal-freshness-hours').value);$('#settings-preview').textContent=[t,f].every(n=>Number.isInteger(n)&&n>=1&&n<=168)?`每 ${t} 小時累積一次新價格；${f} 小時內的報價可沿用。`:'兩個欄位都請輸入 1 至 168 小時的整數。'}
+function closeTrackingSettings(){if(settingsBusy)return;$('#monitor-modal').classList.add('hidden');$('#btn-open-monitor').focus()}
+$('#btn-open-monitor').onclick=async()=>{const modal=$('#monitor-modal'),save=$('#save-monitor-btn'),inputs=[$('#modal-tracking-hours'),$('#modal-freshness-hours')];modal.classList.remove('hidden');settingsBusy=true;save.disabled=true;inputs.forEach(i=>i.disabled=true);$('#settings-message').textContent='正在載入已儲存的設定…';$('#close-monitor-modal').focus();try{const s=await api('/api/planner/settings');inputs[0].value=validSettingsHours(s.tracking_interval_hours,validSettingsHours(inputs[0].value,6));inputs[1].value=validSettingsHours(s.price_freshness_hours,24);const supported=validSettingsHours(s.tracking_interval_hours,null)!==null;$('#settings-message').textContent=supported?'設定儲存於伺服器，重新啟動後保留。':'目前服務仍是舊版本，沒有回傳追蹤頻率。請先重啟 Python 服務，再重新開啟設定；目前顯示的是暫用值。';save.disabled=!supported;updateSettingsPreview()}catch(e){$('#settings-message').textContent=`載入失敗：${e.message}，請關閉後重試。`}finally{settingsBusy=false;inputs.forEach(i=>i.disabled=false)}};
+$('#close-monitor-modal').onclick=closeTrackingSettings;
+$('#settings-cancel').onclick=closeTrackingSettings;
+$('#settings-defaults').onclick=()=>{if(settingsBusy)return;$('#modal-tracking-hours').value=6;$('#modal-freshness-hours').value=24;updateSettingsPreview();$('#settings-message').textContent='已填入建議值，按儲存後才會套用。'};
+['modal-tracking-hours','modal-freshness-hours'].forEach(id=>$('#'+id).oninput=updateSettingsPreview);
+$('#monitor-modal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeTrackingSettings()}if(e.key==='Tab'){const focusable=[...$('#monitor-modal').querySelectorAll('button:not(:disabled),input,a,summary')].filter(el=>el.getClientRects().length),first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+$('#save-monitor-btn').onclick=async()=>{const freshness=Number($('#modal-freshness-hours').value),tracking=Number($('#modal-tracking-hours').value);if(![freshness,tracking].every(n=>Number.isInteger(n)&&n>=1&&n<=168)){$('#settings-message').textContent='請輸入 1 至 168 小時的整數。';return}const button=$('#save-monitor-btn');settingsBusy=true;button.disabled=true;button.textContent='儲存中…';try{await api('/api/planner/settings',{method:'PUT',body:JSON.stringify({price_freshness_hours:freshness,tracking_interval_hours:tracking})});state.priceFreshnessHours=freshness;if(state.step==='p2')await loadCandidates();if(state.step==='p3')renderP3Compare();settingsBusy=false;closeTrackingSettings();toast(`已儲存：每 ${tracking} 小時追蹤，價格有效 ${freshness} 小時`)}catch(e){$('#settings-message').textContent=`儲存失敗：${e.message}，請重試。`}finally{settingsBusy=false;button.disabled=false;button.textContent='儲存設定'}};
+$('#btn-refresh-engine').onclick=()=>loadEngineStatus(true);
+async function init(){
+  renderDestinations();
+  await Promise.all([loadPhase1Insights(),loadEngineStatus(false)]);
+  let d=null;
+  if(state.draftId){
+    try{d=await api(`/api/planner/drafts/${state.draftId}`)}catch{d=null}
+  }
+  try{
+    const latest=(await api('/api/planner/drafts/latest')).draft;
+    if(latest&&(!d||String(latest.updated_at||'')>=String(d.updated_at||'')))d=latest;
+  }catch(e){
+    if(!d){
+      $('#draft-save-status').textContent=`草案載入失敗，資料仍保留：${e.message}`;
+      toast('草案讀取失敗；已保留本機草案識別碼，請檢查伺服器連線。');
+      return;
+    }
+  }
+  if(!d){
+    if(state.draftId){localStorage.removeItem('roamPlannerDraftId');state.draftId=null}
+    return;
+  }
+  try{
+    state.draftId=d.id;state.savedDraft=d;localStorage.setItem('roamPlannerDraftId',d.id);
+    $('#origin').value=getAirportInfo(d.origin).inputVal;
+    if(d.destinations?.length)state.destinations=d.destinations;
+    state.adults=d.travelers.adults;
+    state.children=d.travelers.children.length;
+    state.childAges=d.travelers.children.map(x=>x.age_at_departure);
+    $('#out-start').value=d.outbound_start;$('#out-end').value=d.outbound_end;
+    $('#return-start').value=d.return_start;$('#return-end').value=d.return_end;
+    $('#p1-budget').value=d.budget_twd??'';
+    renderAges();renderDestinations();
+    $('#draft-state').textContent=`草案｜${state.destinations.join('、')}`;
+    $('#draft-save-status').textContent=`已載入並保存`;
+    await loadCandidates();
+    if(state.step!=='p1'){const initialStep=state.step;state.step='p1';showStep(initialStep)}
+  }catch(e){
+    $('#draft-save-status').textContent=`草案載入失敗，資料仍保留：${e.message}`;
+    toast(e.message);
+  }
+}
+init();
+(()=>{const input=$('#origin'),wrap=input.parentElement;wrap.style.position='relative';const box=document.createElement('div');box.className='suggestions hidden';wrap.appendChild(box);let timer;input.addEventListener('input',()=>{clearTimeout(timer);const q=input.value.trim();if(q.length<2){box.classList.add('hidden');return}timer=setTimeout(async()=>{try{const data=await api(`/api/planner/airports?q=${encodeURIComponent(q)}`);box.innerHTML=data.airports.map(a=>`<button class="suggestion" data-origin-choice="${esc(a.iata)}"><span><b>${esc(a.city||a.name)}</b><small> ${esc(a.name)}</small></span><strong>${esc(a.iata)}</strong></button>`).join('')||'<div class="suggestion">沒有找到機場</div>';box.classList.remove('hidden');box.querySelectorAll('[data-origin-choice]').forEach(b=>b.onclick=()=>{input.value=b.dataset.originChoice;box.classList.add('hidden')})}catch(e){box.textContent=e.message;box.classList.remove('hidden')}},280)})})();
+const renderDecisionBase=renderDecision;renderDecision=function(d){renderDecisionBase(d);if(!d)return;const travelers=d.travelers||{},children=travelers.children||[];document.querySelectorAll('#decision-content .booking').forEach((row,index)=>{const option=d.booking_options?.[index];if(!option)return;if(option.separate_tickets){const name=row.querySelector('b');if(name)name.textContent+= ' · 需分開購買'}const small=row.querySelector('.booking > div:first-child small');if(small){const note=document.createElement('div');note.className='note';note.textContent=option.passenger_fares?.length?`旅客票價明細（供應商回傳）：${JSON.stringify(option.passenger_fares)}`:`成人票價明細：未提供（${Number(travelers.adults||0)} 位）${children.length?`；兒童票價明細：未提供（${children.map(c=>`${Number(c.age_at_departure)} 歲`).join('、')}）`:''}`;small.appendChild(note)}})};
+</script>
+<style>
+.p3-shortlist{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:15px 18px;border-radius:10px;background:var(--navy);color:white}
+.p2-candidate-switch{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:8px;margin:14px 0 18px}
+.p2-candidate-switch #candidate-tabs{display:flex;min-width:0;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:3px}
+.p2-candidate-switch .candidate-tab{flex:0 0 clamp(310px,32%,390px);min-height:150px;text-align:left;scroll-snap-align:start;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto 1fr;align-content:stretch;align-items:center;gap:7px 10px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.p2-candidate-switch .candidate-tab.active{background:var(--blue-soft);border:2px solid var(--blue);padding:10px 12px}
+.p2-candidate-switch .candidate-tab .tab-heading{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;min-width:0}
+.p2-candidate-switch .candidate-tab .tab-heading b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p2-candidate-switch .candidate-tab .tab-heading small,.p2-candidate-switch .candidate-tab .tab-flights{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.p2-candidate-switch .candidate-tab .tab-flights{grid-column:1/-1}
+.p2-candidate-switch .candidate-tab strong{font-size:20px;white-space:nowrap;align-self:end}
+.p2-candidate-switch .candidate-tab .tab-trend{justify-self:end;color:var(--muted);font-size:14px;white-space:nowrap;align-self:end}
+.p2-candidate-switch .candidate-tab .tab-trend.down{color:#087f66;font-weight:700}
+.p2-candidate-switch .candidate-tab .tab-trend.up{color:var(--coral);font-weight:700}
+.p2-candidate-switch .candidate-tab .tab-tags{grid-column:1/-1;display:flex;gap:5px;flex-wrap:wrap}
+.p2-candidate-switch .candidate-tab .tab-tags .tag{font-size:10px;padding:2px 7px}
+.p2-candidate-switch .tab-arrow{width:34px;height:42px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.p2-candidate-switch .tab-arrow:disabled{opacity:.4;cursor:default}
+.p2-flight-summary{margin-bottom:16px}
+.p2-flight-summary .candidate-info{margin:0 0 14px}
+.p2-flight-summary .metrics{margin:14px 0}
+.p2-flight-summary .chart{margin-top:14px}
+.p2-shortlist-inline{margin-top:18px}
+.p3-shortlist small{display:block;color:#c9dbe0;margin-top:4px}
+.p3-shortlist button{white-space:nowrap}
+.p3-shortlist .btn:disabled{opacity:.55}
+.p3-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+.p3-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:20px 0 15px}
+.p3-toolbar h3{margin:0 0 4px;font-size:22px}
+.p3-compare-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 12px 28px #15313d12}
+.p3-compare-card.chosen{border:2px solid var(--blue);padding:21px}
+.p3-card-head{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.p3-eyebrow{color:var(--coral);font-size:12px;font-weight:850;letter-spacing:.13em}
+.p3-compare-card h3{margin:0 0 7px;font-size:22px}
+.p3-route{font-size:14px;color:var(--muted)}
+.p3-badge{font-size:12px;color:var(--muted);background:#f1f4ed;border-radius:6px;padding:5px 7px;white-space:nowrap}
+.p3-legs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0}
+.p3-leg{padding:11px;background:var(--surface-alt);border:1px solid var(--line);border-radius:8px}
+.p3-leg small{display:block;color:var(--muted)}
+.p3-leg b{font-size:17px}
+.p3-price{background:var(--blue-soft);padding:13px;border-radius:8px}
+.p3-price small{display:block;color:var(--muted)}
+.p3-price b{font-size:23px}
+.p3-quotes{border-top:1px solid var(--line);margin-top:18px;padding-top:15px}
+.p3-quote{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:11px;margin-top:9px}
+.p3-quote small{display:block;color:var(--muted)}
+.p3-quote.verified{border-color:var(--emerald);background:var(--emerald-soft)}
+.p3-quote.unverified{border-color:#d97706}
+.p3-quote-side{text-align:right;white-space:nowrap}
+.p3-quote-price{font-size:16px;font-weight:700;color:var(--ink)}
+.p3-compare-card .actions{display:flex;gap:8px;margin-top:18px}
+.p3-compare-card .actions .btn{flex:1;min-height:42px;font-weight:750}
+.p3-api-grid{margin:10px 0}
+.p3-source-statuses{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.p3-source-status{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;background:var(--surface-alt);border:1px solid var(--line);border-radius:8px;font-size:12px}
+.p3-source-status>span:last-child{min-width:0}
+.p3-source-status b,.p3-source-status small{display:block}
+.p3-source-status small{color:var(--muted);margin-top:2px;line-height:1.4}
+.p3-source-status .source-dot{flex:0 0 8px;width:8px;height:8px;margin-top:5px;border-radius:50%;background:#9aa9ad}
+.p3-source-status.fresh .source-dot{background:#16836e}
+.p3-source-status .source-reason{color:var(--coral-ink)}
+.p3-best-quote{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0;padding:12px 14px;border:1px solid #9bd3c5;border-radius:9px;background:var(--emerald-soft)}
+.p3-best-quote small{display:block;color:var(--muted)}
+.p3-best-quote strong{font-size:20px;white-space:nowrap}
+.p3-best-quote.pending{border-color:var(--line);background:var(--surface-alt)}
+.p3-more-quotes{margin-top:9px;border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.p3-more-quotes summary{cursor:pointer;color:var(--blue);font-size:13px;font-weight:700}
+.p3-unpriced{margin-top:9px}
+.p3-channel-guide{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.p3-channel-guide summary{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 12px;background:var(--surface-alt);border:1px solid var(--line);border-radius:8px;font-weight:750;cursor:pointer;list-style:none}
+.p3-channel-guide summary::-webkit-details-marker{display:none}
+.p3-channel-guide summary:after{content:'＋';color:var(--blue);font-size:18px}
+.p3-channel-guide[open] summary:after{content:'－'}
+.p3-channel-guide .guide-hint{font-size:12px;color:var(--muted);font-weight:500}
+.p3-channel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.p3-channel-card{padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-alt)}
+.p3-channel-card b{display:block;font-size:14px}
+.p3-channel-card p{font-size:12px;color:var(--muted);margin:5px 0}
+.p3-channel-card ul{padding-left:17px;margin:8px 0;font-size:12px;color:var(--muted)}
+.p3-channel-card li+li{margin-top:4px}
+.p3-channel-card a{color:var(--blue);font-weight:750;font-size:12px}
+@media(max-width:800px){.p3-compare-grid{grid-template-columns:1fr}.p3-shortlist{align-items:stretch;flex-direction:column}.p2-candidate-switch{grid-template-columns:30px minmax(0,1fr) 30px}.p2-candidate-switch .candidate-tab{flex-basis:88%}.p3-source-statuses{grid-template-columns:1fr}.p3-channel-guide .guide-hint{display:none}}
+@media(max-width:800px){.p3-channel-grid{grid-template-columns:1fr}}
+</style>
+<script>
+// P2 shortlist is separate from both price tracking and the final decision.
+const p3Quotes=new Map();
+const p3ShortlistKey=()=>`roamPlannerP3Shortlist:${state.draftId||'new'}`;
+function p3Shortlist(){
+  try{return JSON.parse(localStorage.getItem(p3ShortlistKey())||'[]').filter(id=>typeof id==='string')}
+  catch{return []}
+}
+function saveP3Shortlist(ids){localStorage.setItem(p3ShortlistKey(),JSON.stringify([...new Set(ids)]))}
+function p3CandidateLabel(c){
+  const it=c.itinerary;
+  return `${it.outbound_date} ${it.outbound?.flight_number||'?'} / ${it.return_date} ${it.inbound?.flight_number||'?'}`;
+}
+function p3TravelerLabel(){
+  const travelers=state.savedDraft?.travelers||{};
+  const ages=(travelers.children||[]).map(child=>child.age_at_departure).filter(age=>age!=null);
+  return `${Number(travelers.adults||0)} 位成人 · ${ages.length} 位兒童${ages.length?`（${ages.join('、')} 歲）`:''}`;
+}
+function p3QuoteIsFresh(ts){
+  if(!ts)return false;
+  const raw=String(ts).trim();
+  const parsed=new Date(/^\d{4}-\d\d-\d\d[ T]\d\d:\d\d:\d\d(?:\.\d+)?$/.test(raw)?raw.replace(' ','T')+'Z':raw);
+  if(Number.isNaN(parsed.getTime()))return false;
+  const age=Date.now()-parsed.getTime();
+  return age>=0&&age<=Number(state.priceFreshnessHours||24)*3600*1000;
+}
+function p3ScopeLabel(scope,travelers){
+  const s=String(scope||'unknown').trim();
+  const lower=s.toLowerCase();
+  const total=Number(travelers?.adults||0)+(travelers?.children||[]).length;
+  if(lower==='party_total'||lower==='family_total'||lower===`party_of_${total}`)return `整組總價 (${s})`;
+  if(lower.startsWith('party_of_'))return `指定人數總價 (${s})`;
+  if(lower==='per_person'||lower==='per_adult')return `每人單價 (${s})`;
+  if(!s||lower==='unknown')return '計價範圍未知 (unknown)';
+  return s;
+}
+function p3QuoteIsBookable(option,travelers){
+  if(!option||option.status!=='available'||!option.url||!String(option.url).startsWith('https://'))return false;
+  if(!Number.isFinite(Number(option.amount))||Number(option.amount)<=0)return false;
+  if(option.separate_tickets||option.verified_party_total!==true||option.is_fresh!==true)return false;
+  const quoteTime=option.observed_at||option.checked_at;
+  if(!quoteTime||!p3QuoteIsFresh(quoteTime))return false;
+  const children=travelers?.children||[];
+  if(children.some(c=>Number(c?.age_at_departure??c)<2))return false;
+  const scope=String(option.price_scope||'').toLowerCase();
+  const total=Number(travelers?.adults||0)+children.length;
+  return scope==='party_total'||scope.startsWith('family_total')||scope===`party_of_${total}`||(scope==='per_person'&&total===1&&children.length===0);
+}
+const p3Money=(a,c)=>`${(!c||c==='TWD')?'NT$':esc(c)} ${Math.round(Number(a)).toLocaleString('en-US')}`;
+function renderP3ChannelGuide(channels=[]){
+  if(!channels.length)return '';
+  return `<details class="p3-channel-guide"><summary><span>查看官網、Trip.com、易遊網選購比較</span><span class="guide-hint">親子選位・行李・退改</span></summary><div class="p3-channel-grid">${channels.map(channel=>`<article class="p3-channel-card"><b>${esc(channel.title||'購票通路')}</b><p>${esc(channel.subtitle||'請至通路確認即時票價與條件。')}</p><ul>${(channel.highlights||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>${channel.url?`<a href="${esc(channel.url)}" target="_blank" rel="noopener noreferrer">${esc(channel.cta||'前往通路查看')} ↗</a>`:''}</article>`).join('')}</div></details>`;
+}
+function p3Row(name,tag,line,title,amount,currency,url){
+  const hasAmt=amount!=null&&Number.isFinite(Number(amount))&&Number(amount)>0;
+  let linkLabel='前往通路確認 ↗';try{if(/(^|\.)google\.[a-z.]+$/.test(new URL(url).hostname))linkLabel='前往 Google Flights 確認 ↗'}catch{}
+  return `<div class="p3-quote"><span>${name}${tag?` <span class="tag" style="margin:0 0 0 4px;padding:1px 6px;font-size:10px">${tag}</span>`:''}<small title="${esc(title||'')}">${line}</small></span><span class="p3-quote-side"><strong class="p3-quote-price">${hasAmt?p3Money(amount,currency):'未提供價格'}</strong>${url?`<br><a href="${esc(url)}" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:var(--blue);font-weight:700">${linkLabel}</a>`:''}</span></div>`;
+}
+function p3ShortScope(scope,travelers){return p3ScopeLabel(scope,travelers).replace(/\s*[（(].*$/,'')}
+function renderP3SourceBox(src,fallbackLabel,travelers){
+  if(!src)return p3Row(esc(fallbackLabel),'','尚未查詢 · 按「查詢通路」取得即時報價','',null,null,null);
+  const fresh=src.checked_at?p3QuoteIsFresh(src.checked_at)&&src.is_fresh!==false:false;
+  const line=`${esc(src.status_label||src.status||'未提供價格')} · ${src.checked_at?esc(when(src.checked_at))+(fresh?'':`（已逾 ${state.priceFreshnessHours}h）`):'尚未查詢'}`;
+  return p3Row(esc(src.label||fallbackLabel),'',line,src.unverified_reason||'',src.amount,src.currency,src.url);
+}
+function renderP3OptionRow(o,q,travelers){
+  const ok=p3QuoteIsBookable(o,travelers);
+  const srcTag=String(o.api_source||'').toLowerCase()==='serpapi'?'SerpApi':'Ignav';
+  const provider=String(o.provider||'').replace(/^SerpApi\s*[·・]\s*/,'');
+  const name=esc({'STARLUX Airlines':'星宇航空官網','China Airlines':'中華航空官網'}[provider]||provider);
+  const status=ok?`${Number(travelers.adults||0)} 成人＋${(travelers.children||[]).length} 兒童來回總價`:'尚未確認是否包含全部旅客，請至通路確認';
+  const terms=String(o.terms||'').replace(/1 free carry-on/g,'手提行李 1 件免費').replace(/1st checked bag free/g,'首件托運行李免費');
+  const line=`${esc(status)} · 報價時間 ${esc(when(o.observed_at||q?.checked_at))}${terms?` · ${esc(terms)}${!/checked|托運/.test(terms)?' · 托運額度未提供':''}`:' · 行李與退改需至通路確認'}`;
+  return p3Row(name,'',line,o.unverified_reason||'',o.amount,o.currency,o.url);
+}
+function renderP3SourceStatus(src,label){
+  const status=src?.status_label||src?.status||(src?'已回覆':'尚未查詢');
+  const checked=src?.checked_at?when(src.checked_at):'尚無查詢時間';
+  const fresh=Boolean(src?.checked_at&&src.is_fresh!==false&&p3QuoteIsFresh(src.checked_at));
+  const stateLabel=src?.checked_at?(fresh?`${state.priceFreshnessHours} 小時內`:`已逾 ${state.priceFreshnessHours} 小時`):'等待查詢';
+  const reason=src?.unverified_reason?`<small class="source-reason">${esc(src.unverified_reason)}</small>`:'';
+  return `<div class="p3-source-status ${fresh?'fresh':''}"><span class="source-dot"></span><span><b>${esc(label)}</b><small>${esc(status)} · ${esc(stateLabel)} · ${esc(checked)}</small>${reason}</span></div>`;
+}
+function renderP3QuoteRows(q,serpSrc,ignavSrc,options,travelers){
+  const priced=[],fallback=[];
+  for(const [key,src,label] of [['serpapi',serpSrc,'SerpApi (Google Flights)'],['ignav',ignavSrc,'Ignav']]){
+    const own=(options||[]).filter(o=>(String(o.api_source||'ignav').toLowerCase())===key);
+    const withPrice=own.filter(o=>Number(o.amount)>0);
+    withPrice.forEach(o=>priced.push({amt:Number(o.amount),verified:p3QuoteIsBookable(o,travelers),html:renderP3OptionRow(o,q,travelers)}));
+    own.filter(o=>!(Number(o.amount)>0)).forEach(o=>fallback.push(renderP3OptionRow(o,q,travelers)));
+    if(!own.length)fallback.push(renderP3SourceBox(src,label,travelers));
+  }
+  priced.sort((x,y)=>Number(y.verified)-Number(x.verified)||x.amt-y.amt);
+  const confirmed=priced.filter(r=>r.verified),unverified=priced.filter(r=>!r.verified);
+  const shown=confirmed.slice(0,3).map(r=>r.html),rest=confirmed.slice(3).map(r=>r.html);
+  const sourceStatus=`<div class="p3-source-statuses">${renderP3SourceStatus(serpSrc,'SerpApi')}${renderP3SourceStatus(ignavSrc,'Ignav')}</div>`;
+  return shown.join('')+(rest.length?`<details class="p3-more-quotes"><summary>其他 ${rest.length} 個通路報價</summary>${rest.join('')}</details>`:'')+(unverified.length?`<details class="p3-more-quotes"><summary>其他參考報價 · ${unverified.length} 筆尚未確認整組總價</summary>${unverified.map(r=>r.html).join('')}</details>`:'')+`<details class="p3-more-quotes"><summary>查詢詳情${q?.checked_at?` · ${esc(when(q.checked_at))}`:''}</summary>${sourceStatus}${fallback.join('')}</details>`;
+}
+const renderCandidatesBeforeShortlist=renderCandidates;
+renderCandidates=function(){
+  renderCandidatesBeforeShortlist();
+  const valid=new Set(state.candidates.map(c=>c.id));
+  const selected=p3Shortlist().filter(id=>valid.has(id));
+  if(selected.length!==p3Shortlist().length)saveP3Shortlist(selected);
+  const c=state.candidates.find(item=>item.id===state.activeCandidate);
+  if(c){
+    const panel=$('#candidate-panel');
+    panel.classList.add('p2-flight-summary');
+    panel.insertBefore(panel.querySelector('.candidate-info'),panel.querySelector('.metrics'));
+    const button=$('#decide-flight');
+    if(button){
+      button.textContent=selected.includes(c.id)?'✓ 已加入 P3 比價 · 點擊移除':'＋ 加入 P3 比價';
+      button.onclick=()=>{
+        const next=p3Shortlist();
+        saveP3Shortlist(next.includes(c.id)?next.filter(id=>id!==c.id):[...next,c.id]);
+        renderCandidates();
+      };
+    }
+    const tabs=$('#candidate-tabs');
+    tabs.innerHTML=state.candidates.map(item=>{
+      const it=item.itinerary,comparable=(item.observations||[]).filter(o=>fareComparableForCandidate(o,item)),latest=comparable.at(-1);
+      const recent=comparable.length>1?Number(latest.amount)-Number(comparable.at(-2).amount):null;
+      const date=s=>String(s||'').slice(5).replace('-','/');
+      const nights=Math.max(0,Math.round((Date.parse(`${it.return_date}T00:00:00Z`)-Date.parse(`${it.outbound_date}T00:00:00Z`))/86400000));
+      const schedule=Number(String(it.inbound?.departure_time||'').slice(0,2))>=18?'晚回':Number(String(it.outbound?.departure_time||'').slice(0,2))<12?'早去':'午去';
+      const trendClass=recent<0?'down':recent>0?'up':'';
+      const trendLabel=recent==null?'趨勢待觀測':recent<0?`↓ ${money(-recent,'TWD')}`:recent>0?`↑ ${money(recent,'TWD')}`:'— 持平';
+      return `<button class="candidate-tab ${item.id===state.activeCandidate?'active':''}" data-candidate="${esc(item.id)}" type="button"><span class="tab-heading"><b>${esc(it.airline||it.outbound?.flight_number)}</b><small>${esc(date(it.outbound_date))}–${esc(date(it.return_date))} · ${nights} 晚</small></span><span class="tab-flights">去 ${esc(it.outbound?.flight_number)} ${esc(fmtTime(it.outbound?.departure_time))} ／ 回 ${esc(it.inbound?.flight_number)} ${esc(fmtTime(it.inbound?.flight_number?it.inbound?.departure_time:''))}</span><strong>${latest?money(latest.amount,'TWD'):'尚無同旅客參考價'}</strong><span class="tab-trend ${trendClass}">${trendLabel}</span><span class="tab-tags"><span class="tag">${schedule}</span>${selected.includes(item.id)?'<span class="tag">已選入 P3</span>':''}</span></button>`;
+    }).join('');
+    tabs.querySelectorAll('[data-candidate]').forEach(b=>b.onclick=()=>{state.activeCandidate=b.dataset.candidate;renderCandidates()});
+  }
+  let bar=$('#p3-shortlist');
+  if(!bar){bar=document.createElement('div');bar.id='p3-shortlist';bar.className='p3-shortlist p2-shortlist-inline';$('#candidate-panel').append(bar)}
+  const labels=selected.map(id=>state.candidates.find(c=>c.id===id)).filter(Boolean).map(c=>p3CandidateLabel(c));
+  bar.innerHTML=`<div><b>已加入 P3 比價 · ${selected.length} 組</b><small>${labels.length?labels.map(esc).join('　·　'):'從候選頁籤選擇要查實際購票價格的航班'}</small></div><button class="btn primary" type="button" id="p3-shortlist-go" ${selected.length?'':'disabled'}>前往 P3 比價 →</button>`;
+  $('#p3-shortlist-go').onclick=()=>showStep('p3');
+  $('#p3-shortlist-go').textContent=selected.length?`前往 P3 比價（${selected.length} 組）→`:'先加入候選航班';
+  $('#to-p3-btn').disabled=!selected.length;
+  $('#to-p3-btn').textContent=`前往 P3 比價（${selected.length} 組）→`;
+};
+$('#candidate-tabs-left').onclick=()=>$('#candidate-tabs').scrollBy({left:-$('#candidate-tabs').clientWidth*.8,behavior:'smooth'});
+$('#candidate-tabs-right').onclick=()=>$('#candidate-tabs').scrollBy({left:$('#candidate-tabs').clientWidth*.8,behavior:'smooth'});
+function renderP3Compare(){
+  const ids=p3Shortlist(),candidates=ids.map(id=>state.candidates.find(c=>c.id===id)).filter(Boolean);
+  const travelers=state.savedDraft?.travelers||{adults:state.adults,children:state.childAges.map(age_at_departure=>({age_at_departure}))};
+  let root=$('#p3-compare');
+  if(!root){root=document.createElement('div');root.id='p3-compare';$('#decision-empty').before(root)}
+  const hasAny=candidates.length>0||Boolean(state.decision);
+  $('#decision-empty').classList.toggle('hidden',hasAny);
+  if(!candidates.length){
+    root.innerHTML='';
+    if(!state.decision){
+      $('#decision-empty').textContent='請先回 P2 加入至少一組航班，再查詢各通路報價。';
+      $('#decision-content').classList.add('hidden');
+    }else{
+      $('#decision-content').classList.add('hidden');
+    }
+    return;
+  }
+  const quoteStatus={ready:'✓ 已取得可決選之整組總價',unverified_quotes:'⚠️ 報價未通過整組總價驗證',stale_quotes:`⚠️ 報價已逾 ${state.priceFreshnessHours} 小時新鮮期`,links_only:'已取得通路連結，未提供價格',no_booking_options:'沒有可用通路',missing_provider_offer:'供應商沒有相符去回航班',provider_unavailable:'供應商未設定或暫時無法連線',provider_lookup_failed:'供應商即時查詢失敗',needs_infant_choice:'需先確認未滿 2 歲嬰兒座位'};
+  const shortDate=s=>String(s||'').slice(5).replace('-','/');
+  if(!candidates.some(c=>c.id===state.activeP3Candidate))state.activeP3Candidate=candidates[0].id;
+  const tabs=candidates.map(c=>{const i=c.itinerary,q=p3Quotes.get(c.id),best=(q?.booking_options||[]).filter(o=>p3QuoteIsBookable(o,travelers)).sort((a,b)=>a.amount-b.amount)[0];return `<button class="btn ${state.activeP3Candidate===c.id?'primary':''}" data-p3-tab="${esc(c.id)}" aria-pressed="${state.activeP3Candidate===c.id}">${esc(i.airline)} · ${shortDate(i.outbound_date)}～${shortDate(i.return_date)} ? ${Math.round((Date.parse(i.return_date)-Date.parse(i.outbound_date))/86400000)} &#26202;<br><small>${best?p3Money(best.amount,best.currency):'待確認可訂總價'}</small></button>`}).join('');
+  root.innerHTML=`<div class="p3-toolbar"><div><h3>待比價的航班 · ${candidates.length} 組</h3><span class="p3-route">${esc(p3TravelerLabel())}</span></div><a href="#" data-p3-back style="color:var(--blue);font-weight:750;text-decoration:none;white-space:nowrap">← 回 P2 增減候選</a></div><div style="display:flex;gap:8px;overflow-x:auto;padding:8px 0 16px">${tabs}</div><div class="p3-compare-grid" style="grid-template-columns:1fr">${candidates.filter(c=>c.id===state.activeP3Candidate).map(c=>{
+    const it=c.itinerary,q=p3Quotes.get(c.id)||(state.decision?.candidate_id===c.id?state.decision:null),options=q?.booking_options||[];
+    const comparable=(c.observations||[]).filter(o=>fareComparableForCandidate(o,c));
+    const reference=comparable.at(-1);
+    const runFresh=Boolean(q&&q.is_fresh!==false&&q.checked_at&&p3QuoteIsFresh(q.checked_at));
+    const verifiedQuotes=options.filter(o=>p3QuoteIsBookable(o,travelers)).sort((a,b)=>Number(a.amount)-Number(b.amount));
+    const bestQuote=verifiedQuotes[0]||null;
+    const bestDelta=bestQuote&&reference?Number(bestQuote.amount)-Number(reference.amount):null;
+    const bookable=Boolean(q&&runFresh&&q.can_decide===true&&bestQuote);
+    const serpSrc=q?.api_sources?.serpapi||null;
+    const ignavSrc=q?.api_sources?.ignav||null;
+    const nights=Math.max(0,Math.round((Date.parse(`${it.return_date}T00:00:00Z`)-Date.parse(`${it.outbound_date}T00:00:00Z`))/86400000));
+    const isChosen=state.decision?.candidate_id===c.id&&state.decision?.decision_persisted!==false;
+    return `<article class="p3-compare-card ${isChosen?'chosen':''}">
+      <div class="p3-card-head">
+        <div><div class="p3-eyebrow">${esc(it.airline||'航班')}</div><h3>${esc(it.outbound?.flight_number)} ／ ${esc(it.inbound?.flight_number)}</h3><span class="p3-route">${esc(getAirportInfo(it.origin).inputVal)} ↔ ${esc(getAirportInfo(it.destination).inputVal)} · ${nights} 晚</span></div>
+        <span class="p3-badge">${isChosen?'✓ 目前決選航班':`${esc(shortDate(it.outbound_date))}–${esc(shortDate(it.return_date))}`}</span>
+      </div>
+      <div class="p3-legs">
+        <div class="p3-leg"><small>去程 ${esc(it.outbound_date)}</small><b>${esc(fmtRange(it.outbound))}</b><div>${esc(it.outbound?.flight_number)} · ${esc(it.origin)} → ${esc(it.destination)}</div></div>
+        <div class="p3-leg"><small>回程 ${esc(it.return_date)}</small><b>${esc(fmtRange(it.inbound))}</b><div>${esc(it.inbound?.flight_number)} · ${esc(it.destination)} → ${esc(it.origin)}</div></div>
+      </div>
+      <p class="note">P2 最近參考價：${reference?`${p3Money(reference.amount,'TWD')} · ${esc(when(reference.observed_at))}`:'尚無可比較觀測'}</p>
+      <div class="p3-best-quote ${bestQuote?'':'pending'}"><span><small>${bestQuote?'最低已驗證可訂總價':'尚無已驗證可訂總價'}</small><small>${bestQuote?`${esc(bestQuote.provider)} · ${esc(when(bestQuote.observed_at||bestQuote.checked_at))}${bestDelta===null?'':` · 與 P2 參考價差 ${bestDelta<=0?'低':'高'} ${p3Money(Math.abs(bestDelta),'TWD')}`}`:q?'目前回覆未符合決選驗證條件':'查詢通路後顯示驗證結果'}</small></span><strong>${bestQuote?p3Money(bestQuote.amount,bestQuote.currency):'—'}</strong></div>
+      <div class="p3-quotes">
+        <strong>比較購票通路</strong> <small class="note">${!q?'請先查詢通路':bestQuote?'依全體旅客來回總價排序':'尚未取得已確認的全體旅客總價，可展開參考報價查看'}</small>
+        ${renderP3QuoteRows(q,serpSrc,ignavSrc,options,travelers)}
+      </div>
+      ${renderP3ChannelGuide(c.channel_comparison||q?.channel_comparison||[])}
+      ${q&&!runFresh?`<p class="note" style="color:var(--coral-ink);font-weight:700">⚠️ 此報價已超過 ${state.priceFreshnessHours} 小時新鮮期，請點擊「重新查詢價格」重新執行雙 API 即時查價後再決選。</p>`:(q&&!bookable?`<p class="note" style="color:var(--coral-ink)">⚠️ 尚無 ${state.priceFreshnessHours} 小時內已驗證為本次旅客組成之整組總價與可用訂票連結，決選按鈕保持停用。</p>`:'')}
+      <div class="actions">
+        <button class="btn" type="button" data-p3-remove="${esc(c.id)}">移出 P3 比價</button>
+        <button class="btn" type="button" data-p3-lookup="${esc(c.id)}">${q?'重新查詢通路':'查詢通路'}</button>
+        <button class="btn navy" type="button" data-p3-final="${esc(c.id)}" ${bookable?'':'disabled'}>${isChosen?'✓ 已決選這組':'決選這組'}</button>
+      </div>
+    </article>`;
+  }).join('')}</div><p class="note" style="margin-top:17px">本頁通路金額為 SerpApi 與 Ignav 即時回覆（${state.priceFreshnessHours} 小時新鮮期），僅已驗證整組總價才可決選；行李與退改條件請以訂票頁為準。</p>`;
+  $('#decision-content').classList.add('hidden');
+}
+loadDecision=async function(){
+  try{
+    const current=(await api('/api/planner/decision')).decision;
+    state.decision=current;
+    if(current?.candidate_id)p3Quotes.set(current.candidate_id,current);
+  }catch(e){toast(e.message)}
+  renderP3Compare();
+};
+$('#pane-p3').addEventListener('click',async e=>{
+  const tab=e.target.closest('[data-p3-tab]');if(tab){state.activeP3Candidate=tab.dataset.p3Tab;renderP3Compare();return}
+  if(e.target.closest('[data-p3-back]')){e.preventDefault();showStep('p2');return}
+  const remove=e.target.closest('[data-p3-remove]');
+  if(remove){saveP3Shortlist(p3Shortlist().filter(id=>id!==remove.dataset.p3Remove));renderP3Compare();return}
+  const lookup=e.target.closest('[data-p3-lookup]');
+  if(lookup){lookup.disabled=true;lookup.textContent='雙引擎查價中…';try{const result=await api(`/api/planner/candidates/${lookup.dataset.p3Lookup}/booking-preview`,{method:'POST'});p3Quotes.set(lookup.dataset.p3Lookup,result);renderP3Compare();loadEngineStatus(false);toast(result.status==='ready'?'已完成 SerpApi + Ignav 即時查價':result.message||'已完成雙引擎查價')}catch(error){toast(error.message);lookup.disabled=false;lookup.textContent='重試查詢'}return}
+  const final=e.target.closest('[data-p3-final]');
+  if(final){final.disabled=true;try{const result=await api(`/api/planner/candidates/${final.dataset.p3Final}/decide`,{method:'POST'});state.decision=result;p3Quotes.set(final.dataset.p3Final,result);renderP3Compare();toast('✓ 已完成最終航班決選！')}catch(error){toast(error.message);renderP3Compare()}}
+});
+</script>
+</body>
+</html>

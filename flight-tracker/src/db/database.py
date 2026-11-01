@@ -57,6 +57,61 @@ CREATE TABLE IF NOT EXISTS roundtrip_price_snapshots (
     captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS planner_drafts (
+    id TEXT PRIMARY KEY,
+    payload_json TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS planner_candidates (
+    id TEXT PRIMARY KEY,
+    draft_id TEXT NOT NULL REFERENCES planner_drafts(id) ON DELETE CASCADE,
+    itinerary_key TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    tracking_status TEXT NOT NULL DEFAULT 'tracking',
+    target_price REAL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_refresh_attempt_at TIMESTAMP,
+    UNIQUE(draft_id, itinerary_key)
+);
+CREATE INDEX IF NOT EXISTS idx_planner_candidates_draft ON planner_candidates(draft_id);
+CREATE TABLE IF NOT EXISTS planner_price_observations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    candidate_id TEXT NOT NULL REFERENCES planner_candidates(id) ON DELETE CASCADE,
+    source TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    price_scope TEXT NOT NULL DEFAULT 'unknown',
+    observed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(candidate_id, source, amount, currency, observed_at)
+);
+CREATE INDEX IF NOT EXISTS idx_planner_observations_candidate
+    ON planner_price_observations(candidate_id, observed_at);
+CREATE TABLE IF NOT EXISTS planner_decisions (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    candidate_id TEXT NOT NULL REFERENCES planner_candidates(id),
+    traveler_json TEXT NOT NULL,
+    confirmed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS planner_booking_quotes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    candidate_id TEXT NOT NULL REFERENCES planner_candidates(id) ON DELETE CASCADE,
+    provider TEXT NOT NULL,
+    amount REAL,
+    currency TEXT,
+    price_scope TEXT NOT NULL DEFAULT 'unknown',
+    booking_url TEXT,
+    status TEXT NOT NULL,
+    terms TEXT,
+    passenger_fares_json TEXT,
+    separate_tickets INTEGER NOT NULL DEFAULT 0,
+    api_source TEXT,
+    verified_party_total INTEGER NOT NULL DEFAULT 0,
+    unverified_reason TEXT,
+    traveler_signature TEXT,
+    observed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
@@ -64,6 +119,7 @@ def get_connection(db_path: str) -> sqlite3.Connection:
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
@@ -98,12 +154,52 @@ def _ensure_last_checked_at_column(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def _ensure_planner_booking_quote_columns(conn: sqlite3.Connection) -> None:
+    """Add P3 quote details to databases created before those fields existed."""
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(planner_booking_quotes)")}
+    for col_name, col_def in (
+        ("api_source", "TEXT"),
+        ("verified_party_total", "INTEGER NOT NULL DEFAULT 0"),
+        ("unverified_reason", "TEXT"),
+        ("traveler_signature", "TEXT"),
+    ):
+        if col_name not in columns:
+            conn.execute(f"ALTER TABLE planner_booking_quotes ADD COLUMN {col_name} {col_def}")
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS planner_p3_quote_runs ("
+        "candidate_id TEXT PRIMARY KEY REFERENCES planner_candidates(id) ON DELETE CASCADE, "
+        "traveler_signature TEXT NOT NULL, "
+        "api_sources_json TEXT NOT NULL, "
+        "status TEXT NOT NULL, "
+        "message TEXT, "
+        "checked_at TIMESTAMP NOT NULL)"
+    )
+    if "passenger_fares_json" not in columns:
+        conn.execute("ALTER TABLE planner_booking_quotes ADD COLUMN passenger_fares_json TEXT")
+    if "separate_tickets" not in columns:
+        conn.execute(
+            "ALTER TABLE planner_booking_quotes "
+            "ADD COLUMN separate_tickets INTEGER NOT NULL DEFAULT 0"
+        )
+    conn.commit()
+
+
+def _ensure_planner_candidate_refresh_column(conn: sqlite3.Connection) -> None:
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(planner_candidates)")}
+    if "last_refresh_attempt_at" not in columns:
+        conn.execute("ALTER TABLE planner_candidates ADD COLUMN last_refresh_attempt_at TIMESTAMP")
+        conn.commit()
+
+
 def init_db(db_path: str) -> None:
     conn = get_connection(db_path)
     try:
+        conn.execute("PRAGMA foreign_keys = ON")
         conn.executescript(SCHEMA_SQL)
         conn.commit()
         _ensure_last_checked_at_column(conn)
+        _ensure_planner_candidate_refresh_column(conn)
+        _ensure_planner_booking_quote_columns(conn)
     finally:
         conn.close()
 

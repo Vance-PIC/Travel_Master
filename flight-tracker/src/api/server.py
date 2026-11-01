@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 import os
+import base64
+import secrets
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -32,6 +34,7 @@ from src.exporter.excel_exporter import export_snapshots_to_excel
 from src.pipeline.filter_engine import annotate_flights
 from src.pipeline.runner import run_pipeline
 from src.pipeline.schedule_builder import build_roundtrip_schedule_rows
+from src.planner import service as planner_service
 
 WEB_DIR = PROJECT_ROOT / "web"
 GEMINI_MODEL = "gemini-3-flash-preview"
@@ -40,9 +43,33 @@ GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_M
 app = FastAPI(title="Flight Tracker & Price Analyzer")
 
 
+@app.middleware("http")
+async def private_access(request: Request, call_next):
+    password = os.environ.get("PLANNER_ACCESS_PASSWORD", "")
+    username = os.environ.get("PLANNER_ACCESS_USERNAME", "owner")
+    if request.url.path == "/healthz":
+        return JSONResponse({"status": "ok"})
+    if os.environ.get("PLANNER_REQUIRE_AUTH", "").lower() == "true" and not password:
+        return JSONResponse({"detail": "Private access is not configured."}, status_code=503)
+    if password:
+        try:
+            scheme, encoded = request.headers.get("authorization", "").split(" ", 1)
+            user, supplied = base64.b64decode(encoded, validate=True).decode("utf-8").split(":", 1)
+            valid = scheme.lower() == "basic" and secrets.compare_digest(user.encode(), username.encode()) and secrets.compare_digest(supplied.encode(), password.encode())
+        except (ValueError, UnicodeError):
+            valid = False
+        if not valid:
+            return JSONResponse({"detail": "Authentication required."}, status_code=401,
+                                headers={"WWW-Authenticate": 'Basic realm="ROAM PLAN", charset="UTF-8"'})
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.on_event("startup")
 def _startup() -> None:
     init_db(db_path())
+    planner_service.start_tracking_scheduler()
 
 
 class RunPipelineRequest(BaseModel):
@@ -76,9 +103,169 @@ class EnrichmentRequest(BaseModel):
     cabin_class: str = "ECONOMY"
 
 
+class PlannerDraftRequest(BaseModel):
+    id: Optional[str] = None
+    origin: str
+    destinations: list[str]
+    outbound_start: str
+    outbound_end: str
+    return_start: str
+    return_end: str
+    travelers: dict
+    budget_twd: Optional[int] = None
+
+
+class PlannerCandidateRequest(BaseModel):
+    draft_id: str
+    itinerary: dict
+
+
+class PlannerCandidateUpdateRequest(BaseModel):
+    status: Optional[str] = None
+    target_price: Optional[float] = None
+
+
 @app.get("/")
 def index():
+    return FileResponse(WEB_DIR / "trip_planner.html")
+
+
+@app.get("/planner")
+def trip_planner():
+    return FileResponse(WEB_DIR / "trip_planner.html")
+
+
+@app.get("/legacy")
+def legacy_dashboard():
     return FileResponse(WEB_DIR / "index.html")
+
+
+def _planner_call(callback, *args, **kwargs):
+    try:
+        return callback(*args, **kwargs)
+    except planner_service.PlannerError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/planner/airports")
+def planner_airports(q: str = Query(default="", max_length=80)):
+    return {"airports": _planner_call(planner_service.airport_search, q)}
+
+
+@app.get("/api/planner/engine-status")
+def planner_engine_status():
+    return _planner_call(planner_service.engine_status)
+
+
+@app.get("/api/planner/historical-itineraries")
+def planner_historical_itineraries(draft_id: Optional[str] = Query(default=None)):
+    items = _planner_call(planner_service.historical_itineraries, draft_id)
+    return {"count": len(items), "itineraries": items}
+
+
+@app.post("/api/planner/drafts")
+def planner_save_draft(req: PlannerDraftRequest):
+    return _planner_call(planner_service.save_draft, req.dict(), req.id)
+
+
+@app.get("/api/planner/drafts/latest")
+def planner_latest_draft():
+    return {"draft": planner_service.latest_draft()}
+
+
+@app.get("/api/planner/drafts/{draft_id}")
+def planner_get_draft(draft_id: str):
+    draft = planner_service.get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="找不到旅程草案")
+    return draft
+
+
+@app.post("/api/planner/drafts/{draft_id}/search")
+def planner_search(draft_id: str):
+    itineraries = _planner_call(planner_service.search_draft, draft_id)
+    return {"count": len(itineraries), "itineraries": itineraries}
+
+
+@app.get("/api/planner/drafts/{draft_id}/candidates")
+def planner_candidates(draft_id: str):
+    if not planner_service.get_draft(draft_id):
+        raise HTTPException(status_code=404, detail="找不到旅程草案")
+    return {"candidates": planner_service.list_candidates(draft_id)}
+
+
+@app.post("/api/planner/drafts/{draft_id}/refresh-stale")
+def planner_refresh_stale_candidates(draft_id: str):
+    return _planner_call(planner_service.refresh_stale_candidates, draft_id)
+
+
+@app.get("/api/planner/settings")
+def planner_settings():
+    return {"price_freshness_hours": planner_service.price_freshness_hours(), "tracking_interval_hours": planner_service.tracking_interval_hours()}
+
+
+@app.put("/api/planner/settings")
+def planner_update_settings(payload: dict[str, Any] = Body(...)):
+    value = payload.get("price_freshness_hours")
+    if isinstance(value, bool) or (isinstance(value, float) and not value.is_integer()):
+        raise HTTPException(status_code=422, detail="新鮮度請設定為 1 至 168 小時的整數。")
+    try:
+        value = int(value)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail="新鮮度請設定為 1 至 168 小時的整數。") from exc
+    tracking = payload.get("tracking_interval_hours")
+    if tracking is not None and (isinstance(tracking, bool) or not isinstance(tracking, int) or not 1 <= tracking <= 168):
+        raise HTTPException(status_code=422, detail="追蹤頻率請設定為 1 至 168 小時的整數。")
+    return _planner_call(planner_service.update_price_freshness_hours, value, tracking)
+
+
+@app.post("/api/planner/candidates")
+def planner_add_candidate(req: PlannerCandidateRequest):
+    return _planner_call(planner_service.add_candidate, req.draft_id, req.itinerary)
+
+
+@app.patch("/api/planner/candidates/{candidate_id}")
+def planner_update_candidate(candidate_id: str, req: PlannerCandidateUpdateRequest):
+    result = _planner_call(
+        planner_service.set_candidate, candidate_id, req.status, req.target_price,
+        "target_price" in req.__fields_set__,
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="找不到航班候選")
+    return result
+
+
+@app.delete("/api/planner/candidates/{candidate_id}")
+def planner_remove_candidate(candidate_id: str):
+    if not planner_service.remove_candidate(candidate_id):
+        raise HTTPException(status_code=404, detail="找不到航班候選")
+    return {"ok": True}
+
+
+@app.post("/api/planner/candidates/{candidate_id}/refresh")
+def planner_refresh_candidate(candidate_id: str):
+    return _planner_call(planner_service.refresh_candidate, candidate_id)
+
+
+@app.post("/api/planner/candidates/{candidate_id}/decide")
+def planner_decide_candidate(candidate_id: str):
+    result = _planner_call(planner_service.decide_candidate, candidate_id)
+    if not result.get("decision_persisted"):
+        raise HTTPException(
+            status_code=422,
+            detail=result.get("message") or f"尚無 {planner_service.price_freshness_hours()} 小時內已驗證之本次旅客整組總價與可用訂票連結，無法決選。",
+        )
+    return result
+
+
+@app.post("/api/planner/candidates/{candidate_id}/booking-preview")
+def planner_preview_booking_candidate(candidate_id: str):
+    return _planner_call(planner_service.preview_booking_candidate, candidate_id)
+
+
+@app.get("/api/planner/decision")
+def planner_get_decision():
+    return {"decision": planner_service.current_decision()}
 
 
 if WEB_DIR.exists():

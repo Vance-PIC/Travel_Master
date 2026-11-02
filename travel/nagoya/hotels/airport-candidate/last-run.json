@@ -1,8 +1,8 @@
 {
-  "run_id": "843ff22aca2c4f9a8e2aa3b25d384d92",
+  "run_id": "e04216ad2cdf42aa9ce024b73122f48b",
   "monitor_id": "airport-candidate",
   "stage": "candidate_search",
-  "started_at": "2026-11-01T07:26:15.827998+00:00",
+  "started_at": "2026-11-02T07:36:50.195773+00:00",
   "status": "error",
   "snapshot_run_id": "f9ad6104f0d64b328b6dfbe0c4a73956",
   "effective_request": {
@@ -101,7 +101,7 @@
       "searchapi.io"
     ]
   },
-  "ended_at": "2026-11-01T07:26:15.973871+00:00",
+  "ended_at": "2026-11-02T07:36:50.393860+00:00",
   "error": "Hotel query or validation failed",
   "attempted_requests": 1,
   "error_diagnostics": {

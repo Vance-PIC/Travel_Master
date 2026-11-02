@@ -1,31 +1,72 @@
 {
-  "checked_at": "2026-11-02T06:48:16+00:00",
+  "checked_at": "2026-11-02T18:49:18+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 1,
-  "searches_used": 1,
-  "api_searches_used": 1,
-  "account_calls": 2,
+  "planned_searches": 4,
+  "searches_used": 4,
+  "api_searches_used": 4,
+  "account_calls": 5,
   "quota_before": {
-    "usage": 99,
-    "remaining": 151,
+    "usage": 116,
+    "remaining": 134,
     "tier": "normal",
-    "plan_searches_left": 151,
+    "plan_searches_left": 134,
     "renewal_date": "2026-11-30"
   },
   "quota_after": {
-    "usage": 99,
-    "remaining": 151,
+    "usage": 120,
+    "remaining": 130,
     "tier": "normal",
-    "plan_searches_left": 151,
+    "plan_searches_left": 130,
     "renewal_date": "2026-11-30"
   },
-  "actual_usage_delta": 0,
-  "monitoring_mode": "market_only",
-  "refreshed_outbounds": [],
+  "actual_usage_delta": 4,
+  "monitoring_mode": "market_plus_return",
+  "refreshed_outbounds": [
+    "JX838",
+    "CX530"
+  ],
   "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [],
-  "refresh_complete": false
+  "booking_verification_checks": [
+    {
+      "itinerary_key": "JX838+JX839",
+      "reasons": [
+        "drop_5_percent"
+      ],
+      "status": "price_not_matched",
+      "quota_before": {
+        "usage": 118,
+        "remaining": 132,
+        "tier": "normal",
+        "plan_searches_left": 132,
+        "renewal_date": "2026-11-30"
+      },
+      "quota_after": {
+        "usage": 120,
+        "remaining": 130,
+        "tier": "normal",
+        "plan_searches_left": 130,
+        "renewal_date": "2026-11-30"
+      }
+    },
+    {
+      "itinerary_key": "CX530+CX531",
+      "reasons": [
+        "drop_5_percent",
+        "new_low"
+      ],
+      "status": "deferred",
+      "quota_before": {
+        "usage": 120,
+        "remaining": 130,
+        "tier": "normal",
+        "plan_searches_left": 130,
+        "renewal_date": "2026-11-30"
+      },
+      "deferred_reason": "run_limit"
+    }
+  ],
+  "refresh_complete": true
 }

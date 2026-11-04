@@ -1,35 +1,55 @@
 {
-  "checked_at": "2026-11-03T19:48:08+00:00",
+  "checked_at": "2026-11-04T00:53:33+00:00",
   "status": "ok",
   "mode": "monitor_query",
-  "planned_searches": 2,
-  "searches_used": 2,
-  "api_searches_used": 2,
-  "account_calls": 3,
+  "planned_searches": 3,
+  "searches_used": 3,
+  "api_searches_used": 3,
+  "account_calls": 4,
   "quota_before": {
-    "usage": 170,
-    "remaining": 80,
+    "usage": 196,
+    "remaining": 54,
     "tier": "normal",
-    "plan_searches_left": 80,
+    "plan_searches_left": 54,
     "renewal_date": "2026-11-30"
   },
   "quota_after": {
-    "usage": 171,
-    "remaining": 79,
+    "usage": 199,
+    "remaining": 51,
     "tier": "normal",
-    "plan_searches_left": 79,
+    "plan_searches_left": 51,
     "renewal_date": "2026-11-30"
   },
-  "actual_usage_delta": 1,
+  "actual_usage_delta": 3,
   "monitoring_mode": "market_plus_return",
   "refreshed_outbounds": [
-    "JX838"
-  ],
-  "deferred_outbounds": [
     "CX530"
   ],
+  "deferred_outbounds": [],
   "missing_required_outbounds": [],
   "baseline_complete": true,
-  "booking_verification_checks": [],
-  "refresh_complete": false
+  "booking_verification_checks": [
+    {
+      "itinerary_key": "CX530+CX531",
+      "reasons": [
+        "new_low"
+      ],
+      "status": "verified",
+      "quota_before": {
+        "usage": 197,
+        "remaining": 53,
+        "tier": "normal",
+        "plan_searches_left": 53,
+        "renewal_date": "2026-11-30"
+      },
+      "quota_after": {
+        "usage": 199,
+        "remaining": 51,
+        "tier": "normal",
+        "plan_searches_left": 51,
+        "renewal_date": "2026-11-30"
+      }
+    }
+  ],
+  "refresh_complete": true
 }

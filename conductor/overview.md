@@ -10,6 +10,7 @@
 | :--- | :---: | :---: | :---: | :--- | :--- |
 | [2026 熊本阿蘇 7 日親子自駕](./kumamoto/doc-tracks.md) | 11 | 11 | 100% | ✅ DONE | 全案完工，已產出 [RELEASE-kumamoto.md](../specs/kumamoto/RELEASE-kumamoto.md) |
 | [2026 日本 12 日鐵道大縱貫](./japan-march/doc-tracks.md) | 16 | 16 | 100% | ✅ DONE | 全案完工，已產出 [RELEASE-japan-march.md](../specs/japan-march/RELEASE-japan-march.md) |
+| [2027 名古屋 7 日親子自由行](./nagoya-2027/doc-tracks.md) | 12 | 0 | 0% | 🔄 IN PROGRESS | 逐章對齊 Travel Master 範本與 UAT 審計中 |
 
 ---
 *註：進度由『旅行大師』治理機制實時定錨維護。*

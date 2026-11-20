@@ -23,8 +23,8 @@
     *   [x] **WP-08: Day 6 熱田神宮與水族館** (Step 8)
     *   [x] **WP-09: Day 7 常滑與返台** (Step 8)
     *   [x] **WP-10: Chapter 3 行李準備與打包清單** (Step 8)
-*   **L2 - D5: 全域整合與發布 (Release)**
-    *   [ ] **WP-11: D5 全域整合發布**
+*   **L2 - D5: 全域整合與發布 (Release)** ✅
+    *   [x] **WP-11: D5 全域整合發布** (Step 8)
 
 ---
 
@@ -43,7 +43,7 @@
 | 08 | Day 6 熱田與水族館 | **Step 8** | [DONE] | ✅ PASS | 已整合 LaLaport 與 Workman、熱田／水族館亮點表演，補齊最後一晚晚餐備選。 |
 | 09 | Day 7 常滑返台 | **Step 8** | [DONE] | ✅ PASS | 已補常滑招財貓、機場「風の湯」泡湯與 2026/11 免稅退稅順序。 |
 | 10 | Ch3 行李打包清單 | **Step 8** | [DONE] | ✅ PASS | 已依 03_PACKING_CHECKLIST 範本完成初版（小紅卡、7 月避暑裝備、免稅規定）。 |
-| 11 | D5 全域整合發布 | **Step 0** | [PENDING] | ⏳ PENDING | 待全部章節完成後執行全域審計與合併發布。 |
+| 11 | D5 全域整合發布 | **Step 8** | [DONE] | ✅ PASS | 已執行 `merge-doc.ps1 -Spec nagoya-2027` 產出 `RELEASE-nagoya-2027.md`。 |
 
 ---
 **本看板由『旅行大師』物理更新，確保流程合規。**

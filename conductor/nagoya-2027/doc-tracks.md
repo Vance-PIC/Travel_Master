@@ -14,8 +14,8 @@
 *   **L2 - D4: 內容精鍊循環 (Authoring - 執行中)**
     *   [x] **WP-00: 00_Index 總目錄索引** (Step 8)
     *   [x] **WP-01: Chapter 1 行程總覽與預算** (Step 8)
-    *   [ ] **WP-02: Chapter 2 每日行程總覽** (Step 7)
-    *   [ ] **WP-03: Day 1 抵達名古屋**
+    *   [x] **WP-02: Chapter 2 每日行程總覽** (Step 8)
+    *   [ ] **WP-03: Day 1 抵達名古屋** (Step 2)
     *   [ ] **WP-04: Day 2 LEGOLAND 生日與戲水**
     *   [ ] **WP-05: Day 3 榮商圈與名古屋站飛騨牛**
     *   [ ] **WP-06: Day 4 東山動植物園**
@@ -34,8 +34,8 @@
 | :-- | :--- | :--- | :--- | :--- | :--- |
 | 00 | 00_Index 總目錄 | **Step 8** | [DONE] | ✅ PASS | 已對齊 00_MASTER_INDEX 範本並補上 Ch3 索引。 |
 | 01 | Ch1 總覽與預算 | **Step 8** | [DONE] | ✅ PASS | 已補齊住宿預算項目、Agoda 確認單細節、修正「待核訂單」並補行前提醒。 |
-| 02 | Ch2 每日總覽 | **Step 7** | [IN REVIEW] | ⏳ PENDING | 已對齊 02_DAILY_OPERATIONS 範本、補齊交通/住宿欄與快速跳轉索引。 |
-| 03 | Day 1 抵達名古屋 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
+| 02 | Ch2 每日總覽 | **Step 8** | [DONE] | ✅ PASS | 已對齊 02_DAILY_OPERATIONS 範本、補齊交通/住宿欄與快速跳轉索引。 |
+| 03 | Day 1 抵達名古屋 | **Step 2** | [TRACKING] | ⏳ PENDING | 檢索 Google Map、Tabelog 評分與離飯店距離，對齊 02.X_DAY_MISSION 範本。 |
 | 04 | Day 2 LEGOLAND | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 05 | Day 3 榮商圈 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 06 | Day 4 東山動植物園 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |

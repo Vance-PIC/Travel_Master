@@ -16,8 +16,8 @@
     *   [x] **WP-01: Chapter 1 行程總覽與預算** (Step 8)
     *   [x] **WP-02: Chapter 2 每日行程總覽** (Step 8)
     *   [x] **WP-03: Day 1 抵達名古屋** (Step 8)
-    *   [ ] **WP-04: Day 2 LEGOLAND 生日與戲水** (Step 2)
-    *   [ ] **WP-05: Day 3 榮商圈與名古屋站飛騨牛**
+    *   [x] **WP-04: Day 2 LEGOLAND 生日與戲水** (Step 8)
+    *   [ ] **WP-05: Day 3 榮商圈與名古屋站飛騨牛** (Step 2)
     *   [ ] **WP-06: Day 4 東山動植物園**
     *   [ ] **WP-07: Day 5 科學館與大須**
     *   [ ] **WP-08: Day 6 熱田神宮與水族館**
@@ -36,8 +36,8 @@
 | 01 | Ch1 總覽與預算 | **Step 8** | [DONE] | ✅ PASS | 已補齊住宿預算項目、Agoda 確認單細節、修正「待核訂單」並補行前提醒。 |
 | 02 | Ch2 每日總覽 | **Step 8** | [DONE] | ✅ PASS | 已對齊 02_DAILY_OPERATIONS 範本、補齊交通/住宿欄與快速跳轉索引。 |
 | 03 | Day 1 抵達名古屋 | **Step 8** | [DONE] | ✅ PASS | 已補航班 T1 時刻、大園第三停車場、唐吉訶德、Google Map 與 7 欄購物表。 |
-| 04 | Day 2 LEGOLAND | **Step 2** | [TRACKING] | ⏳ PENDING | 檢索 Maker's Pier/Central Park 餐廳 Google Map、距離與對齊 02.X 範本。 |
-| 05 | Day 3 榮商圈 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
+| 04 | Day 2 LEGOLAND | **Step 8** | [DONE] | ✅ PASS | 已更名生日慶典、補 14 項遊樂設施、5 家園區商店、身高解鎖與車資。 |
+| 05 | Day 3 榮商圈 | **Step 2** | [TRACKING] | ⏳ PENDING | 檢索榮/LACHIC/名站餐廳 Tabelog 與 Google Map，並對齊 02.X 範本。 |
 | 06 | Day 4 東山動植物園 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 07 | Day 5 科學館大須 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 08 | Day 6 熱田與水族館 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |

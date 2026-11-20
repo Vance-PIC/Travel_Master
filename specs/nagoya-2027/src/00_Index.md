@@ -14,7 +14,7 @@
 #### **第二章：每日詳細行程**
 * [02_第二章：每日行程總覽與執行原則](./02_Chapter2_每日行程總覽.md)
 * ➔ [Day 1：抵達名古屋](./02.01_Day1_抵達名古屋.md)
-* ➔ [Day 2：LEGOLAND 生日與戲水](./02.02_Day2_LEGOLAND.md)
+* ➔ [Day 2：LEGOLAND 生日慶典與積木奇幻日](./02.02_Day2_LEGOLAND.md)
 * ➔ [Day 3：榮商圈採買與名古屋站飛騨牛晚餐](./02.03_Day3_榮商圈.md)
 * ➔ [Day 4：東山動植物園](./02.04_Day4_東山動植物園.md)
 * ➔ [Day 5：科學館、大須與 PARCO](./02.05_Day5_科學館大須.md)
@@ -30,7 +30,7 @@
 
 1. **航班確認**：核對 JX838／JX839 的實際訂位、日期、航廈和起降時間；原 Excel 的時刻不能當作 2027 訂票證明。
 2. **住宿已訂妥**：訂房確認單為 6 晚、2 大 2 小、禁菸豪華雙床房（[訂房確認 PDF](../orders/Confirmation_for_Booking_ID_%23_1770065317%20(1).pdf)）。房型資料列有房內洗衣機、兩段式冰箱與微波爐；乾燥功能未能確認，入住時看機型或向櫃台確認。來源：[飯店房型](https://www.hotel-livemax.com/aichi/nagoya-marunouchi/room/)、[豪華房型設備](https://travel.yahoo.co.jp/00912823/room/)、[住客實拍介紹](https://kumanekocampus.com/livemax-nagoya-marunouchi/)。
-3. **LEGOLAND 方案確認**：向 LEGOLAND 確認 2027 年生日套票、戲水預約與台灣證明的 AAP 申請方式。平日生日套票是否含 Skip Pass 依當期方案，不預設有。來源：[生日套票](https://faq.legoland.jp/hc/ja-jp/articles/37720830744221-%E3%83%AC%E3%82%B4%E3%83%A9%E3%83%B3%E3%83%89-%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3%E3%81%AE%E3%83%8F%E3%83%83%E3%83%94%E3%83%BC-%E3%83%90%E3%83%BC%E3%82%B9%E3%83%87%E3%83%BC-%E3%83%91%E3%83%BC%E3%82%AF-%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8-%E3%81%AE%E7%89%B9%E5%85%B8%E5%86%85%E5%AE%B9%E3%82%92%E6%95%99%E3%81%88%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84)、[身障旅客服務](https://www.legoland.jp/resort-guide/service/guests-with-disabilities/)。
+3. **LEGOLAND 方案確認**：向 LEGOLAND 確認 2027 年生日套票與台灣證明的 AAP 申請方式。平日生日套票是否含 Skip Pass 依當期方案，不預設有。來源：[生日套票](https://faq.legoland.jp/hc/ja-jp/articles/37720830744221-%E3%83%AC%E3%82%B4%E3%83%A9%E3%83%B3%E3%83%89-%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3%E3%81%AE%E3%83%8F%E3%83%83%E3%83%94%E3%83%BC-%E3%83%90%E3%83%BC%E3%82%B9%E3%83%87%E3%83%BC-%E3%83%91%E3%83%BC%E3%82%AF-%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8-%E3%81%AE%E7%89%B9%E5%85%B8%E5%86%85%E5%AE%B9%E3%82%92%E6%95%99%E3%81%88%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84)、[身障旅客服務](https://www.legoland.jp/resort-guide/service/guests-with-disabilities/)。
 4. **D3 晚餐未訂位**：D3 改吃[飛騨牛焼肉 伏見屋本店](https://hushimiya-honten.owst.jp/)（名古屋站旁），**尚未預約**。原 Excel 寫的前沢牛舎伏見屋是另一家店，且「已預約」是錯誤資料。
 
 ---

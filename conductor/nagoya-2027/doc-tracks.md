@@ -18,8 +18,8 @@
     *   [x] **WP-03: Day 1 抵達名古屋** (Step 8)
     *   [x] **WP-04: Day 2 LEGOLAND 生日與戲水** (Step 8)
     *   [x] **WP-05: Day 3 榮商圈與名古屋站飛騨牛** (Step 8)
-    *   [ ] **WP-06: Day 4 東山動植物園** (Step 2)
-    *   [ ] **WP-07: Day 5 科學館與大須**
+    *   [x] **WP-06: Day 4 東山動植物園** (Step 8)
+    *   [ ] **WP-07: Day 5 科學館與大須** (Step 2)
     *   [ ] **WP-08: Day 6 熱田神宮與水族館**
     *   [ ] **WP-09: Day 7 常滑與返台**
     *   [ ] **WP-10: Chapter 3 行李準備與打包清單**
@@ -38,7 +38,7 @@
 | 03 | Day 1 抵達名古屋 | **Step 8** | [DONE] | ✅ PASS | 已補航班 T1 時刻、大園第三停車場、唐吉訶德、Google Map 與 7 欄購物表。 |
 | 04 | Day 2 LEGOLAND | **Step 8** | [DONE] | ✅ PASS | 已更名生日慶典、補 14 項遊樂設施、5 家園區商店、身高解鎖與車資。 |
 | 05 | Day 3 榮商圈 | **Step 8** | [DONE] | ✅ PASS | 已補 Google Map、離飯店距離、7 欄購物表、伏見屋免手續費訂位管道與地鐵車資。 |
-| 06 | Day 4 東山動植物園 | **Step 2** | [TRACKING] | ⏳ PENDING | 查證 D4 地鐵精準區間車資、Google Map、離飯店距離與 7 欄購物表。 |
+| 06 | Day 4 東山動植物園 | **Step 7** | [IN REVIEW] | ⏳ PENDING | 已補 D4 精準地鐵車資與 IC 卡比較、Google Map、離飯店距離與 7 欄購物表。 |
 | 07 | Day 5 科學館大須 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 08 | Day 6 熱田與水族館 | **Step 0** | [PENDING] | ⏳ PENDING | 待補 Google Map 連結、Tabelog、離飯店距離與 7 欄購物表。 |
 | 09 | Day 7 常滑返台 | **Step 0** | [PENDING] | ⏳ PENDING | 待修正小提醒重複編號 4.、補 Google Map／Tabelog／距離與 7 欄購物表。 |

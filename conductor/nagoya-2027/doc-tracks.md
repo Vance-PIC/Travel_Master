@@ -35,7 +35,7 @@
 | 00 | 00_Index 總目錄 | **Step 8** | [DONE] | ✅ PASS | 已對齊 00_MASTER_INDEX 範本並補上 Ch3 索引。 |
 | 01 | Ch1 總覽與預算 | **Step 8** | [DONE] | ✅ PASS | 已補齊住宿預算項目、Agoda 確認單細節、修正「待核訂單」並補行前提醒。 |
 | 02 | Ch2 每日總覽 | **Step 8** | [DONE] | ✅ PASS | 已對齊 02_DAILY_OPERATIONS 範本、補齊交通/住宿欄與快速跳轉索引。 |
-| 03 | Day 1 抵達名古屋 | **Step 8** | [DONE] | ✅ PASS | 已補航班 T1 時刻、大園第三停車場、唐吉訶德、Google Map 與 7 欄購物表。 |
+| 03 | Day 1 抵達名古屋 | **Step 8** | [DONE] | ✅ PASS | D1 修訂：中部國際空港名鐵窗口辦小兒 manaca、購買 μticket，經金山轉名城線至久屋大通，入住後吃拉麵。 |
 | 04 | Day 2 LEGOLAND | **Step 8** | [DONE] | ✅ PASS | 已更名生日慶典、補 14 項遊樂設施、5 家園區商店、身高解鎖與車資。 |
 | 05 | Day 3 榮商圈 | **Step 8** | [DONE] | ✅ PASS | 已補 Google Map、離飯店距離、7 欄購物表、伏見屋免手續費訂位管道與地鐵車資。 |
 | 06 | Day 4 東山動植物園 | **Step 8** | [DONE] | ✅ PASS | 已潤稿定案、補動物園亮點（夏巴尼／清正／小熊貓）與 7 項遊樂園設施。 |
